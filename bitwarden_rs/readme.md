@@ -10,7 +10,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 * [Official site](https://bitwarden.com/)
 * [Github](https://github.com/dani-garcia/bitwarden_rs)
-* [DockerHub image used](https://hub.docker.com/r/bitwardenrs/server)
+* [DockerHub](https://hub.docker.com/r/bitwardenrs/server)
 
 ### Files and directory structure
 
@@ -19,7 +19,6 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   └── ~
       └── docker
           └── bitwarden
-              ├── 🗁 bitwarden-backup
               ├── 🗁 bitwarden-data
               ├── 🗋 .env
               ├── 🗋 docker-compose.yml
@@ -72,10 +71,10 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
   # BITWARDEN
   ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
-  DOMAIN=https://passwd.blabla.org
   SIGNUPS_ALLOWED=true
 
   # USING SENDGRID FOR SENDING EMAILS
+  DOMAIN=https://passwd.blabla.org
   SMTP_SSL=true
   SMTP_EXPLICIT_TLS=true
   SMTP_HOST=smtp.sendgrid.net
@@ -110,13 +109,13 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 ### Extra info
 
-  * **bitwarden can be managed** at `passwd.blabla.org/admin` and entering `ADMIN_TOKEN` set in the `.env` file
+  * **bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN` set in the `.env` file
 
 ![interface-pic](https://i.imgur.com/5LxEUsA.png)
 
 ### Update
 
-  * [watchtower](https://github.com/DoTheEvo/docker-selfhosted-projects/tree/master/watchtower) updates the image automaticly
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
   * manual image update</br>
     `docker-compose pull`</br>
@@ -125,8 +124,8 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 ### Backup and restore
 
-  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/docker-selfhosted-projects/tree/master/borg_backup)
-  that makes daily backup of the entire directory
+  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  that makes daily snapshot of the entire directory
     
   * **restore**</br>
     down the bitwarden container `docker-compose down`</br>
@@ -136,35 +135,27 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 ### Backup of just user data
 
-For additional peace of mind.
-Having user-data daily exported using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
-For bitwarden_rs it means sqlite database dump and the content of the `attachments` folder.
-The backup files are overwriten on every run of the script,
-but borg backup is backing the entire directory in to snapshots daily, so no need for some keeping-last-X consideration.
+For additional peace of mind,
+user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
+For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.
+The created backup files are overwriten on every run of the script,
+but borg backup is daily making snapshot of the entire directory.
 
-* **install sqlite on the host system**
-
-* **create backup script**</br>
+* **create a backup script**</br>
     placed inside `bitwarden` directory on the host
     
-    `make_bitwarden_backup.sh`
+    `bitwarden-backup-script.sh`
     ```
-    #!/bin/sh
-
-    # GO IN TO THE DIRECTORY WHERE THIS SCRIPT RESIDES
-    cd "${0%/*}"
-
-    # CREATE BACKUP DIRECTORY IF IT DOES NOT EXIST
-    mkdir -p ./bitwarden-backup
+    #!/bin/bash
 
     # CREATE SQLITE BACKUP
-    sqlite3 ./bitwarden-data/db.sqlite3 ".backup './bitwarden-BACKUP.db.sqlite3'"
+    docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
 
     # BACKUP ATTACHMENTS
-    tar -czvf ./bitwarden-backup/attachments.tar.gz ./bitwarden-data/attachments
+    docker container exec bitwarden tar -czPf /data/BACKUP.attachments.tar.gz /data/attachments
     ```
 
-    the script must be executabe - `chmod +x make_bitwarden_backup.sh`
+    the script must be executabe - `chmod +x bitwarden-backup-script.sh`
 
 * **cronjob** on the host</br>
   `crontab -e` - add new cron job</br>
@@ -173,8 +164,13 @@ but borg backup is backing the entire directory in to snapshots daily, so no nee
 
 ### Restore the user data
 
-  - down the container `docker-compose down`</br> 
-  - replace `db.sqlite3` with the one from the backup
-  - replace attachments folder with the one from the backup
-  - start the container `docker-compose up -d`
+  Assuming clean start.
+
+  * start the bitwarden container: `docker-compose up -d`
+  * let it run so it creates its file structure
+  * down the container `docker-compose down`
+  * in `bitwarden/bitwarden-data/`</br>
+    replace `db.sqlite3` with the one from the backup `BACKUP.bitwarden.db.sqlite3`</br>
+    replace `attachments` directory with the one from the archive `BACKUP.attachments.tar.gz` 
+  * start the container `docker-compose up -d`
 

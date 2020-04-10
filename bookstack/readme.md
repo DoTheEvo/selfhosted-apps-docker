@@ -36,11 +36,28 @@ Documentation and notes.
   version: "2"
   services:
 
+    bookstack_db:
+      image: linuxserver/mariadb
+      container_name: bookstack_db
+      hostname: bookstack_db
+      environment:
+        - TZ
+        - PUID
+        - PGID
+        - MYSQL_ROOT_PASSWORD
+        - MYSQL_DATABASE
+        - MYSQL_USER
+        - MYSQL_PASSWORD
+      volumes:
+        - ./bookstack-data-db:/config
+      restart: unless-stopped
+
     bookstack:
       image: linuxserver/bookstack
       container_name: bookstack
       hostname: bookstack
       environment:
+        - TZ
         - PUID
         - PGID
         - DB_HOST
@@ -48,27 +65,18 @@ Documentation and notes.
         - DB_PASS
         - DB_DATABASE
         - APP_URL
+        - MAIL_DRIVER
+        - MAIL_HOST
+        - MAIL_PORT
+        - MAIL_FROM
+        - MAIL_USERNAME
+        - MAIL_PASSWORD
+        - MAIL_ENCRYPTION
       volumes:
         - ./bookstack-data:/config
       restart: unless-stopped
       depends_on:
         - bookstack_db
-
-    bookstack_db:
-      image: linuxserver/mariadb
-      container_name: bookstack_db
-      hostname: bookstack_db
-      environment:
-        - PUID
-        - PGID
-        - MYSQL_ROOT_PASSWORD
-        - TZ
-        - MYSQL_DATABASE
-        - MYSQL_USER
-        - MYSQL_PASSWORD
-      volumes:
-        - ./bookstack-data-db:/config
-      restart: unless-stopped
 
   networks:
     default:
@@ -84,22 +92,31 @@ Documentation and notes.
   DEFAULT_NETWORK=caddy_net
   TZ=Europe/Prague
 
+  # BOOKSTACK-MARIADB
+  PUID=1000
+  PGID=1000
+  MYSQL_ROOT_PASSWORD=bookstack
+  MYSQL_DATABASE=bookstack
+  MYSQL_USER=bookstack
+  MYSQL_PASSWORD=bookstack
+
   # BOOKSTACK
   PUID=1000
   PGID=1000
   DB_HOST=bookstack_db
   DB_USER=bookstack
   DB_PASS=bookstack
-  DB_DATABASE=bookstackapp
-  APP_URL=https://book.blabla.org
+  DB_DATABASE=bookstack
 
-  # BOOKSTACK-MARIADB
-  PUID=1000
-  PGID=1000
-  MYSQL_ROOT_PASSWORD=bookstack
-  MYSQL_DATABASE=bookstackapp
-  MYSQL_USER=bookstack
-  MYSQL_PASSWORD=bookstack
+  # USING SENDGRID FOR SENDING EMAILS
+  APP_URL=https://book.blabla.org
+  MAIL_DRIVER=smtp
+  MAIL_HOST=smtp.sendgrid.net
+  MAIL_PORT=465
+  MAIL_FROM=book@blabla.org
+  MAIL_USERNAME=apikey
+  MAIL_PASSWORD=SG.2FA24asaddasdasdasdsadasdasdassadDEMBzuh9e43
+  MAIL_ENCRYPTION=SSL
   ```
 
 ### Reverse proxy
@@ -134,7 +151,7 @@ Documentation and notes.
 ### Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-  that makes daily backup of the entire directory
+  that makes daily snapshot of the entire directory
     
   * **restore**</br>
     down the bookstack containers `docker-compose down`</br>
@@ -144,8 +161,7 @@ Documentation and notes.
 
 ### Backup of just user data
 
-For additional peace of mind,
-user-data daily exported using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
+user-data daily export using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
 For bookstack it means database dump and backing up several directories containing user uploaded files.
 The created backup files are overwriten on every run of the script,
 but borg backup is daily making snapshot of the entire directory.
@@ -155,10 +171,10 @@ but borg backup is daily making snapshot of the entire directory.
 
     `bookstack-backup-script.sh`
     ```
-    #!/bin/sh
+    #!/bin/bash
 
-    # CREATE DATABASE DUMP, sh -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
-    docker container exec bookstack_db sh -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
+    # CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
+    docker container exec bookstack_db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
 
     # ARCHIVE UPLOADED FILES
     docker container exec bookstack tar -czPf /config/BACKUP.bookstack.uploaded-files.tar.gz /config/www/
@@ -181,13 +197,13 @@ but borg backup is daily making snapshot of the entire directory.
     `docker container exec -it bookstack_db /bin/bash`</br>
     `cd /config`</br>
     `mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql`
-  * now start both containers: `docker-compose up -d`
-  * let it run so it creates folder structure
+  * now start the app container: `docker-compose up -d`
+  * let it run so it creates its file structure
   * down the containers `docker-compose down`
-  * extract `BACKUP.bookstack.uploaded-files.tar.gz` and place directories `files` and `uploads` where they belong in the mounted volume
+  * in `bookstack/bookstack-data/www/` replace directories `files`,`images` and `uploads` and the file `.env`
+    with the ones from the archive `BACKUP.bookstack.uploaded-files.tar.gz` 
   * start the containers: `docker-compose up -d`
-  * if there was a major version jump, exec in to the container and run `php artisan migrate`</br>
+  * if there was a major version jump, exec in to the app container and run `php artisan migrate`</br>
     `docker container exec -it bookstack /bin/bash`</br>
     `cd /var/www/html/`</br>
     `php artisan migrate`
-
