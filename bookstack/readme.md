@@ -10,7 +10,7 @@ Documentation and notes.
 
 * [Official site](https://www.bookstackapp.com/)
 * [Github](https://github.com/BookStackApp/BookStack)
-* [DockerHub image used](https://hub.docker.com/r/linuxserver/bookstack)
+* [DockerHub](https://hub.docker.com/r/linuxserver/bookstack)
 
 ### Files and directory structure
 
@@ -21,7 +21,6 @@ Documentation and notes.
           └── bookstack
               ├── 🗁 bookstack-data
               ├── 🗁 bookstack-data-db
-              ├── 🗁 bookstack-backup
               ├── 🗋 .env
               ├── 🗋 docker-compose.yml
               └── 🗋 bookstack-backup-script.sh
@@ -103,9 +102,9 @@ Documentation and notes.
   MYSQL_PASSWORD=bookstack
   ```
 
-### reverse proxy
+### Reverse proxy
 
-  caddy v2 is used,
+  Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
 
   `Caddyfile`
@@ -121,18 +120,20 @@ Documentation and notes.
   }
   ```
 
-### update
+![logo](https://i.imgur.com/cN1GUZw.png)
 
-  * [watchguard]() updates the image automaticly
+### Update
+
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
   * manual image update</br>
     `docker-compose pull`</br>
     `docker-compose up -d`</br>
     `docker image prune`
 
-### backup and restore
+### Backup and restore
 
-  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/docker-selfhosted-projects/tree/master/borg_backup)
+  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily backup of the entire directory
     
   * **restore**</br>
@@ -143,104 +144,50 @@ Documentation and notes.
 
 ### Backup of just user data
 
-For additional peace of mind.
-Having user-data daily exported using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
-For bookstack it means database dump and the content of several directories
-containing user uploaded files.
-The backup files are overwriten on every run of the script,
-but borg backup is backing entire directory in to snapshots, so no need for some keeping-last-X consideration.
+For additional peace of mind,
+user-data daily exported using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
+For bookstack it means database dump and backing up several directories containing user uploaded files.
+The created backup files are overwriten on every run of the script,
+but borg backup is daily making snapshot of the entire directory.
 
-  * **database backup**</br>
-    script `make_backup.sh` placed in to `bookstack_db` container,
-    in to `/config` directory that is bind mounted to the host machine.</br>
-    made executable `chmod +x make_backup.sh` inside the container
+* **create a backup script**</br>
+    placed inside `bookstack` directory on the host
 
-    - This script creates path `/config/backups-db`</br>
-    - deletes all files in the backup path except 30 newest</br>
-    - creates new mysqldump using env variables passed from `.env` file</br>
-
-    `make_backup.sh`
+    `bookstack-backup-script.sh`
     ```
-    #!/bin/bash
+    #!/bin/sh
 
-    # -----------------------------------------------
-    NUMB_BACKUPS_TO_KEEP=30
-    BACKUP_PATH=/config/backups-db
-    BACKUP_NAME=$(date +"%s").bookstack.database.backup.sql
-    # -----------------------------------------------
+    # CREATE DATABASE DUMP, sh -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
+    docker container exec bookstack_db sh -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
 
-    mkdir -p $BACKUP_PATH
-
-    cd $BACKUP_PATH
-    ls -tr | head -n -$NUMB_BACKUPS_TO_KEEP | xargs --no-run-if-empty rm
-
-    mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $BACKUP_PATH/$BACKUP_NAME
+    # ARCHIVE UPLOADED FILES
+    docker container exec bookstack tar -czPf /config/BACKUP.bookstack.uploaded-files.tar.gz /config/www/
     ```
 
-  * **files backup**</br>
-    script `make_backup.sh` placed in to `bookstack` container,
-    in to `/config` directory that is bind mounted to the host machine.</br>
-    made executable `chmod +x make_backup.sh` inside the container
+    the script must be executabe - `chmod +x bookstack-backup-script.sh`
 
-    - This script creates path `/config/backups-files`</br>
-    - deletes all files in the backup path except 30 newest</br>
-    - creates new archive containing uploaded files</br>
+* **cronjob** on the host</br>
+  `crontab -e` - add new cron job</br>
+  `0 2 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
+  `crontab -l` - list cronjobs
 
-    `make_backup.sh`
-    ```
-    #!/bin/bash
+### Restore the user data
 
-    # -----------------------------------------------
-    NUMB_BACKUPS_TO_KEEP=30
-    BACKUP_PATH=/config/backups-files
-    BACKUP_NAME=$(date +"%s").bookstack.files.backup.tar.gz
-    # -----------------------------------------------
+  Assuming clean start, first restore the database before running the app container.
 
-    mkdir -p $BACKUP_PATH
-
-    cd $BACKUP_PATH
-    ls -tr | head -n -$NUMB_BACKUPS_TO_KEEP | xargs --no-run-if-empty rm
-
-    cd /config/www
-    tar -czvf $BACKUP_PATH/$BACKUP_NAME .env uploads files images
-    ```
-
-  * **automatic periodic execution of the backup scripts**
-
-    Using cron running on the host machine that will execute scripts inside containers.
-
-    script `cron_job_do_backups.sh` inside `~/docker/bookstack`
-
-    `cron_job_do_backups.sh`
-    ```
-    #!/bin/bash
-
-    docker exec bookstack /config/make_backup.sh
-    docker exec bookstack_db /config/make_backup.sh
-    ```
-
-    `chmod +x cron_job_do_backups.sh` on the host machine
-
-    `crontab -e`
-
-    `0 2 * * * /home/bastard/docker/bookstack/cron_job_do_backups.sh`
-
-### restore official way
-  
-  * restore of the database
-
-    copy the backup sql dump file in to the bind mount `bookstack-data-db` directory
-
-    exec in to the container and tell mariadb to restore data from the copied file
-
-    `docker exec -it bookstack_db /bin/bash`</br>
+  * start only the database container: `docker-compose up -d bookstack_db`
+  * have `BACKUP.bookstack.database.sql` mounted in
+  * exec in to the container and restore the database</br>
+    `docker container exec -it bookstack_db /bin/bash`</br>
     `cd /config`</br>
-    `mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < 1584566634.bookstack.database.backup.sql`
+    `mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql`
+  * now start both containers: `docker-compose up -d`
+  * let it run so it creates folder structure
+  * down the containers `docker-compose down`
+  * extract `BACKUP.bookstack.uploaded-files.tar.gz` and place directories `files` and `uploads` where they belong in the mounted volume
+  * start the containers: `docker-compose up -d`
+  * if there was a major version jump, exec in to the container and run `php artisan migrate`</br>
+    `docker container exec -it bookstack /bin/bash`</br>
+    `cd /var/www/html/`</br>
+    `php artisan migrate`
 
-  * restore of the files
-
-    copy the backup gz.tar archive in to bind mount `bookstack-data/www/` directory</br>
-
-    `docker exec -it bookstack /bin/bash`</br>
-    `cd /config/www`</br>
-    `tar -xvzf 1584566633.bookstack.files.backup.tar.gz`
