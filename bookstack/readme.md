@@ -180,7 +180,7 @@ but borg backup is daily making snapshot of the entire directory.
     docker container exec bookstack tar -czPf /config/BACKUP.bookstack.uploaded-files.tar.gz /config/www/
     ```
 
-    the script must be executabe - `chmod +x bookstack-backup-script.sh`
+    the script must be **executabe** - `chmod +x bookstack-backup-script.sh`
 
 * **cronjob** on the host</br>
   `crontab -e` - add new cron job</br>
@@ -192,7 +192,7 @@ but borg backup is daily making snapshot of the entire directory.
   Assuming clean start, first restore the database before running the app container.
 
   * start only the database container: `docker-compose up -d bookstack_db`
-  * have `BACKUP.bookstack.database.sql` mounted in
+  * have `BACKUP.bookstack.database.sql` mounted in by placing it in `bookstack/bookstack-data`
   * exec in to the container and restore the database</br>
     `docker container exec -it bookstack_db /bin/bash`</br>
     `cd /config`</br>

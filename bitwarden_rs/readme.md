@@ -135,7 +135,6 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 ### Backup of just user data
 
-For additional peace of mind,
 user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.
 The created backup files are overwriten on every run of the script,
@@ -155,7 +154,7 @@ but borg backup is daily making snapshot of the entire directory.
     docker container exec bitwarden tar -czPf /data/BACKUP.attachments.tar.gz /data/attachments
     ```
 
-    the script must be executabe - `chmod +x bitwarden-backup-script.sh`
+    the script must be **executabe** - `chmod +x bitwarden-backup-script.sh`
 
 * **cronjob** on the host</br>
   `crontab -e` - add new cron job</br>
@@ -170,7 +169,7 @@ but borg backup is daily making snapshot of the entire directory.
   * let it run so it creates its file structure
   * down the container `docker-compose down`
   * in `bitwarden/bitwarden-data/`</br>
-    replace `db.sqlite3` with the one from the backup `BACKUP.bitwarden.db.sqlite3`</br>
+    replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
     replace `attachments` directory with the one from the archive `BACKUP.attachments.tar.gz` 
   * start the container `docker-compose up -d`
 
