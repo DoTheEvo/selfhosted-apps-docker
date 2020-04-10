@@ -2,150 +2,132 @@
 
 ###### guide by example
 
-chapters
+![logo](https://i.imgur.com/6Wqs7J1.png)
 
-1. [Docker compose](#1-docker-compose)
-2. [Reverse proxy using caddy v2](#2-Reverse-proxy-using-caddy-v2)
-3. [Some stuff afterwards](#3-Some-stuff-afterwards)
-4. [Update Nextcloud](#4-Update-Nextcloud)
-5. [Backup and restore](#5-Backup-and-restore)
+### Purpose
 
-# #1 Docker compose
+File share & sync.
 
-Official examples [here](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose)
+* [Official site](https://nextcloud.com/)
+* [Github](https://github.com/nextcloud/server)
+* [DockerHub](https://hub.docker.com/_/nextcloud/)
 
-There are several options, default recomendation is apache.
-Alternative is fpm php as stand alone container with either apache or ngnix.</br>
-The default apache with php as a module is used in this setup
-
-- **Create a new docker network**</br> `docker network create caddy_net`</br>
-All nextcloud containers must be on the same network.
-
-- **Create a directory structure**
-Where nextcloud docker stuff will be organized.</br>
-Here will be `~/docker/nextcloud`.</br>
+### Files and directory structure
 
   ```
   /home
   └── ~
       └── docker
           └── nextcloud
-              ├── nextcloud-data
-              ├── .env
-              └── docker-compose.yml
+              ├── 🗁 nextcloud-data
+              ├── 🗁 nextcloud-data-db
+              ├── 🗋 .env
+              ├── 🗋 docker-compose.yml
+              └── 🗋 nextcloud-backup-script.sh
   ```
-  
-  - `nextcloud-data` the directory where '/var/www/html' will be bind-mounted
-  - `.env` the env file with the variables
-  - `docker-compose.yml` the compose file
 
+### docker-compose
 
-- **Create `.env` file**</br>
+Official examples [here](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose)
+
+There are several options, default recomendation is apache.
+Alternative is php-fpm as a stand alone container with either apache or ngnix.
+Apache with php as a module is used in this setup.
+
+Four containers are spin up
+  - `nextcloud-db` - mariadb database where files and users meta data are stored
+  - `nextcloud` - the nextcloud
+  - `nextcloud-redis` - in memory data store for faster and responsive interface
+  - `nextcloud-cron` - for being able to run maintnance cronjobs
+
+Two persinstent storages
+  - `nextcloud-data` bind mount - nextcloud app storage with web server and the works
+  - `nextcloud-data-db` bind mount - database storage
+
+  `docker-compose.yml`
+
+  ```
+  version: '3'
+  services:
+
+    nextcloud-db:
+      image: mariadb
+      container_name: nextcloud-db
+      hostname: nextcloud-db
+      command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+      restart: unless-stopped
+      volumes:
+        - ./nextcloud-data-db:/var/lib/mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD
+        - MYSQL_PASSWORD
+        - MYSQL_DATABASE
+        - MYSQL_USER
+
+    nextcloud:
+      image: nextcloud:apache
+      container_name: nextcloud
+      hostname: nextcloud
+      restart: unless-stopped
+      depends_on:
+        - nextcloud-db
+        - nextcloud-redis
+      links:
+        - nextcloud-db
+      volumes:
+        - ./nextcloud-data/:/var/www/html
+      environment:
+        - MYSQL_HOST
+        - REDIS_HOST
+        - NEXTCLOUD_TRUSTED_DOMAINS
+
+    nextcloud-redis:
+      image: redis:alpine
+      container_name: nextcloud-redis
+      hostname: nextcloud-redis
+      restart: unless-stopped
+
+    nextcloud-cron:
+      image: nextcloud:apache
+      container_name: nextcloud-cron
+      hostname: nextcloud-cron
+      restart: unless-stopped
+      volumes:
+        - ./nextcloud-data/:/var/www/html
+      entrypoint: /cron.sh
+      depends_on:
+        - nextcloud-db
+        - nextcloud-redis
+
+  networks:
+    default:
+      external:
+        name: $DEFAULT_NETWORK
+  ```
 
   `.env`
   ```
   # GENERAL
   MY_DOMAIN=blabla.org
   DEFAULT_NETWORK=caddy_net
+  TZ=Europe/Prague
 
   # NEXTCLOUD-MARIADB
   MYSQL_ROOT_PASSWORD=nextcloud
   MYSQL_PASSWORD=nextcloud
   MYSQL_DATABASE=nextcloud
   MYSQL_USER=nextcloud
+
+  # NEXTCLOUD
+  MYSQL_HOST=nextcloud-db
+  REDIS_HOST=nextcloud-redis
+  NEXTCLOUD_TRUSTED_DOMAINS=
   ```
 
-- **Create `docker-compose.yml` file**</br>
-  Four containers are spin up
-  - nextcloud-db - mariadb database where files and users meta data are stored
-  - nextcloud-redis - in memory data store for more responsive interface
-  - nextcloud-app - the nextcloud
-  - nextcloud-cron - for being able to run maintnance cronjobs
+### Reverse proxy
 
-  Two persinstent storages
-    - nextcloud-db named volume - nextcloud-db:/var/lib/mysql
-    - nextcloud-app bind mount - ./nextcloud-data/:/var/www/html
-
-  `docker-compose.yml`
-
-    ```
-    version: '3'
-
-    services:
-
-      nextcloud-db:
-        image: mariadb
-        container_name: nextcloud-db
-        hostname: nextcloud-db
-        command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-        restart: unless-stopped
-        volumes:
-          - nextcloud-db:/var/lib/mysql
-        environment:
-          - MYSQL_ROOT_PASSWORD
-          - MYSQL_PASSWORD
-          - MYSQL_DATABASE
-          - MYSQL_USER
-
-      nextcloud-redis:
-        image: redis:alpine
-        container_name: nextcloud-redis
-        hostname: nextcloud-redis
-        restart: unless-stopped
-
-      nextcloud-app:
-        image: nextcloud:apache
-        container_name: nextcloud
-        hostname: nextcloud
-        restart: unless-stopped
-        depends_on:
-          - nextcloud-db
-          - nextcloud-redis
-        links:
-          - nextcloud-db
-        ports:
-          - 8080:80
-        volumes:
-          - ./nextcloud-data/:/var/www/html
-        environment:
-          - MYSQL_HOST=nextcloud-db
-          - REDIS_HOST=nextcloud-redis
-          - NEXTCLOUD_TRUSTED_DOMAINS
-
-      nextcloud-cron:
-        image: nextcloud:apache
-        container_name: nextcloud-cron
-        hostname: nextcloud-cron
-        restart: unless-stopped
-        volumes:
-          - ./nextcloud-data/:/var/www/html
-        entrypoint: /cron.sh
-        depends_on:
-          - nextcloud-db
-          - nextcloud-redis
-
-    volumes:
-      nextcloud-db:
-
-    networks:
-      default:
-        external:
-          name: $DEFAULT_NETWORK
-
-    ```
-
-- **Run docker compose**
-
-  `docker-compose -f docker-compose.yml up -d`
-
-# #2 Reverse proxy using caddy v2
-
-  Provides reverse proxy so that more services can run on this docker host,</br>
-  and also provides https.</br>
-  This is a basic setup, for more details here is
-  [Caddy v2 tutorial + examples](https://github.com/DoTheEvo/Caddy-v2-examples)
-
-- **Have nextcloud to Caddyfile**</br>
+  Caddy v2 is used,
+  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
 
   `Caddyfile`
   ```
@@ -158,60 +140,48 @@ Here will be `~/docker/nextcloud`.</br>
           to nextcloud:80
       }
   }
-
   ```
+### First run
 
-- **Create docker-compose.yml**</br>
+![first-run-pic](https://i.imgur.com/EygHgKa.png)
 
-  `docker-compose.yml`
-  ```
-  version: "3.7"
 
-  services:
-    caddy:
-      image: "caddy/caddy:alpine"
-      container_name: "caddy"
-      hostname: "caddy"
-      ports:
-        - "80:80"
-        - "443:443"
-      volumes:
-        - "./Caddyfile:/etc/caddy/Caddyfile:ro"
-        - caddy_lets_encrypt_storage:/data
-        - caddy_config_storage:/config
-      environment:
-        - MY_DOMAIN
+### Extra info
 
-  networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
+  - check if redis container works</br>
+    exec in to redis container: `docker container exec -it nextcloud-redis /bin/sh`</br>
+    start monitoring: `redis-cli MONITOR`</br>
+    in browse start browsing files on the nextcloud,
+    there should be lot of activity in the monitoring
 
-  volumes:
-    caddy_lets_encrypt_storage:
-    caddy_config_storage:
-  ```
-  Make sure docker-compose.yml has the .env file with the same variables for 
-  $DEFAULT_NETWORK and $MY_DOMAIN
+  - check if cron container works</br>
+    in *settings > administration > basic settings*</br>
+    **Background jobs** should be set to **Cron** and the last job info
+    should never be older than 10 minutes
 
-- **Run it**
+    - in *settings > administration > overview*</br>
+    nextcloud complains about missing indexes or big int
 
-  `docker-compose -f docker-compose.yml up -d`
+  - in *settings > administration > overview*</br>
+    nextcloud complains about missing indexes or big int
 
-  If something is fucky use `docker logs caddy` to see what is happening.
-  Restarting the container can help getting the certificates, if its stuck there.
-  Or investigate inside `docker container exec -it caddy /bin/sh`,
-  trying to ping hosts that are suppose to be reachable for example.
-
-# #3. Some stuff afterwards
-
-  - in settings > overview, nextcloud complains about missing indexes or big int
     - docker exec -it nextcloud /bin/sh
     - chsh -s /bin/sh www-data
     - su www-data
     - cd /var/www/html
     - php occ db:add-missing-indices
     - php occ db:convert-filecache-bigint
+
+  - in *settings > administration > overview*</br>
+     not resolve "/.well-known/caldav" and "/.well-known/carddav"
+
+     `docker container exec -it nextcloud /bin/sh`</br>
+     `cd /etc/apache2/sites-enabled`</br>
+     `echo >> 000-default.conf`</br>
+     `echo Redirect 301 /.well-known/carddav /nextcloud/remote.php/dav >> 000-default.conf`</br>
+     `echo Redirect 301 /.well-known/caldav /nextcloud/remote.php/dav >> 000-default.conf`
+
+![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
 # #4 Update Nextcloud
 

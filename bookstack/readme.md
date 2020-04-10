@@ -119,6 +119,9 @@ Documentation and notes.
   MAIL_ENCRYPTION=SSL
   ```
 
+  **All containers must be on the same network**.</br>
+  If one does not exist yet: `docker network create caddy_net`
+
 ### Reverse proxy
 
   Caddy v2 is used,
@@ -137,7 +140,7 @@ Documentation and notes.
   }
   ```
 
-![logo](https://i.imgur.com/cN1GUZw.png)
+![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
 ### Update
 
