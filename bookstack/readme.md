@@ -36,10 +36,10 @@ Documentation and notes.
   version: "2"
   services:
 
-    bookstack_db:
+    bookstack-db:
       image: linuxserver/mariadb
-      container_name: bookstack_db
-      hostname: bookstack_db
+      container_name: bookstack-db
+      hostname: bookstack-db
       environment:
         - TZ
         - PUID
@@ -76,7 +76,7 @@ Documentation and notes.
         - ./bookstack-data:/config
       restart: unless-stopped
       depends_on:
-        - bookstack_db
+        - bookstack-db
 
   networks:
     default:
@@ -103,7 +103,7 @@ Documentation and notes.
   # BOOKSTACK
   PUID=1000
   PGID=1000
-  DB_HOST=bookstack_db
+  DB_HOST=bookstack-db
   DB_USER=bookstack
   DB_PASS=bookstack
   DB_DATABASE=bookstack
@@ -177,7 +177,7 @@ but borg backup is daily making snapshot of the entire directory.
     #!/bin/bash
 
     # CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
-    docker container exec bookstack_db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
+    docker container exec bookstack-db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
 
     # ARCHIVE UPLOADED FILES
     docker container exec bookstack tar -czPf /config/BACKUP.bookstack.uploaded-files.tar.gz /config/www/
@@ -194,10 +194,10 @@ but borg backup is daily making snapshot of the entire directory.
 
   Assuming clean start, first restore the database before running the app container.
 
-  * start only the database container: `docker-compose up -d bookstack_db`
+  * start only the database container: `docker-compose up -d bookstack-db`
   * have `BACKUP.bookstack.database.sql` mounted in by placing it in `bookstack/bookstack-data`
   * exec in to the container and restore the database</br>
-    `docker container exec -it bookstack_db /bin/bash`</br>
+    `docker container exec -it bookstack-db /bin/bash`</br>
     `cd /config`</br>
     `mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql`
   * now start the app container: `docker-compose up -d`
