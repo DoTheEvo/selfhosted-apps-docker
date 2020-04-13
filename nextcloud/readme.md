@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/6Wqs7J1.png)
 
-### Purpose
+## Purpose
 
 File share & sync.
 
@@ -12,7 +12,7 @@ File share & sync.
 * [Github](https://github.com/nextcloud/server)
 * [DockerHub](https://hub.docker.com/_/nextcloud/)
 
-### Files and directory structure
+## Files and directory structure
 
   ```
   /home
@@ -26,23 +26,15 @@ File share & sync.
               └── 🗋 nextcloud-backup-script.sh
   ```
 
-### docker-compose
+## docker-compose
 
 Official examples [here](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose)
 
-There are several options, default recomendation is apache.
-Alternative is php-fpm as a stand alone container with either apache or ngnix.
-Apache with php as a module is used in this setup.
-
 Four containers are spin up
+  - `nextcloud` - nextcloud app with apache web server with php as a module 
   - `nextcloud-db` - mariadb database where files and users meta data are stored
-  - `nextcloud` - the nextcloud
-  - `nextcloud-redis` - in memory data store for faster and responsive interface
+  - `nextcloud-redis` - in memory file cashing and more reliable tranactional file locking
   - `nextcloud-cron` - for being able to run maintnance cronjobs
-
-Two persinstent storages
-  - `nextcloud-data` bind mount - nextcloud app storage with web server and the works
-  - `nextcloud-data-db` bind mount - database storage
 
   `docker-compose.yml`
 
@@ -64,6 +56,12 @@ Two persinstent storages
         - MYSQL_DATABASE
         - MYSQL_USER
 
+    nextcloud-redis:
+      image: redis:alpine
+      container_name: nextcloud-redis
+      hostname: nextcloud-redis
+      restart: unless-stopped
+
     nextcloud:
       image: nextcloud:apache
       container_name: nextcloud
@@ -79,13 +77,13 @@ Two persinstent storages
       environment:
         - MYSQL_HOST
         - REDIS_HOST
-        - NEXTCLOUD_TRUSTED_DOMAINS
-
-    nextcloud-redis:
-      image: redis:alpine
-      container_name: nextcloud-redis
-      hostname: nextcloud-redis
-      restart: unless-stopped
+        - MAIL_DOMAIN
+        - MAIL_FROM_ADDRESS
+        - SMTP_SECURE
+        - SMTP_HOST
+        - SMTP_PORT
+        - SMTP_NAME
+        - SMTP_PASSWORD
 
     nextcloud-cron:
       image: nextcloud:apache
@@ -121,13 +119,23 @@ Two persinstent storages
   # NEXTCLOUD
   MYSQL_HOST=nextcloud-db
   REDIS_HOST=nextcloud-redis
-  NEXTCLOUD_TRUSTED_DOMAINS=
+
+  # USING SENDGRID FOR SENDING EMAILS
+  MAIL_DOMAIN=blabla.org
+  MAIL_FROM_ADDRESS=nextcloud
+  SMTP_SECURE=ssl
+  SMTP_HOST=smtp.sendgrid.net
+  SMTP_PORT=465
+  SMTP_NAME=apikey
+  SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
   ```
 
-### Reverse proxy
+## Reverse proxy
 
   Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+  
+  There are few extra directives here to fix some nextcloud warnings
 
   `Caddyfile`
   ```
@@ -136,61 +144,133 @@ Two persinstent storages
   }
 
   nextcloud.{$MY_DOMAIN} {
-      reverse_proxy {
-          to nextcloud:80
-      }
+      reverse_proxy nextcloud:80
+      header Strict-Transport-Security max-age=31536000;
+      redir /.well-known/carddav /remote.php/carddav 301
+      redir /.well-known/caldav /remote.php/caldav 301
   }
   ```
-### First run
+
+## First run
+
+Nextcloud needs few minutes to start, then there is the initial configuration.
+Creating adming account and giving the database details as set in the `.env` file
 
 ![first-run-pic](https://i.imgur.com/EygHgKa.png)
 
 
-### Extra info
+## Security & setup warnings
 
-  - check if redis container works</br>
-    exec in to redis container: `docker container exec -it nextcloud-redis /bin/sh`</br>
+Nextcloud has status check in *Settings > Administration > Overview*</br>
+There are likely several warnings on a freshly spun container.
+
+  - **The database is missing some indexes**
+    - `docker exec --user www-data --workdir /var/www/html nextcloud php occ db:add-missing-indices`
+
+  - **Some columns in the database are missing a conversion to big int**
+    - `docker exec --user www-data --workdir /var/www/html nextcloud php occ db:convert-filecache-bigint`
+
+  - **The "Strict-Transport-Security" HTTP header is not set to at least "15552000" seconds.**
+    - helps to know what [HSTS means](https://www.youtube.com/watch?v=kYhMnw4aJTw)
+    - fixed in the reverse proxy section above in caddy config
+    - the line `header Strict-Transport-Security max-age=31536000;`
+
+  - **Your web server is not properly set up to resolve "/.well-known/caldav"** and **Your web server is not properly set up to resolve "/.well-known/carddav".**
+    - fixed in the reverse proxy section above in caddy config
+    - `redir /.well-known/carddav /remote.php/carddav 301`
+    - `redir /.well-known/caldav /remote.php/caldav 301`
+
+![status-pic](https://i.imgur.com/wjjd5CJ.png)
+
+
+## Extra info
+
+  - **check if redis container works**</br>
+    at `https://<nexcloud url>/ocs/v2.php/apps/serverinfo/api/v1/info`</br>
+    ctrl+f for `redis`, should be in memcache.distributed and memcache.locking
+
+    you can also exec in to redis container: `docker exec -it nextcloud-redis /bin/bash`</br>
     start monitoring: `redis-cli MONITOR`</br>
-    in browse start browsing files on the nextcloud,
-    there should be lot of activity in the monitoring
+    start browsing files on the nextcloud,
+    there should be activity in the monitoring
 
-  - check if cron container works</br>
+  - **check if cron container works**</br>
     in *settings > administration > basic settings*</br>
-    **Background jobs** should be set to **Cron** and the last job info
-    should never be older than 10 minutes
+    Background jobs should be set to Cron</br>
+    the last job info should never be older than 10 minutes</br>
 
-    - in *settings > administration > overview*</br>
-    nextcloud complains about missing indexes or big int
+## Update
 
-  - in *settings > administration > overview*</br>
-    nextcloud complains about missing indexes or big int
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
-    - docker exec -it nextcloud /bin/sh
-    - chsh -s /bin/sh www-data
-    - su www-data
-    - cd /var/www/html
-    - php occ db:add-missing-indices
-    - php occ db:convert-filecache-bigint
+  * manual image update</br>
+    `docker-compose pull`</br>
+    `docker-compose up -d`</br>
+    `docker image prune`
 
-  - in *settings > administration > overview*</br>
-     not resolve "/.well-known/caldav" and "/.well-known/carddav"
+## Backup and restore
 
-     `docker container exec -it nextcloud /bin/sh`</br>
-     `cd /etc/apache2/sites-enabled`</br>
-     `echo >> 000-default.conf`</br>
-     `echo Redirect 301 /.well-known/carddav /nextcloud/remote.php/dav >> 000-default.conf`</br>
-     `echo Redirect 301 /.well-known/caldav /nextcloud/remote.php/dav >> 000-default.conf`
+  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  that makes daily snapshot of the entire directory
+    
+  * **restore**</br>
+    down the nextcloud containers `docker-compose down`</br>
+    delete the entire nextcloud directory</br>
+    from the backup copy back the nextcloud directortory</br>
+    start the container `docker-compose up -d`
 
-![interface-pic](https://i.imgur.com/cN1GUZw.png)
+### Backup of just user data
 
-# #4 Update Nextcloud
+user-data daily export using the [official procedure.](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html)</br>
+For nextcloud it means entering maintenance mode,
+database dump and backing up several directories containing data, configs, themes.</br>
+The created backup files are overwriten on every run of the script,
+but borg backup is daily making snapshot of the entire directory.
 
-  `docker-compose pull`
-  `docker-compose up -d`
-  `docker image prune`
+* **create a backup script**</br>
+    placed inside `nextcloud` directory on the host
 
+    `nextcloud-backup-script.sh`
+    ```
+    #!/bin/bash
 
-# #5.Backup and restore
+    # MAINTENANCE MODE ON
+    docker container exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:mode --on
 
-  likely there will be container running borg or borgmatic and cron
-  
+    # CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
+    docker container exec nextcloud-db bash -c 'mysqldump --single-transaction -h nextcloud-db -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > /var/lib/mysql/BACKUP.nextcloud.database.sql'
+
+    # ARCHIVE DIRECTORIES
+    docker container exec --workdir /var/www/html nextcloud tar -czPf BACKUP.nextcloud.data.tar config data themes
+
+    # MAINTENANCE MODE OFF
+    docker container exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:mode --off
+    ```
+
+    the script must be **executabe** - `chmod +x bookstack-backup-script.sh`
+
+* **cronjob** on the host</br>
+  `crontab -e` - add new cron job</br>
+  `0 2 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
+  `crontab -l` - list cronjobs
+
+### Restore the user data
+
+  Assuming clean start, first restore the database before running the app container.
+
+  * start the containers: `docker-compose up -d`</br>
+    let it run so it creates its file structure
+  * down the containers: `docker-compose up -d`
+  * from backup copy the direcotries `data`, `configs`, `themes` in to `nextcloud-data` replacing the ones in place
+  * from backup copy the backup database in to `nextcloud-data-db`
+  * start the containers: `docker-compose up -d`
+  * set the correct user ownership of the direcotries copied:</br>
+    `docker exec --workdir /var/www/html nextcloud chown -R www-data:www-data config data themes`
+  * restore the database</br>
+    `docker exec --workdir /var/lib/mysql nextcloud-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.nextcloud.database.sql'`
+  * turn off the maintenance mode:</br>
+    `docker container exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:mode --off`
+  * update the systems data-fingerprint:</br>
+    `docker exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:data-fingerprint`
+  * restart the containers: `docker-compose restart`
+  * log in
