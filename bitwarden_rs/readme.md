@@ -2,9 +2,9 @@
 
 ###### guide by example
 
-![logo](https://i.imgur.com/BQ9Ec6f.png)
+![logo](https://i.imgur.com/tT3FQLJ.png)
 
-### Purpose
+## Purpose
 
 Password manager. RS version is simpler and lighter than the official bitwarden.
 
@@ -12,7 +12,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 * [Github](https://github.com/dani-garcia/bitwarden_rs)
 * [DockerHub](https://hub.docker.com/r/bitwardenrs/server)
 
-### Files and directory structure
+## Files and directory structure
 
   ```
   /home
@@ -25,7 +25,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
               └── 🗋 bitwarden-backup-script.sh
   ```
 
-### docker-compose
+## docker-compose
   
   [Documentation](https://github.com/dani-garcia/bitwarden_rs/wiki/Using-Docker-Compose) on compose.
 
@@ -40,20 +40,9 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
       hostname: bitwarden
       container_name: bitwarden
       restart: unless-stopped
+      env_file: .env
       volumes:
         - ./bitwarden-data/:/data/
-      environment:
-        - TZ
-        - ADMIN_TOKEN
-        - DOMAIN
-        - SIGNUPS_ALLOWED
-        - SMTP_SSL
-        - SMTP_EXPLICIT_TLS
-        - SMTP_HOST
-        - SMTP_PORT
-        - SMTP_USERNAME
-        - SMTP_PASSWORD
-        - SMTP_FROM
 
   networks:
     default:
@@ -84,7 +73,10 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   SMTP_FROM=admin@blabla.org
   ```
 
-### Reverse proxy
+  **All containers must be on the same network**.</br>
+  If one does not exist yet: `docker network create caddy_net`
+
+## Reverse proxy
 
   Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-examples)</br>
   Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
@@ -96,6 +88,12 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   }
 
   passwd.{$MY_DOMAIN} {
+      header / {
+         X-XSS-Protection "1; mode=block"
+         X-Frame-Options "DENY"
+         X-Robots-Tag "none"
+         -Server
+      }
       encode gzip
       reverse_proxy /notifications/hub/negotiate bitwarden:80
       reverse_proxy /notifications/hub bitwarden:3012
@@ -103,17 +101,19 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   }
   ```
 
-### Forward port 3012 on your router
+## Forward port 3012 on your router
 
   - websocket protocol used for some kind of notifications
 
-### Extra info
+## Extra info
 
   * **bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN` set in the `.env` file
 
+---
+
 ![interface-pic](https://i.imgur.com/5LxEUsA.png)
 
-### Update
+## Update
 
   * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
@@ -122,7 +122,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
     `docker-compose up -d`</br>
     `docker image prune`
 
-### Backup and restore
+## Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
@@ -133,7 +133,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
     from the backup copy back the bitwarden directortory</br>
     start the container `docker-compose up -d`
 
-### Backup of just user data
+## Backup of just user data
 
 user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.
@@ -161,7 +161,7 @@ but borg backup is daily making snapshot of the entire directory.
   `0 2 * * * /home/bastard/docker/bitwarden/bitwarden-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
   `crontab -l` - list cronjobs
 
-### Restore the user data
+## Restore the user data
 
   Assuming clean start.
 

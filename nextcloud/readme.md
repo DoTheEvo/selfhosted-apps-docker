@@ -2,7 +2,7 @@
 
 ###### guide by example
 
-![logo](https://i.imgur.com/6Wqs7J1.png)
+![logo](https://i.imgur.com/VXSovC9.png)
 
 ## Purpose
 
@@ -20,7 +20,7 @@ File share & sync.
       └── docker
           └── nextcloud
               ├── 🗁 nextcloud-data
-              ├── 🗁 nextcloud-data-db
+              ├── 🗁 nextcloud-db-data
               ├── 🗋 .env
               ├── 🗋 docker-compose.yml
               └── 🗋 nextcloud-backup-script.sh
@@ -48,13 +48,9 @@ Four containers are spin up
       hostname: nextcloud-db
       command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
       restart: unless-stopped
+      env_file: .env
       volumes:
-        - ./nextcloud-data-db:/var/lib/mysql
-      environment:
-        - MYSQL_ROOT_PASSWORD
-        - MYSQL_PASSWORD
-        - MYSQL_DATABASE
-        - MYSQL_USER
+        - ./nextcloud-db-data:/var/lib/mysql
 
     nextcloud-redis:
       image: redis:alpine
@@ -67,6 +63,7 @@ Four containers are spin up
       container_name: nextcloud
       hostname: nextcloud
       restart: unless-stopped
+      env_file: .env
       depends_on:
         - nextcloud-db
         - nextcloud-redis
@@ -74,28 +71,18 @@ Four containers are spin up
         - nextcloud-db
       volumes:
         - ./nextcloud-data/:/var/www/html
-      environment:
-        - MYSQL_HOST
-        - REDIS_HOST
-        - MAIL_DOMAIN
-        - MAIL_FROM_ADDRESS
-        - SMTP_SECURE
-        - SMTP_HOST
-        - SMTP_PORT
-        - SMTP_NAME
-        - SMTP_PASSWORD
 
     nextcloud-cron:
       image: nextcloud:apache
       container_name: nextcloud-cron
       hostname: nextcloud-cron
       restart: unless-stopped
-      volumes:
-        - ./nextcloud-data/:/var/www/html
       entrypoint: /cron.sh
       depends_on:
         - nextcloud-db
         - nextcloud-redis
+      volumes:
+        - ./nextcloud-data/:/var/www/html
 
   networks:
     default:
@@ -129,6 +116,8 @@ Four containers are spin up
   SMTP_NAME=apikey
   SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
   ```
+  **All containers must be on the same network**.</br>
+  If one does not exist yet: `docker network create caddy_net`
 
 ## Reverse proxy
 
@@ -157,7 +146,6 @@ Nextcloud needs few minutes to start, then there is the initial configuration.
 Creating adming account and giving the database details as set in the `.env` file
 
 ![first-run-pic](https://i.imgur.com/EygHgKa.png)
-
 
 ## Security & setup warnings
 
@@ -224,8 +212,10 @@ There are likely several warnings on a freshly spun container.
 user-data daily export using the [official procedure.](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html)</br>
 For nextcloud it means entering maintenance mode,
 database dump and backing up several directories containing data, configs, themes.</br>
-The created backup files are overwriten on every run of the script,
-but borg backup is daily making snapshot of the entire directory.
+
+For the script it just means database dump as borg backup and its deduplication
+will deal with the directories, especially in the case of nextcloud where 
+hundreds gigabytes can be stored.
 
 * **create a backup script**</br>
     placed inside `nextcloud` directory on the host
@@ -240,18 +230,15 @@ but borg backup is daily making snapshot of the entire directory.
     # CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
     docker container exec nextcloud-db bash -c 'mysqldump --single-transaction -h nextcloud-db -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > /var/lib/mysql/BACKUP.nextcloud.database.sql'
 
-    # ARCHIVE DIRECTORIES
-    docker container exec --workdir /var/www/html nextcloud tar -czPf BACKUP.nextcloud.data.tar config data themes
-
     # MAINTENANCE MODE OFF
     docker container exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:mode --off
     ```
 
-    the script must be **executabe** - `chmod +x bookstack-backup-script.sh`
+    the script must be **executabe** - `chmod +x nextcloud-backup-script.sh`
 
 * **cronjob** on the host</br>
   `crontab -e` - add new cron job</br>
-  `0 2 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
+  `0 2 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
   `crontab -l` - list cronjobs
 
 ### Restore the user data
@@ -262,7 +249,7 @@ but borg backup is daily making snapshot of the entire directory.
     let it run so it creates its file structure
   * down the containers: `docker-compose up -d`
   * from backup copy the direcotries `data`, `configs`, `themes` in to `nextcloud-data` replacing the ones in place
-  * from backup copy the backup database in to `nextcloud-data-db`
+  * from backup copy the backup database in to `nextcloud-db-data`
   * start the containers: `docker-compose up -d`
   * set the correct user ownership of the direcotries copied:</br>
     `docker exec --workdir /var/www/html nextcloud chown -R www-data:www-data config data themes`
