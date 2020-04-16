@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/qDXwqaU.png)
 
-### Purpose
+## Purpose
 
 Documentation and notes.
 
@@ -12,7 +12,7 @@ Documentation and notes.
 * [Github](https://github.com/BookStackApp/BookStack)
 * [DockerHub](https://hub.docker.com/r/linuxserver/bookstack)
 
-### Files and directory structure
+## Files and directory structure
 
   ```
   /home
@@ -20,13 +20,13 @@ Documentation and notes.
       └── docker
           └── bookstack
               ├── 🗁 bookstack-data
-              ├── 🗁 bookstack-data-db
+              ├── 🗁 bookstack-db-data
               ├── 🗋 .env
               ├── 🗋 docker-compose.yml
               └── 🗋 bookstack-backup-script.sh
   ```
 
-### docker-compose
+## docker-compose
 
   Dockerhub linuxserver/bookstack [example compose.](https://hub.docker.com/r/linuxserver/bookstack)
 
@@ -40,43 +40,21 @@ Documentation and notes.
       image: linuxserver/mariadb
       container_name: bookstack-db
       hostname: bookstack-db
-      environment:
-        - TZ
-        - PUID
-        - PGID
-        - MYSQL_ROOT_PASSWORD
-        - MYSQL_DATABASE
-        - MYSQL_USER
-        - MYSQL_PASSWORD
-      volumes:
-        - ./bookstack-data-db:/config
       restart: unless-stopped
+      env_file: .env
+      volumes:
+        - ./bookstack-db-data:/config
 
     bookstack:
       image: linuxserver/bookstack
       container_name: bookstack
       hostname: bookstack
-      environment:
-        - TZ
-        - PUID
-        - PGID
-        - DB_HOST
-        - DB_USER
-        - DB_PASS
-        - DB_DATABASE
-        - APP_URL
-        - MAIL_DRIVER
-        - MAIL_HOST
-        - MAIL_PORT
-        - MAIL_FROM
-        - MAIL_USERNAME
-        - MAIL_PASSWORD
-        - MAIL_ENCRYPTION
-      volumes:
-        - ./bookstack-data:/config
       restart: unless-stopped
+      env_file: .env
       depends_on:
         - bookstack-db
+      volumes:
+        - ./bookstack-data:/config
 
   networks:
     default:
@@ -92,17 +70,17 @@ Documentation and notes.
   DEFAULT_NETWORK=caddy_net
   TZ=Europe/Prague
 
-  # BOOKSTACK-MARIADB
+  #LINUXSERVER.IO
   PUID=1000
   PGID=1000
+
+  # BOOKSTACK-MARIADB
   MYSQL_ROOT_PASSWORD=bookstack
   MYSQL_DATABASE=bookstack
   MYSQL_USER=bookstack
   MYSQL_PASSWORD=bookstack
 
   # BOOKSTACK
-  PUID=1000
-  PGID=1000
   DB_HOST=bookstack-db
   DB_USER=bookstack
   DB_PASS=bookstack
@@ -122,7 +100,7 @@ Documentation and notes.
   **All containers must be on the same network**.</br>
   If one does not exist yet: `docker network create caddy_net`
 
-### Reverse proxy
+## Reverse proxy
 
   Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
@@ -134,15 +112,15 @@ Documentation and notes.
   }
 
   book.{$MY_DOMAIN} {
-      reverse_proxy {
-          to bookstack:80
-      }
+      reverse_proxy bookstack:80
   }
   ```
 
+---
+
 ![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
-### Update
+## Update
 
   * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
@@ -151,7 +129,7 @@ Documentation and notes.
     `docker-compose up -d`</br>
     `docker image prune`
 
-### Backup and restore
+## Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
@@ -162,7 +140,7 @@ Documentation and notes.
     from the backup copy back the bookstack directortory</br>
     start the container `docker-compose up -d`
 
-### Backup of just user data
+## Backup of just user data
 
 user-data daily export using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
 For bookstack it means database dump and backing up several directories containing user uploaded files.
@@ -190,7 +168,7 @@ but borg backup is daily making snapshot of the entire directory.
   `0 2 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
   `crontab -l` - list cronjobs
 
-### Restore the user data
+## Restore the user data
 
   Assuming clean start, first restore the database before running the app container.
 

@@ -2,14 +2,14 @@
 
 ###### guide by example
 
-### purpose
+## purpose
 
 Backup terminal utility.
 
 * [Official site](https://www.borgbackup.org/)
 * [Github](https://github.com/borgbackup/borg)
 
-### files and directory structure
+## files and directory structure
 
   ```
   /home
@@ -20,15 +20,28 @@ Backup terminal utility.
       │    └── 🗋 borg_backup.log
       │
       └── docker
-          ├── container #1
-          ├── container #2
+          ├── container-setup #1
+          ├── container-setup #2
           └── ...
   ```
 
-### borg-backup.sh
+## The setup
+
+Borg is installed directly on the host system.</br>
+A script is created that backs up entire docker directory somewhere locally.</br>
+Cronjob executing the script daily.
+
+The script needs manual initialization of a repo somewhere.</br>
+
+
+* **Install borg backup**
+
+* **The script**
+
+  Repo needs to be initialized manualy first.</br>
+
 
   `borg-backup.sh`
-
   ```
   #!/bin/bash
 
@@ -68,7 +81,6 @@ Backup terminal utility.
       --keep-yearly=0                             \
 
   echo "$NOW Done" >> $LOGFILE
-  borg list $REPOSITORY >> $LOGFILE
   echo '------------------------------' >> $LOGFILE
 
   # --- USEFULL SHIT ---
@@ -87,13 +99,14 @@ Backup terminal utility.
   # to delete single backup in a repo:
   #   borg delete .::1584472836
   ```
+  the script must be **executabe** - `chmod +x borg-backup.sh`
 
-### automatic execution
+* **automatic execution**
 
-* make the script executable `chmod +x borg-backup.sh`
+  cron job, every day at 3:00</br>
+  `crontab -e`
+  `0 3 * * * /home/bastard/borg_backup/borg-backup.sh`
 
-* cron job, every day at 3:00
+## Remote backup
 
-    `crontab -e`
-
-    `0 3 * * * /home/bastard/borg_backup/borg-backup.sh`
+Backing up to network share or cloud, rclone
