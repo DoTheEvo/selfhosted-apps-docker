@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/VXSovC9.png)
 
-## Purpose
+# Purpose
 
 File share & sync.
 
@@ -12,7 +12,7 @@ File share & sync.
 * [Github](https://github.com/nextcloud/server)
 * [DockerHub](https://hub.docker.com/_/nextcloud/)
 
-## Files and directory structure
+# Files and directory structure
 
   ```
   /home
@@ -26,15 +26,15 @@ File share & sync.
               └── 🗋 nextcloud-backup-script.sh
   ```
 
-## docker-compose
+# docker-compose
 
 Official examples [here](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose)
 
 Four containers are spin up
   - `nextcloud` - nextcloud app with apache web server with php as a module 
-  - `nextcloud-db` - mariadb database where files and users meta data are stored
-  - `nextcloud-redis` - in memory file cashing and more reliable tranactional file locking
-  - `nextcloud-cron` - for being able to run maintnance cronjobs
+  - `nextcloud-db` - mariadb database where files-metadata and users-metadata are stored
+  - `nextcloud-redis` - in memory file caching and more reliable transactional file locking
+  - `nextcloud-cron` - for being able to run maintenance cronjobs
 
   `docker-compose.yml`
 
@@ -119,7 +119,7 @@ Four containers are spin up
   **All containers must be on the same network**.</br>
   If one does not exist yet: `docker network create caddy_net`
 
-## Reverse proxy
+# Reverse proxy
 
   Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)
@@ -140,14 +140,14 @@ Four containers are spin up
   }
   ```
 
-## First run
+# First run
 
 Nextcloud needs few minutes to start, then there is the initial configuration.
-Creating adming account and giving the database details as set in the `.env` file
+Creating admin account and giving the database details as set in the `.env` file
 
 ![first-run-pic](https://i.imgur.com/EygHgKa.png)
 
-## Security & setup warnings
+# Security & setup warnings
 
 Nextcloud has status check in *Settings > Administration > Overview*</br>
 There are likely several warnings on a freshly spun container.
@@ -171,7 +171,7 @@ There are likely several warnings on a freshly spun container.
 ![status-pic](https://i.imgur.com/wjjd5CJ.png)
 
 
-## Extra info
+# Extra info
 
   - **check if redis container works**</br>
     at `https://<nexcloud url>/ocs/v2.php/apps/serverinfo/api/v1/info`</br>
@@ -187,16 +187,16 @@ There are likely several warnings on a freshly spun container.
     Background jobs should be set to Cron</br>
     the last job info should never be older than 10 minutes</br>
 
-## Update
+# Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automatically
 
   * manual image update</br>
     `docker-compose pull`</br>
     `docker-compose up -d`</br>
     `docker image prune`
 
-## Backup and restore
+# Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
@@ -204,10 +204,10 @@ There are likely several warnings on a freshly spun container.
   * **restore**</br>
     down the nextcloud containers `docker-compose down`</br>
     delete the entire nextcloud directory</br>
-    from the backup copy back the nextcloud directortory</br>
+    from the backup copy back the nextcloud directory</br>
     start the container `docker-compose up -d`
 
-### Backup of just user data
+# Backup of just user data
 
 user-data daily export using the [official procedure.](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html)</br>
 For nextcloud it means entering maintenance mode,
@@ -234,24 +234,24 @@ hundreds gigabytes can be stored.
     docker container exec --user www-data --workdir /var/www/html nextcloud php occ maintenance:mode --off
     ```
 
-    the script must be **executabe** - `chmod +x nextcloud-backup-script.sh`
+    the script must be **executable** - `chmod +x nextcloud-backup-script.sh`
 
 * **cronjob** on the host</br>
   `crontab -e` - add new cron job</br>
   `0 2 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
   `crontab -l` - list cronjobs
 
-### Restore the user data
+# Restore the user data
 
   Assuming clean start, first restore the database before running the app container.
 
   * start the containers: `docker-compose up -d`</br>
     let it run so it creates its file structure
   * down the containers: `docker-compose up -d`
-  * from backup copy the direcotries `data`, `configs`, `themes` in to `nextcloud-data` replacing the ones in place
+  * from backup copy the directories `data`, `configs`, `themes` in to `nextcloud-data` replacing the ones in place
   * from backup copy the backup database in to `nextcloud-db-data`
   * start the containers: `docker-compose up -d`
-  * set the correct user ownership of the direcotries copied:</br>
+  * set the correct user ownership of the directories copied:</br>
     `docker exec --workdir /var/www/html nextcloud chown -R www-data:www-data config data themes`
   * restore the database</br>
     `docker exec --workdir /var/lib/mysql nextcloud-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.nextcloud.database.sql'`
