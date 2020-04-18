@@ -122,7 +122,7 @@ Four containers are spin up
 ## Reverse proxy
 
   Caddy v2 is used,
-  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+  details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)
   
   There are few extra directives here to fix some nextcloud warnings
 
