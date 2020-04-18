@@ -48,9 +48,13 @@ Four containers are spin up
       hostname: nextcloud-db
       command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
       restart: unless-stopped
-      env_file: .env
       volumes:
-        - ./nextcloud-db-data:/var/lib/mysql
+        - ./nextcloud-data-db:/var/lib/mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD
+        - MYSQL_PASSWORD
+        - MYSQL_DATABASE
+        - MYSQL_USER
 
     nextcloud-redis:
       image: redis:alpine
@@ -63,26 +67,33 @@ Four containers are spin up
       container_name: nextcloud
       hostname: nextcloud
       restart: unless-stopped
-      env_file: .env
       depends_on:
         - nextcloud-db
         - nextcloud-redis
-      links:
-        - nextcloud-db
       volumes:
         - ./nextcloud-data/:/var/www/html
+      environment:
+        - MYSQL_HOST
+        - REDIS_HOST
+        - MAIL_DOMAIN
+        - MAIL_FROM_ADDRESS
+        - SMTP_SECURE
+        - SMTP_HOST
+        - SMTP_PORT
+        - SMTP_NAME
+        - SMTP_PASSWORD
 
     nextcloud-cron:
       image: nextcloud:apache
       container_name: nextcloud-cron
       hostname: nextcloud-cron
       restart: unless-stopped
+      volumes:
+        - ./nextcloud-data/:/var/www/html
       entrypoint: /cron.sh
       depends_on:
         - nextcloud-db
         - nextcloud-redis
-      volumes:
-        - ./nextcloud-data/:/var/www/html
 
   networks:
     default:
@@ -121,9 +132,12 @@ Four containers are spin up
 
 # Reverse proxy
 
+  [Nextcloud official documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/reverse_proxy_configuration.html)
+  regarding reverse proxy.
+
   Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)
-  
+
   There are few extra directives here to fix some nextcloud warnings
 
   `Caddyfile`
@@ -146,6 +160,11 @@ Nextcloud needs few minutes to start, then there is the initial configuration.
 Creating admin account and giving the database details as set in the `.env` file
 
 ![first-run-pic](https://i.imgur.com/EygHgKa.png)
+
+The domain or IP you access nextcloud on this first run is added
+to `trusted_domains` in `config.php`. 
+Changing the domain later on will throw *"Access through untrusted domain"* error.
+Editing config.php and adding the new domain will fix it.
 
 # Security & setup warnings
 
