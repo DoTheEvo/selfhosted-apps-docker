@@ -78,7 +78,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 ## Reverse proxy
 
-  Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-examples)</br>
+  Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)</br>
   Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
   
   `Caddyfile`
