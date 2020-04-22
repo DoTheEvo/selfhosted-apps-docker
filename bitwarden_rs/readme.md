@@ -61,6 +61,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   # BITWARDEN
   ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
   SIGNUPS_ALLOWED=true
+  WEBSOCKET_ENABLED=true
 
   # USING SENDGRID FOR SENDING EMAILS
   DOMAIN=https://passwd.blabla.org
