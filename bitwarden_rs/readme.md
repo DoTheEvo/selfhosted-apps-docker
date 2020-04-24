@@ -60,7 +60,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
   # BITWARDEN
   ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
-  SIGNUPS_ALLOWED=true
+  SIGNUPS_ALLOWED=false
   WEBSOCKET_ENABLED=true
 
   # USING SENDGRID FOR SENDING EMAILS
@@ -102,13 +102,26 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   }
   ```
 
-## Forward port 3012 on your router
+## Forward port 3012 TCP on your router
 
-  - websocket protocol used for some kind of notifications
+[WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications,
+so that all web based clients can immediatly sync when a change happens on server.
 
+Enviromental variable `WEBSOCKET_ENABLED=true` needs to be set.</br>
+Reverse proxy needs to route `/notifications/hub` to port 3012.</br>
+Router needs to **forward port 3012** to docker host,
+same as port 80 and 443 are forwarded.
+
+To test if websocket works, have the desktop app open
+and make changes through browser extension, or through the website.
+Changes should immediatly appear in the desktop app. If it is not working,
+you need to manually sync for changes to appear.
+ 
 ## Extra info
 
-  * **bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN` set in the `.env` file
+**bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
+set in the `.env` file. Especially if signups are disabled it is the only way
+to invite users.
 
 ---
 
