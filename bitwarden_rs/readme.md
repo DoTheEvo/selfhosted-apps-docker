@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/tT3FQLJ.png)
 
-## Purpose
+# Purpose
 
 Password manager. RS version is simpler and lighter than the official bitwarden.
 
@@ -12,7 +12,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 * [Github](https://github.com/dani-garcia/bitwarden_rs)
 * [DockerHub](https://hub.docker.com/r/bitwardenrs/server)
 
-## Files and directory structure
+# Files and directory structure
 
   ```
   /home
@@ -25,7 +25,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
               └── 🗋 bitwarden-backup-script.sh
   ```
 
-## docker-compose
+# docker-compose
   
   [Documentation](https://github.com/dani-garcia/bitwarden_rs/wiki/Using-Docker-Compose) on compose.
 
@@ -77,7 +77,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   **All containers must be on the same network**.</br>
   If one does not exist yet: `docker network create caddy_net`
 
-## Reverse proxy
+# Reverse proxy
 
   Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)</br>
   Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
@@ -102,7 +102,7 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
   }
   ```
 
-## Forward port 3012 TCP on your router
+# Forward port 3012 TCP on your router
 
 [WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications,
 so that all web based clients can immediatly sync when a change happens on server.
@@ -117,7 +117,7 @@ and make changes through browser extension, or through the website.
 Changes should immediatly appear in the desktop app. If it is not working,
 you need to manually sync for changes to appear.
  
-## Extra info
+# Extra info
 
 **bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
 set in the `.env` file. Especially if signups are disabled it is the only way
@@ -127,7 +127,7 @@ to invite users.
 
 ![interface-pic](https://i.imgur.com/5LxEUsA.png)
 
-## Update
+# Update
 
   * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
@@ -136,7 +136,7 @@ to invite users.
     `docker-compose up -d`</br>
     `docker image prune`
 
-## Backup and restore
+# Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
@@ -147,7 +147,7 @@ to invite users.
     from the backup copy back the bitwarden directortory</br>
     start the container `docker-compose up -d`
 
-## Backup of just user data
+# Backup of just user data
 
 user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
@@ -175,7 +175,7 @@ but borg backup is daily making snapshot of the entire directory.
   `0 2 * * * /home/bastard/docker/bitwarden/bitwarden-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
   `crontab -l` - list cronjobs
 
-## Restore the user data
+# Restore the user data
 
   Assuming clean start.
 
