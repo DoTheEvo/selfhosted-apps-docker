@@ -107,9 +107,9 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 [WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications,
 so that all web based clients can immediatly sync when a change happens on server.
 
-Enviromental variable `WEBSOCKET_ENABLED=true` needs to be set.</br>
-Reverse proxy needs to route `/notifications/hub` to port 3012.</br>
-Router needs to **forward port 3012** to docker host,
+* Enviromental variable `WEBSOCKET_ENABLED=true` needs to be set.</br>
+* Reverse proxy needs to route `/notifications/hub` to port 3012.</br>
+* Router needs to **forward port 3012** to docker host,
 same as port 80 and 443 are forwarded.
 
 To test if websocket works, have the desktop app open
@@ -150,7 +150,7 @@ to invite users.
 ## Backup of just user data
 
 user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
-For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.
+For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
 The created backup files are overwriten on every run of the script,
 but borg backup is daily making snapshot of the entire directory.
 
