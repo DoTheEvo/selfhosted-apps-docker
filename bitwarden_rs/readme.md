@@ -123,6 +123,8 @@ you need to manually sync for changes to appear.
 set in the `.env` file. Especially if signups are disabled it is the only way
 to invite users.
 
+**push notifications**
+
 ---
 
 ![interface-pic](https://i.imgur.com/5LxEUsA.png)
@@ -149,10 +151,14 @@ to invite users.
 
 # Backup of just user data
 
-user-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
+User-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
-The created backup files are overwriten on every run of the script,
-but borg backup is daily making snapshot of the entire directory.
+
+Daily run of [borg backup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+takes care of backing up the directory.
+So only database dump is needed.
+The created backup sqlite3 file is overwriten on every run of the script,
+but that's ok since borg backup is making daily snapshots.
 
 * **create a backup script**</br>
     placed inside `bitwarden` directory on the host
@@ -163,9 +169,6 @@ but borg backup is daily making snapshot of the entire directory.
 
     # CREATE SQLITE BACKUP
     docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
-
-    # BACKUP ATTACHMENTS
-    docker container exec bitwarden tar -czPf /data/BACKUP.attachments.tar.gz /data/attachments
     ```
 
     the script must be **executabe** - `chmod +x bitwarden-backup-script.sh`
@@ -184,6 +187,6 @@ but borg backup is daily making snapshot of the entire directory.
   * down the container `docker-compose down`
   * in `bitwarden/bitwarden-data/`</br>
     replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
-    replace `attachments` directory with the one from the archive `BACKUP.attachments.tar.gz` 
+    replace `attachments` directory with the one from the borg backup repository 
   * start the container `docker-compose up -d`
 
