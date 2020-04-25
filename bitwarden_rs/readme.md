@@ -51,8 +51,7 @@ networks:
 ```
 
 `.env`
-
-```yml
+```bash
 # GENERAL
 MY_DOMAIN=blabla.org
 DEFAULT_NETWORK=caddy_net
