@@ -2,79 +2,74 @@
 
 ###### guide by example
 
-### purpose
+![logo](https://i.imgur.com/QxnuB1g.png)
+
+# Purpose
 
 User friendly overview of running containers.
 
-### files and directory structure
+# Files and directory structure
 
-  ```
-  /home
-  └── ~
-      └── docker
-          └── portainer
-              ├── 🗁 portainer_data
-              ├── 🗋 .env
-              └── 🗋 docker-compose.yml
-  ```
+```
+/home
+└── ~
+    └── docker
+        └── portainer
+            ├── 🗁 portainer_data
+            ├── 🗋 .env
+            └── 🗋 docker-compose.yml
+```
 
-### docker-compose
+# docker-compose
 
-  `docker-compose.yml`
+`docker-compose.yml`
+```yml
+version: '2'
 
-  ```
-  version: '2'
+services:
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    hostname: portainer
+    command: -H unix:///var/run/docker.sock
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer_data:/data
+    environment:
+      - TZ
 
-  services:
-    portainer:
-      image: portainer/portainer
-      container_name: portainer
-      hostname: portainer
-      command: -H unix:///var/run/docker.sock
-      restart: unless-stopped
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-        - ./portainer_data:/data
-      environment:
-        - TZ
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
 
-  networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
-  ```
+`.env`
+```bash
+# GENERAL
+MY_DOMAIN=blabla.org
+DEFAULT_NETWORK=caddy_net
+TZ=Europe/Prague
+```
 
-  `.env`
+# reverse proxy
 
-  ```
-  # GENERAL
-  MY_DOMAIN=blabla.org
-  DEFAULT_NETWORK=caddy_net
-  TZ=Europe/Prague
-  ```
+Caddy v2 is used,
+details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup).
 
-### reverse proxy
+`Caddyfile`
+```
+portainer.{$MY_DOMAIN} {
+    reverse_proxy portainer:9000
+}
+```
 
-  caddy v2 is used,
-  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+# Update
 
-  `Caddyfile`
-  ```
-  {
-      # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-  }
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
-  portainer.{$MY_DOMAIN} {
-      reverse_proxy {
-          to portainer:9000
-      }
-  }
-  ```
-
-### update
-
-  * image update using docker compose 
-
+  * manual image update</br>
     `docker-compose pull`</br>
     `docker-compose up -d`</br>
     `docker image prune`
