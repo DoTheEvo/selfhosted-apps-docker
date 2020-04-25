@@ -70,7 +70,7 @@ details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)
 
 # Config
 
-Homepage is configured in `config.yml`
+Homepage is configured in `config.yml` file.
 
 `config.yml`
 ```yml
@@ -78,21 +78,21 @@ title: "Homepage"
 subtitle: "Homer"
 logo: "assets/homer.png"
 # icon: "fas fa-skull-crossbones"
-footer: false #'<p>bla bla bla</p>'
+footer: '<p>less boring look with a footer</p>'
 
 # Optional navbar
 links:
-  - name: "Font Awesome Icon Galery"
+  - name: "Font Awesome Icons Galery"
     icon: "fab fa-fort-awesome"
     url: "https://fontawesome.com/icons?d=gallery"
   - name: "Reddit SelfHosted"
     icon: "fab fa-reddit"
     url: "https://www.reddit.com/r/selfhosted/"
 
-# First level array represent a group.
+# First level array represent a group
 # Single service with an empty name if not using groups
 services:
-  - name: "Crux"
+  - name: "Main"
     icon: "fab fa-docker"
     items:
       - name: "Bookstack"
@@ -119,6 +119,8 @@ services:
         subtitle: "Docker Manager"
         url: "https://portainer.blabla.org"
 ```
+
+![look](https://i.imgur.com/hrggtcZ.png)
 
 # Update
 
