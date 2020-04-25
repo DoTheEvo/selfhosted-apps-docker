@@ -24,14 +24,14 @@ Backups.
     └── docker
         ├── container-setup #1
         ├── container-setup #2
-        └── ...
+        ├── ...
 ```
 
 # The setup
 
 BorgBackup is installed directly on the host system.</br>
 A script is created that backs up the entire docker directory locally.</br>
-Cronjob is executing the script daily.
+Cronjob is executing this script daily.
 
 #### • Install BorgBackup
 
@@ -103,7 +103,7 @@ echo '------------------------------' >> $LOGFILE
 
 the script must be **executabe** - `chmod +x borg_backup.sh`
 
-#### • automatic execution
+#### • Automatic execution
 
 cron job, every day at 3:00</br>
 `crontab -e`
