@@ -85,6 +85,7 @@ login=bastard.blabla@gmail.com, \
 password=global-api-key-goes-here \
 blabla.org,*.blabla.org,subdomain.blabla.org
 
+##
 protocol=cloudflare,        \
 zone=blabla.tech,              \
 ttl=1,                      \
