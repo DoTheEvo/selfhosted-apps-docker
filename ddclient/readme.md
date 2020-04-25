@@ -87,7 +87,7 @@ blabla.org,*.blabla.org,subdomain.blabla.org
 
 ##
 protocol=cloudflare,        \
-zone=blabla.tech,              \
+zone=blabla.net,              \
 ttl=1,                      \
 login=bastard.blabla@gmail.com, \
 password=global-api-key-goes-here \
