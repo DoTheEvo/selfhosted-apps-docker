@@ -14,107 +14,101 @@ Documentation and notes.
 
 # Files and directory structure
 
-  ```
-  /home
-  └── ~
-      └── docker
-          └── bookstack
-              ├── 🗁 bookstack-data
-              ├── 🗁 bookstack-db-data
-              ├── 🗋 .env
-              ├── 🗋 docker-compose.yml
-              └── 🗋 bookstack-backup-script.sh
-  ```
+```
+/home
+└── ~
+    └── docker
+        └── bookstack
+            ├── 🗁 bookstack-data
+            ├── 🗁 bookstack-db-data
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            └── 🗋 bookstack-backup-script.sh
+```
 
 # docker-compose
 
-  Dockerhub linuxserver/bookstack [example compose.](https://hub.docker.com/r/linuxserver/bookstack)
+Dockerhub linuxserver/bookstack [example compose.](https://hub.docker.com/r/linuxserver/bookstack)
 
-  `docker-compose.yml`
+`docker-compose.yml`
+```yml
+version: "2"
+services:
 
-  ```
-  version: "2"
-  services:
+  bookstack-db:
+    image: linuxserver/mariadb
+    container_name: bookstack-db
+    hostname: bookstack-db
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./bookstack-db-data:/config
 
-    bookstack-db:
-      image: linuxserver/mariadb
-      container_name: bookstack-db
-      hostname: bookstack-db
-      restart: unless-stopped
-      env_file: .env
-      volumes:
-        - ./bookstack-db-data:/config
+  bookstack:
+    image: linuxserver/bookstack
+    container_name: bookstack
+    hostname: bookstack
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - bookstack-db
+    volumes:
+      - ./bookstack-data:/config
 
-    bookstack:
-      image: linuxserver/bookstack
-      container_name: bookstack
-      hostname: bookstack
-      restart: unless-stopped
-      env_file: .env
-      depends_on:
-        - bookstack-db
-      volumes:
-        - ./bookstack-data:/config
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
 
-  networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
-  ```
+`.env`
+```bash
+# GENERAL
+MY_DOMAIN=blabla.org
+DEFAULT_NETWORK=caddy_net
+TZ=Europe/Prague
 
-  `.env`
+#LINUXSERVER.IO
+PUID=1000
+PGID=1000
 
-  ```
-  # GENERAL
-  MY_DOMAIN=blabla.org
-  DEFAULT_NETWORK=caddy_net
-  TZ=Europe/Prague
+# BOOKSTACK-MARIADB
+MYSQL_ROOT_PASSWORD=bookstack
+MYSQL_DATABASE=bookstack
+MYSQL_USER=bookstack
+MYSQL_PASSWORD=bookstack
 
-  #LINUXSERVER.IO
-  PUID=1000
-  PGID=1000
+# BOOKSTACK
+DB_HOST=bookstack-db
+DB_USER=bookstack
+DB_PASS=bookstack
+DB_DATABASE=bookstack
 
-  # BOOKSTACK-MARIADB
-  MYSQL_ROOT_PASSWORD=bookstack
-  MYSQL_DATABASE=bookstack
-  MYSQL_USER=bookstack
-  MYSQL_PASSWORD=bookstack
+# USING SENDGRID FOR SENDING EMAILS
+APP_URL=https://book.blabla.org
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.sendgrid.net
+MAIL_PORT=465
+MAIL_FROM=book@blabla.org
+MAIL_USERNAME=apikey
+MAIL_PASSWORD=SG.2FA24asaddasdasdasdsadasdasdassadDEMBzuh9e43
+MAIL_ENCRYPTION=SSL
+```
 
-  # BOOKSTACK
-  DB_HOST=bookstack-db
-  DB_USER=bookstack
-  DB_PASS=bookstack
-  DB_DATABASE=bookstack
-
-  # USING SENDGRID FOR SENDING EMAILS
-  APP_URL=https://book.blabla.org
-  MAIL_DRIVER=smtp
-  MAIL_HOST=smtp.sendgrid.net
-  MAIL_PORT=465
-  MAIL_FROM=book@blabla.org
-  MAIL_USERNAME=apikey
-  MAIL_PASSWORD=SG.2FA24asaddasdasdasdsadasdasdassadDEMBzuh9e43
-  MAIL_ENCRYPTION=SSL
-  ```
-
-  **All containers must be on the same network**.</br>
-  If one does not exist yet: `docker network create caddy_net`
+**All containers must be on the same network**.</br>
+If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
-  Caddy v2 is used,
-  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+Caddy v2 is used,
+details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
 
-  `Caddyfile`
-  ```
-  {
-      # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-  }
-
-  book.{$MY_DOMAIN} {
-      reverse_proxy bookstack:80
-  }
-  ```
+`Caddyfile`
+```
+book.{$MY_DOMAIN} {
+    reverse_proxy bookstack:80
+}
+```
 
 ---
 
@@ -131,7 +125,7 @@ Documentation and notes.
 
 # Backup and restore
 
-  * **backup** using [borg backup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  * **backup** using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
     
   * **restore**</br>
@@ -146,11 +140,11 @@ User-data daily export using the [official procedure.](https://www.bookstackapp.
 For bookstack it means database dump and backing up several directories
 containing user uploaded files.
 
-Daily run of [borg backup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+Daily run of [BorgBackup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
 takes care of backing up the directories.
 So only database dump is needed.
 The created database backup sql file is overwriten on every run of the script,
-but that's ok since borg backup is making daily snapshots.
+but that's ok since BorgBackup is making daily snapshots.
 
 * **create a backup script**</br>
     placed inside `bookstack` directory on the host
@@ -175,7 +169,7 @@ but that's ok since borg backup is making daily snapshots.
   Assuming clean start, first restore the database before running the app container.
 
   * start only the database container: `docker-compose up -d bookstack-db`
-  * copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack-db-data`
+  * copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack-db-data/`
   * restore the database inside the container</br>
     `docker container exec --workdir /config bookstack-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql'`
   * now start the app container: `docker-compose up -d`
@@ -183,7 +177,7 @@ but that's ok since borg backup is making daily snapshots.
   * down the containers `docker-compose down`
   * in `bookstack/bookstack-data/www/`</br>
     replace directories `files`,`images`,`uploads` and the file `.env`</br>
-    with the ones from the borg backup repository 
+    with the ones from the BorgBackup repository 
   * start the containers: `docker-compose up -d`
   * if there was a major version jump, exec in to the app container and run `php artisan migrate`</br>
     `docker container exec -it bookstack /bin/bash`</br>
