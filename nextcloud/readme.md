@@ -149,8 +149,8 @@ nextcloud.{$MY_DOMAIN} {
 
 # First run
 
-Nextcloud needs few minutes to start, then there is the initial configuration.
-Creating admin account and giving the database details as set in the `.env` file
+Nextcloud needs few minutes to start, then there is the initial configuration,
+creating admin account and giving the database details as set in the `.env` file
 
 ![first-run-pic](https://i.imgur.com/EygHgKa.png)
 
