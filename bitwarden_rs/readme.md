@@ -14,93 +14,89 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 
 # Files and directory structure
 
-  ```
-  /home
-  └── ~
-      └── docker
-          └── bitwarden
-              ├── 🗁 bitwarden-data
-              ├── 🗋 .env
-              ├── 🗋 docker-compose.yml
-              └── 🗋 bitwarden-backup-script.sh
-  ```
+```
+/home
+└── ~
+    └── docker
+        └── bitwarden
+            ├── 🗁 bitwarden-data
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            └── 🗋 bitwarden-backup-script.sh
+```
 
 # docker-compose
   
-  [Documentation](https://github.com/dani-garcia/bitwarden_rs/wiki/Using-Docker-Compose) on compose.
+[Documentation](https://github.com/dani-garcia/bitwarden_rs/wiki/Using-Docker-Compose) on compose.
 
-  `docker-compose.yml`
+`docker-compose.yml`
 
-  ```
-  version: "3"
-  services:
+```yml
+version: "3"
+services:
 
-    bitwarden:
-      image: bitwardenrs/server
-      hostname: bitwarden
-      container_name: bitwarden
-      restart: unless-stopped
-      env_file: .env
-      volumes:
-        - ./bitwarden-data/:/data/
+  bitwarden:
+    image: bitwardenrs/server
+    container_name: bitwarden
+    hostname: bitwarden
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./bitwarden-data/:/data/
 
-  networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
-  ```
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
 
-  `.env`
+`.env`
 
-  ```
-  # GENERAL
-  MY_DOMAIN=blabla.org
-  DEFAULT_NETWORK=caddy_net
-  TZ=Europe/Prague
+```yml
+# GENERAL
+MY_DOMAIN=blabla.org
+DEFAULT_NETWORK=caddy_net
+TZ=Europe/Prague
 
-  # BITWARDEN
-  ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
-  SIGNUPS_ALLOWED=false
-  WEBSOCKET_ENABLED=true
+# BITWARDEN
+ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
+SIGNUPS_ALLOWED=false
+WEBSOCKET_ENABLED=true
 
-  # USING SENDGRID FOR SENDING EMAILS
-  DOMAIN=https://passwd.blabla.org
-  SMTP_SSL=true
-  SMTP_EXPLICIT_TLS=true
-  SMTP_HOST=smtp.sendgrid.net
-  SMTP_PORT=465
-  SMTP_USERNAME=apikey
-  SMTP_PASSWORD=SG.MOQQegA3bgfodRN4IG2Wqwe.s23Ld4odqhOQQegf4466A4
-  SMTP_FROM=admin@blabla.org
-  ```
+# USING SENDGRID FOR SENDING EMAILS
+DOMAIN=https://passwd.blabla.org
+SMTP_SSL=true
+SMTP_EXPLICIT_TLS=true
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=465
+SMTP_USERNAME=apikey
+SMTP_PASSWORD=SG.MOQQegA3bgfodRN4IG2Wqwe.s23Ld4odqhOQQegf4466A4
+SMTP_FROM=admin@blabla.org
+```
 
-  **All containers must be on the same network**.</br>
-  If one does not exist yet: `docker network create caddy_net`
+**All containers must be on the same network**.</br>
+If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
-  Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)</br>
-  Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
-  
-  `Caddyfile`
-  ```
-  {
-      # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-  }
+Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)</br>
+Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
 
-  passwd.{$MY_DOMAIN} {
-      header / {
-         X-XSS-Protection "1; mode=block"
-         X-Frame-Options "DENY"
-         X-Robots-Tag "none"
-         -Server
-      }
-      encode gzip
-      reverse_proxy /notifications/hub/negotiate bitwarden:80
-      reverse_proxy /notifications/hub bitwarden:3012
-      reverse_proxy bitwarden:80
-  }
-  ```
+`Caddyfile`
+```
+passwd.{$MY_DOMAIN} {
+    header / {
+       X-XSS-Protection "1; mode=block"
+       X-Frame-Options "DENY"
+       X-Robots-Tag "none"
+       -Server
+    }
+    encode gzip
+    reverse_proxy /notifications/hub/negotiate bitwarden:80
+    reverse_proxy /notifications/hub bitwarden:3012
+    reverse_proxy bitwarden:80
+}
+```
 
 # Forward port 3012 TCP on your router
 
@@ -140,7 +136,7 @@ to invite users.
 
 # Backup and restore
 
-  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  * **backup** using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
     
   * **restore**</br>
@@ -154,11 +150,11 @@ to invite users.
 User-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
 
-Daily run of [borg backup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+Daily run of [BorgBackup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
 takes care of backing up the directory.
 So only database dump is needed.
 The created backup sqlite3 file is overwriten on every run of the script,
-but that's ok since borg backup is making daily snapshots.
+but that's ok since BorgBackup is making daily snapshots.
 
 * **create a backup script**</br>
     placed inside `bitwarden` directory on the host
@@ -187,6 +183,6 @@ but that's ok since borg backup is making daily snapshots.
   * down the container `docker-compose down`
   * in `bitwarden/bitwarden-data/`</br>
     replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
-    replace `attachments` directory with the one from the borg backup repository 
+    replace `attachments` directory with the one from the BorgBackup repository 
   * start the container `docker-compose up -d`
 
