@@ -24,7 +24,7 @@ Automatic DNS entries update. Useful if no static IP from ISP.
 
 # docker-compose
   
-[Based on linuxserver.io](https://hub.docker.com/r/linuxserver/ddclient).
+[Based on linuxserver.io](https://hub.docker.com/r/linuxserver/ddclient)
 
 `docker-compose.yml`
 
