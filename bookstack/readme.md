@@ -150,7 +150,7 @@ but that's ok since BorgBackup is making daily snapshots.
     placed inside `bookstack` directory on the host
 
     `bookstack-backup-script.sh`
-    ```
+    ```bash
     #!/bin/bash
 
     # CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
