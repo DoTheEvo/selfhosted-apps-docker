@@ -2,82 +2,137 @@
 
 ###### guide by example
 
-### purpose
+![logo](https://i.imgur.com/NSZ1DTH.png)
+
+# Purpose
 
 Homepage.
 
 * [Github](https://github.com/bastienwirtz/homer)
-* [DockerHub image used](https://hub.docker.com/r/linuxserver/bookstack)
+* [DockerHub image used](https://hub.docker.com/r/b4bz/homer)
 
-### files and directory structure
+# Files and directory structure
 
-  ```
-  /home
-  └── ~
-      └── docker
-          └── homer
-              ├── 🗁 assets
-              ├── 🗋 .config.yml
-              ├── 🗋 .env
-              └── 🗋 docker-compose.yml
-  ```
+```
+/home
+└── ~
+    └── docker
+        └── homer
+            ├── 🗁 assets
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            └── 🗋 config.yml
+```
 
-### docker-compose
+# docker-compose
 
-  `docker-compose.yml`
+`docker-compose.yml`
 
-  ```
-  version: "2"
-  services:
-    homer:
-      image: b4bz/homer:latest
-      container_name: homer
-      hostname: homer
-      volumes:
-        - .config.yml:/www/config.yml
-        - ./assets/:/www/assets
-      restart: unless-stopped
-      expose:
-        - "8080"
+```
+version: "2"
+services:
 
-  networks:
-    default:
-      external:
-        name: $DEFAULT_NETWORK
-  ```
+  homer:
+    image: b4bz/homer:latest
+    container_name: homer
+    hostname: homer
+    restart: unless-stopped
+    volumes:
+      - ./config.yml:/www/config.yml
+      - ./assets/:/www/assets
 
-  `.env`
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
 
-  ```
-  # GENERAL
-  MY_DOMAIN=blabla.org
-  DEFAULT_NETWORK=caddy_net
-  ```
+`.env`
 
-### reverse proxy
+```
+# GENERAL
+MY_DOMAIN=blabla.org
+DEFAULT_NETWORK=caddy_net
+TZ=Europe/Prague
+```
 
-  caddy v2 is used,
-  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+# Reverse proxy
 
-  `Caddyfile`
-  ```
-  {
-      # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-  }
+Caddy v2 is used,
+details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)
 
-  netdata.{$MY_DOMAIN} {
-      reverse_proxy {
-          to netdata:80
-      }
-  }
-  ```
+`Caddyfile`
+```
+{$MY_DOMAIN} {
+    reverse_proxy homer:8080
+}
+```
 
-### update
+# Config
 
-  * image update using docker compose 
+Homepage is configured in `config.yml`
 
+`config.yml`
+```yml
+title: "Homepage"
+subtitle: "Homer"
+logo: "assets/homer.png"
+# icon: "fas fa-skull-crossbones"
+footer: false #'<p>bla bla bla</p>'
+
+# Optional navbar
+links:
+  - name: "Font Awesome Icon Galery"
+    icon: "fab fa-fort-awesome"
+    url: "https://fontawesome.com/icons?d=gallery"
+  - name: "Reddit SelfHosted"
+    icon: "fab fa-reddit"
+    url: "https://www.reddit.com/r/selfhosted/"
+
+# First level array represent a group.
+# Single service with an empty name if not using groups
+services:
+  - name: "Crux"
+    icon: "fab fa-docker"
+    items:
+      - name: "Bookstack"
+        logo: "/assets/tools/bookstack.png"
+        subtitle: "Notes and Documentation"
+        url: "https://book.blabla.org"
+      - name: "Bitwarden"
+        logo: "/assets/tools/bitwarden.png"
+        subtitle: "Password Manager"
+        url: "https://passwd.blabla.org"
+      - name: "Nextcloud"
+        logo: "/assets/tools/nextcloud.png"
+        subtitle: "File Sync & Share"
+        url: "https://nextcloud.blabla.org"
+  - name: "Monitoring"
+    icon: "fas fa-heartbeat"
+    items:
+      - name: "Prometheus + Grafana"
+        logo: "/assets/tools/grafana.png"
+        subtitle: "Metric analytics & dashboards"
+        url: "https://grafana.blabla.org"
+      - name: "Portainer"
+        logo: "/assets/tools/portainer.png"
+        subtitle: "Docker Manager"
+        url: "https://portainer.blabla.org"
+```
+
+# Update
+
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+
+  * manual image update</br>
     `docker-compose pull`</br>
     `docker-compose up -d`</br>
     `docker image prune`
 
+# Backup and restore
 
+  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  that makes daily snapshot of the entire directory
+    
+  * **restore**</br>
+    copy config.yml and assets directory from a borg repository to a freshly spin container
