@@ -6,6 +6,7 @@
 
 Automatic DNS entries update. Useful if no static IP from ISP.
 
+* [Official site](https://sourceforge.net/p/ddclient/wiki/usage/)
 * [Github](https://github.com/ddclient/ddclient)
 * [DockerHub](https://hub.docker.com/r/linuxserver/ddclient)
 
