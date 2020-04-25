@@ -2,14 +2,14 @@
 
 ###### guide by example
 
-# purpose
+# Purpose
 
 Automatic DNS entries update. Useful if no static IP from ISP.
 
 * [Github](https://github.com/ddclient/ddclient)
 * [DockerHub](https://hub.docker.com/r/linuxserver/ddclient)
 
-# files and directory structure
+# Files and directory structure
 
   ```
   /home
