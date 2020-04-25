@@ -27,7 +27,6 @@ Homepage.
 # docker-compose
 
 `docker-compose.yml`
-
 ```yml
 version: "2"
 services:
@@ -48,7 +47,6 @@ networks:
 ```
 
 `.env`
-
 ```bash
 # GENERAL
 MY_DOMAIN=blabla.org
