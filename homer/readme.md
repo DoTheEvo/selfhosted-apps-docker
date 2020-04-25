@@ -133,7 +133,7 @@ services:
 
 # Backup and restore
 
-  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  * **backup** using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
     
   * **restore**</br>
