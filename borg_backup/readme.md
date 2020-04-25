@@ -2,21 +2,23 @@
 
 ###### guide by example
 
-## purpose
+![logo](https://i.imgur.com/dR50bkP.png)
 
-Backup terminal utility.
+# purpose
+
+Backups.
 
 * [Official site](https://www.borgbackup.org/)
 * [Github](https://github.com/borgbackup/borg)
 
-## files and directory structure
+# files and directory structure
 
   ```
   /home
   └── ~
-      ├── borg_backup
+      ├── borg
       │    ├── 🗁 docker_backup
-      │    ├── 🗋 borg-backup.sh
+      │    ├── 🗋 borg_backup.sh
       │    └── 🗋 borg_backup.log
       │
       └── docker
@@ -25,35 +27,33 @@ Backup terminal utility.
           └── ...
   ```
 
-## The setup
+# The setup
 
-Borg is installed directly on the host system.</br>
-A script is created that backs up entire docker directory somewhere locally.</br>
-Cronjob executing the script daily.
+BorgBackup is installed directly on the host system.</br>
+A script is created that backs up the entire docker directory locally.</br>
+Cronjob is executing the script daily.
 
-The script needs manual initialization of a repo somewhere.</br>
+* **Install BorgBackup**
 
-
-* **Install borg backup**
+* **Create a new borg repo**</br>
+  `mkdir ~/borg`</br>
+  `borg init --encryption=none ~/borg/docker_backup`
 
 * **The script**
 
-  Repo needs to be initialized manualy first.</br>
-
-
-  `borg-backup.sh`
+  `borg_backup.sh`
   ```
   #!/bin/bash
 
   # INITIALIZE THE REPO WITH THE COMMAND:
-  #   borg init --encryption=none /mnt/C1/backup_borg/
+  #   borg init --encryption=none ~/borg/my_backup
   # THEN RUN THIS SCRIPT
 
   # -----------------------------------------------
 
-  BACKUP_THIS='/home/spravca/docker /etc'
-  REPOSITORY='/home/spravca/borg_backup/docker_backup'
-  LOGFILE='/home/spravca/borg_backup/borg_backup.log'
+  BACKUP_THIS='/home/bastard/docker /etc'
+  REPOSITORY='/home/bastard/borg/docker_backup'
+  LOGFILE='/home/bastard/borg/borg_backup.log'
 
   # -----------------------------------------------
 
@@ -99,14 +99,16 @@ The script needs manual initialization of a repo somewhere.</br>
   # to delete single backup in a repo:
   #   borg delete .::1584472836
   ```
-  the script must be **executabe** - `chmod +x borg-backup.sh`
+  the script must be **executabe** - `chmod +x borg_backup.sh`
 
 * **automatic execution**
 
   cron job, every day at 3:00</br>
   `crontab -e`
-  `0 3 * * * /home/bastard/borg_backup/borg-backup.sh`
+  `0 3 * * * /home/bastard/borg/borg_backup.sh`
 
-## Remote backup
+# Remote backup
 
-Backing up to network share or cloud, rclone
+Backing up borg repo to a network share or cloud using rclone
+
+*To be continued*
