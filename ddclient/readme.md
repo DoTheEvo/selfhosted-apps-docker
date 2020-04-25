@@ -12,89 +12,86 @@ Automatic DNS entries update. Useful if no static IP from ISP.
 
 # Files and directory structure
 
-  ```
-  /home
-  └── ~
-      └── docker
-          └── ddclient
-              ├── 🗁 config
-              │   └── 🗋 ddclient.conf
-              ├── 🗋 .env
-              └── 🗋 docker-compose.yml
-  ```              
+```
+/home
+└── ~
+    └── docker
+        └── ddclient
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            └── 🗋 ddclient.conf
+```              
 
 # docker-compose
   
-  [Based on linuxserver.io](https://hub.docker.com/r/linuxserver/ddclient).
+[Based on linuxserver.io](https://hub.docker.com/r/linuxserver/ddclient).
 
-  `docker-compose.yml`
+`docker-compose.yml`
 
-  ```
-  version: "2.1"
-  services:
+```yml
+version: "2.1"
+services:
 
-    ddclient:
-      image: linuxserver/ddclient
-      hostname: ddclient
-      container_name: ddclient
-      restart: unless-stopped
-      env_file: .env
-      volumes:
-        - ./config:/config
-      restart: unless-stopped
-  ```
+  ddclient:
+    image: linuxserver/ddclient
+    hostname: ddclient
+    container_name: ddclient
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./ddclient.conf:/config/ddclient.conf
+    restart: unless-stopped
+```
 
-  `.env`
+`.env`
 
-  ```
-  # GENERAL
-  MY_DOMAIN=blabla.org
-  DEFAULT_NETWORK=caddy_net
-  TZ=Europe/Prague
+```bash
+# GENERAL
+MY_DOMAIN=blabla.org
+DEFAULT_NETWORK=caddy_net
+TZ=Europe/Prague
 
-  #LINUXSERVER.IO
-  PUID=1000
-  PGID=1000
-  ```
+#LINUXSERVER.IO
+PUID=1000
+PGID=1000
+```
 
 # Configuration
 
 Official ddclient config example
-[here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf)
-
+[here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf).</br>
 Make sure A-records exist on cloudflare.
 
-  `ddclient.conf`
+`ddclient.conf`
 
-  ```
-  daemon=600
-  syslog=yes
-  mail=root
-  mail-failure=root
-  pid=/var/run/ddclient/ddclient.pid
-  ssl=yes
+```bash
+daemon=600
+syslog=yes
+mail=root
+mail-failure=root
+pid=/var/run/ddclient/ddclient.pid
+ssl=yes
 
-  use=web, web=checkip.dyndns.org/, web-skip='IP Address'
-  wildcard=yes
+use=web, web=checkip.dyndns.org/, web-skip='IP Address'
+wildcard=yes
 
-  ##
-  ## CloudFlare (www.cloudflare.com)
-  ##
-  protocol=cloudflare,        \
-  zone=blabla.org,              \
-  ttl=1,                      \
-  login=bastard.blabla@gmail.com, \
-  password=global-api-key-goes-here \
-  blabla.org,*.blabla.org,subdomain.blabla.org
+##
+## CloudFlare (www.cloudflare.com)
+##
+protocol=cloudflare,        \
+zone=blabla.org,              \
+ttl=1,                      \
+login=bastard.blabla@gmail.com, \
+password=global-api-key-goes-here \
+blabla.org,*.blabla.org,subdomain.blabla.org
 
-  ##
-  protocol=cloudflare,        \
-  zone=blabla.tech,              \
-  ttl=1,                      \
-  login=bastard.blabla@gmail.com, \
-  password=global-api-key-goes-here \
-  blabla.net,*.blabla.net,whatever.blabla.org
-  ```
+protocol=cloudflare,        \
+zone=blabla.tech,              \
+ttl=1,                      \
+login=bastard.blabla@gmail.com, \
+password=global-api-key-goes-here \
+blabla.net,*.blabla.net,whatever.blabla.org
+```
 
 # Update
 
