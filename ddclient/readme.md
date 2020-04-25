@@ -1,4 +1,4 @@
-# ddclient in docker
+# DDclient in docker
 
 ###### guide by example
 
@@ -56,12 +56,12 @@ Automatic DNS entries update. Useful if no static IP from ISP.
   PGID=1000
   ```
 
-# configuration
+# Configuration
 
 Official ddclient config example
 [here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf)
 
-Make sure A-records exist on 
+Make sure A-records exist on cloudflare.
 
   `ddclient.conf`
 
