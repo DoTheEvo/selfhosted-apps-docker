@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/e03aF8d.png)
 
-## Purpose
+# Purpose
 
 Monitoring of the host and the running cointaners.
 
@@ -15,14 +15,14 @@ Monitoring of the host and the running cointaners.
 Everything here is based on an excelent
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
 
-## The containers
+# The containers
 
 * Prometheus - monitoring system and the metrics database
-* Grafana - web based ui visualisation of the metrics
-* NodeExporter - hosts metrics collector
+* Grafana - web based ui visualisation of colleted metrics
+* NodeExporter - host machine metrics collector
 * cAdvisor - docker containers metrics collector
 
-## Files and directory structure
+# Files and directory structure
 
 ```
 /home
@@ -49,7 +49,7 @@ Everything here is based on an excelent
             └── 🗋 prometheus.yml
 ```
 
-## docker-compose
+# docker-compose
 
 `docker-compose.yml`
 ```yml
@@ -151,10 +151,12 @@ GF_USERS_ALLOW_SIGN_UP=false
 **All containers must be on the same network**.</br>
 If one does not exist yet: `docker network create caddy_net`
 
-## Other files
+# Configuration files
 
-**prometheus.yml** - config for prometheus, bind mounted in to prometheus container.
-This one contains the bare minimum setup of metric endpoints to be scarepd for data.
+#### prometheus.yml
+
+A config file for prometheus, bind mounted in to prometheus container.</br>
+This one contains the bare minimum setup of endpoints to be scraped for data.
 
 `prometheus.yml`
 ```yml
@@ -179,8 +181,11 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 ```
+#### datasource.yml
 
-**The entire /grafana/provisioning directory is bind mounted in to grafana container**
+in /grafana/provisioning/datasources/datasource.yml
+
+bind mounted in to grafana container
 
 /grafana/provisioning/datasources/**datasource.yml** - grafana's datasource config file
 if one would not exist then during the first run it would ask for this info.
@@ -200,7 +205,9 @@ datasources:
     editable: true
 ```
 
-* grafana/provisioning/dashboards/**dashboard.yml** - not sure
+* grafana/provisioning/dashboards/**dashboard.yml** - 
+
+[docs](https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards)
 
 
 `dashboard.yml`
@@ -223,7 +230,7 @@ providers:
 
 Premade Dashboards are in the `dashboards` of this tutorial.
 
-## Reverse proxy
+# Reverse proxy
 
   Caddy v2 is used,
   details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
@@ -235,7 +242,7 @@ Premade Dashboards are in the `dashboards` of this tutorial.
   }
   ```
 
-## Explanation
+# Explanation
 
   asdasd
 
@@ -244,7 +251,7 @@ Premade Dashboards are in the `dashboards` of this tutorial.
 
 ![interface-pic](https://i.imgur.com/RrK29wC.png)
 
-## Update
+# Update
 
   * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
@@ -253,7 +260,7 @@ Premade Dashboards are in the `dashboards` of this tutorial.
     `docker-compose up -d`</br>
     `docker image prune`
 
-## Backup and restore
+# Backup and restore
 
   * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
@@ -264,8 +271,8 @@ Premade Dashboards are in the `dashboards` of this tutorial.
     from the backup copy back the bookstack directortory</br>
     start the container `docker-compose up -d`
 
-## Backup of just user data
+# Backup of just user data
 
 
-## Restore the user data
+# Restore the user data
 
