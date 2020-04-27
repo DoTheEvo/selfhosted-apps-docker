@@ -23,9 +23,9 @@ Automatic updates of containers.
 
 # docker-compose
 
-[scheduled](https://pkg.go.dev/github.com/robfig/cron@v1.2.0?tab=doc#hdr-CRON_Expression_Format)
-to run every saturday at midnight</br>
-Heads up that it's not a typical cron format, seconds are the first digit.
+Scheduled to run every saturday at midnight</br>
+Heads up that not a typical cron format is used,
+[seconds are the first digit](https://pkg.go.dev/github.com/robfig/cron@v1.2.0?tab=doc#hdr-CRON_Expression_Format).
 
 `docker-compose.yml`
 ```yml

@@ -6,7 +6,8 @@
 
 # Purpose
 
-User friendly overview of running containers.
+User friendly overview and managment of the running containers,
+networks, volumes, images,...
 
 # Files and directory structure
 

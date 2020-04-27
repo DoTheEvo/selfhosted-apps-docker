@@ -59,8 +59,10 @@ PGID=1000
 # Configuration
 
 Official ddclient config example
-[here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf).</br>
-Make sure A-records exist on cloudflare.
+[here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf).
+
+This setup assumes the DNS are managed Cloudflare.
+Make sure all subdomains in the config have A-records on Cloudflare.
 
 `ddclient.conf`
 

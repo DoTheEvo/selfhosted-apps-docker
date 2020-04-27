@@ -30,11 +30,15 @@ File share & sync.
 
 Official examples [here](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose)
 
-Four containers are spin up
-  - `nextcloud` - nextcloud app with apache web server with php as a module 
-  - `nextcloud-db` - mariadb database where files-metadata and users-metadata are stored
-  - `nextcloud-redis` - in memory file caching and more reliable transactional file locking
-  - `nextcloud-cron` - for being able to run maintenance cronjobs
+Four containers to spin up
+
+* **nextcloud** - nextcloud app that stores uploaded files and runs
+  apache web server with php as a module.
+* **nextcloud-db** - mariadb database where files-metadata
+  and users-metadata are stored
+* **nextcloud-redis** - in memory file caching
+  and more reliable transactional file locking
+* **nextcloud-cron** - for being able to run maintenance cronjobs
 
 `docker-compose.yml`
 ```yml
@@ -132,7 +136,8 @@ If one does not exist yet: `docker network create caddy_net`
 # Reverse proxy
 
 [Nextcloud official documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/reverse_proxy_configuration.html)
-regarding reverse proxy.</br>
+regarding reverse proxy.
+
 Caddy v2 is used,
 details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup).</br>
 There are few extra directives here to fix some nextcloud warnings.
@@ -161,7 +166,7 @@ Editing config.php and adding the new domain will fix it.
 
 # Security & setup warnings
 
-Nextcloud has status check in *Settings > Administration > Overview*</br>
+Nextcloud has a status check in *Settings > Administration > Overview*</br>
 There are likely several warnings on a freshly spun container.
 
 ##### The database is missing some indexes

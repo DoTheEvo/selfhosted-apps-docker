@@ -15,19 +15,6 @@ Monitoring of the host and the running cointaners.
 Everything here is based on the magnificent
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
 
-# Containers
-
-* **Prometheus** - monitoring system that pulls and stores data from exporters
-  and then exposes them for visualization.
-  Can also alert if a metric fails preset rule.
-* **Grafana** - web based visualization of the collected metrics
-  in nice graphs, gauges, tables,...
-* **NodeExporter** - exporter for linux machines,
-  in this case gathering docker host metrics,
-  like uptime, cpu load, memory use, network bandwidth use, disk space,...
-* **cAdvisor** - exporter for gathering docker containers metrics,
-  showing cpu, memory, network use of each container
-
 # Files and directory structure
 
 ```
@@ -56,6 +43,21 @@ Everything here is based on the magnificent
 ```
 
 # docker-compose
+
+Four containers to spin up.</br>
+While the illustrious [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
+also got alertmanager and pushgateway, this is a simpler setup for now.
+
+* **Prometheus** - monitoring system that pulls and stores data from exporters
+  and then exposes them for visualization.
+  Can also alert if a metric fails preset rule.
+* **Grafana** - web based visualization of the collected metrics
+  in nice graphs, gauges, tables,...
+* **NodeExporter** - exporter for linux machines,
+  in this case gathering docker host metrics,
+  like uptime, cpu load, memory use, network bandwidth use, disk space,...
+* **cAdvisor** - exporter for gathering docker containers metrics,
+  showing cpu, memory, network use of each container
 
 `docker-compose.yml`
 ```yml

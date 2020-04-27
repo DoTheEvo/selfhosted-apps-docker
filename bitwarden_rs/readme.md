@@ -100,7 +100,7 @@ passwd.{$MY_DOMAIN} {
 # Forward port 3012 TCP on your router
 
 [WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications,
-so that all web based clients can immediatly sync when a change happens on server.
+so that all web based clients can immediatly sync when a change happens on the server.
 
 * Enviromental variable `WEBSOCKET_ENABLED=true` needs to be set.</br>
 * Reverse proxy needs to route `/notifications/hub` to port 3012.</br>
