@@ -73,8 +73,6 @@ services:
     user: root
     depends_on:
       - cadvisor
-    ports:
-      - "9090:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -249,6 +247,9 @@ providers:
 * grafana/provisioning/dashboards/**<dashboards.json>**
 * [official documentation](https://grafana.com/docs/grafana/latest/reference/dashboard/)
 
+In [the dashboards](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana/dashboards)
+directory of this repository.
+
 Preconfigured dashboards from the prodigious
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom).</br>
 Mostly unchanged, except for the default time range shown changed from 15min to 1 hour,
@@ -268,8 +269,7 @@ details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
 
 The setup is accessed through grafana.
 But occasionally there might be need to check with prometheus,
-which will be available on \<docker-host-ip>:9090,
-assuming port 9090 is kept mapped in the compose file.
+which will be available on \<docker-host-ip>:9090.
 
 `Caddyfile`
 ```
@@ -281,6 +281,8 @@ grafana.{$MY_DOMAIN} {
     reverse_proxy prometheus:9090
 }
 ```
+
+*Extra info:* `:9000` is short notation for `localhost:9000`
 
 ---
 
