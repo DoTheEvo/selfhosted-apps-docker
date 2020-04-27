@@ -247,11 +247,17 @@ providers:
 * grafana/provisioning/dashboards/**<dashboards.json>**
 * [official documentation](https://grafana.com/docs/grafana/latest/reference/dashboard/)
 
-Preconfigured dashboards from prodigious
+Preconfigured dashboards from the prodigious
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom).</br>
-Mostly unchanged, except for default time interval shown changed from 15min to 1 hour,
+Mostly unchanged, except for the default time range shown changed from 15min to 1 hour,
 and [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
 for host network monitoring not showing traffick.
+
+* **docker_host.json** - dashboard showing linux host metrics
+* **docker_containers.json** - dashboard showing docker containers metrics,
+  except the ones labeled as `monitoring` in the compose file
+* **monitoring_services.json** - dashboar showing docker containers metrics
+  of containers that are labeled `monitoring`
 
 # Reverse proxy
 
@@ -280,20 +286,20 @@ grafana.{$MY_DOMAIN} {
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+* manual image update</br>
+  `docker-compose pull`</br>
+  `docker-compose up -d`</br>
+  `docker image prune`
 
 # Backup and restore
 
-  * **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-  that makes daily snapshot of the entire directory
-    
-  * **restore**</br>
-    down the containers `docker-compose down`</br>
-    delete the entire prometheus directory</br>
-    from the backup copy back the prometheus directortory</br>
-    start the container `docker-compose up -d`
+* **backup** using [borgbackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the entire directory
+  
+* **restore**</br>
+  down the containers `docker-compose down`</br>
+  delete the entire prometheus directory</br>
+  from the backup copy back the prometheus directortory</br>
+  start the container `docker-compose up -d`
