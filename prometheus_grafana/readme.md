@@ -12,15 +12,21 @@ Monitoring of the host and the running cointaners.
 * [Github](https://github.com/prometheus)
 * [DockerHub](https://hub.docker.com/r/prom/prometheus/)
 
-Everything here is based on an excelent
+Everything here is based on the magnificent
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
 
-# The containers
+# Containers
 
-* Prometheus - monitoring system and the metrics database
-* Grafana - web based ui visualisation of colleted metrics
-* NodeExporter - host machine metrics collector
-* cAdvisor - docker containers metrics collector
+* **Prometheus** - monitoring system that pulls and stores data from exporters
+  and then exposes them for visualization.
+  Can also alert if a metric fails preset rule.
+* **Grafana** - web based visualization of the collected metrics
+  in nice graphs, gauges, tables,...
+* **NodeExporter** - exporter for linux machines,
+  in this case gathering docker host metrics,
+  like uptime, cpu load, memory use, network bandwidth use, disk space,...
+* **cAdvisor** - exporter for gathering docker containers metrics,
+  showing cpu, memory, network use of each container
 
 # Files and directory structure
 
@@ -65,6 +71,8 @@ services:
     user: root
     depends_on:
       - cadvisor
+    ports:
+      - "9090:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -153,7 +161,13 @@ If one does not exist yet: `docker network create caddy_net`
 
 # Configuration files
 
+Setup is mostly configured through config files.
+Some of the grafana config files could be ommited and info passed on the first run,
+but setting it through GUI wont generate these files which hinders backup.
+
 #### prometheus.yml
+
+* [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 
 A config file for prometheus, bind mounted in to prometheus container.</br>
 This one contains the bare minimum setup of endpoints to be scraped for data.
@@ -181,14 +195,14 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 ```
+
 #### datasource.yml
 
-in /grafana/provisioning/datasources/datasource.yml
+* /grafana/provisioning/datasources/**datasource.yml**
+* [official documentation](https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources)
 
-bind mounted in to grafana container
-
-/grafana/provisioning/datasources/**datasource.yml** - grafana's datasource config file
-if one would not exist then during the first run it would ask for this info.
+Grafana's datasources config file, from where it suppose to get metrics.</br>
+Here it ust points at prometheus container.
 
 `datasource.yml`
 ```yml
@@ -202,13 +216,15 @@ datasources:
     url: http://prometheus:9090
     basicAuth: false
     isDefault: true
-    editable: true
+    editable: false
 ```
 
-* grafana/provisioning/dashboards/**dashboard.yml** - 
+#### dashboard.yml
 
-[docs](https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards)
+* grafana/provisioning/dashboards/**dashboard.yml**
+* [official documentation](https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards)
 
+Config file telling grafana from where to load dashboards.
 
 `dashboard.yml`
 ```yml
@@ -220,32 +236,43 @@ providers:
     folder: ''
     type: file
     disableDeletion: false
-    editable: true
-    allowUiUpdates: true
+    editable: false
+    allowUiUpdates: false
     options:
       path: /etc/grafana/provisioning/dashboards
 ```
 
-* grafana/provisioning/dashboards/**<dashboards.json files>** - pre configured dashboards
+#### \<dashboards>.json
 
-Premade Dashboards are in the `dashboards` of this tutorial.
+* grafana/provisioning/dashboards/**<dashboards.json>**
+* [official documentation](https://grafana.com/docs/grafana/latest/reference/dashboard/)
+
+Preconfigured dashboards from prodigious
+[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom).</br>
+Mostly unchanged, except for default time interval shown changed from 15min to 1 hour,
+and [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
+for host network monitoring not showing traffick.
 
 # Reverse proxy
 
-  Caddy v2 is used,
-  details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+Caddy v2 is used,
+details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
 
-  `Caddyfile`
-  ```
-  grafana.{$MY_DOMAIN} {
-      reverse_proxy grafana:3000
-  }
-  ```
+The setup is accessed through grafana.
+But occasionally there might be need to check with prometheus,
+which will be available on \<docker-host-ip>:9090,
+assuming port 9090 is kept mapped in the compose file.
 
-# Explanation
+`Caddyfile`
+```
+grafana.{$MY_DOMAIN} {
+    reverse_proxy grafana:3000
+}
 
-  asdasd
-
+:9090 {
+    reverse_proxy prometheus:9090
+}
+```
 
 ---
 
@@ -266,13 +293,7 @@ Premade Dashboards are in the `dashboards` of this tutorial.
   that makes daily snapshot of the entire directory
     
   * **restore**</br>
-    down the bookstack containers `docker-compose down`</br>
-    delete the entire bookstack directory</br>
-    from the backup copy back the bookstack directortory</br>
+    down the containers `docker-compose down`</br>
+    delete the entire prometheus directory</br>
+    from the backup copy back the prometheus directortory</br>
     start the container `docker-compose up -d`
-
-# Backup of just user data
-
-
-# Restore the user data
-
