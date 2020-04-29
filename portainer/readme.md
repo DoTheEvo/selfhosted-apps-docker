@@ -7,7 +7,7 @@
 # Purpose
 
 User friendly overview and managment of the running containers,
-networks, volumes, images,...
+networks, volumes, images,... the work.
 
 # Files and directory structure
 

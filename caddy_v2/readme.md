@@ -18,7 +18,7 @@ and bitwarden.blabla.org takes you to your password manager.
 Caddy will be running as a docker container and will route traffic to other containers,
 or servers on the network.
 
-#### - Requirements
+### - Requirements
 
 * have a docker host and some vague docker knowledge
 * have port 80 and 443 forwarded on the router/firewall to the docker host
@@ -27,7 +27,7 @@ or servers on the network.
   preferably using Cloudflare
 
 
-#### - Files and directory structure
+### - Files and directory structure
 
 ```
 /home
@@ -51,15 +51,15 @@ or servers on the network.
 The diretories are created by docker on the first run, 
 the conten is visible on only for docker host root user.
 
-#### - Create a new docker network
+### - Create a new docker network
 
 `docker network create caddy_net`
   
 All the containers and Caddy must be on the same network.
 
-#### - Create `.env` file
+### - Create `.env` file
 
-You want to change `MY_DOMAIN` to your domain.
+You want to change `blabla.org` to your domain.
 
 `.env`
 ```bash
@@ -71,20 +71,21 @@ Domain names, api keys, email settings, ip addresses, database credentials, ...
 whatever is specific for one deployment and different for another,
 all of that ideally goes in to the `.env` file.
 
-These variables will be available for docker-compose when building
-the container with `docker-compose up`.
+If `.env` file is present in the directory with the compose file,
+it is automatically loaded and these variables will be available
+for docker-compose when building the container with `docker-compose up`.
 This allows compose files to be moved from system to system more freely
 and changes are done to the `.env` file.
 
 Often variable should be available also inside the running container.
 For that it must be declared in the `environment` section of the compose file,
-as can be seen later in caddie's `docker-compose.yml`
+as can be seen next in caddie's `docker-compose.yml`
 
 *extra info:*</br>
 `docker-compose config` shows how compose will look
 with the variables filled in.
 
-#### - Create docker-compose.yml
+### - Create docker-compose.yml
 
 `docker-compose.yml`
 ```yml
@@ -119,7 +120,7 @@ The `Caddyfile` is read-only bind-mounted from the docker host.</br>
 Directories `config` and `data` are bind mounted so that their content persists.</br>
 The same network is joined as for all other containers.
 
-#### - Create Caddyfile
+### - Create Caddyfile
 
 `Caddyfile`
 ```
@@ -142,13 +143,13 @@ pointing at your public ip set on Cloudflare, or wherever the domains DNS is man
 Can also be a wild card `*.blabla.org -> 104.17.436.89`
 
 The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.</br>
-The subdomains point at docker containers by their **hostname** and **port**.
+The subdomains point at docker containers by their **hostname** and **exposed port**.
 So every docker container you spin should have hostname definied.</br>
 Commented out is the staging url for let's encrypt, useful for testing.
 
-#### - Setup some docker containers
+### - Setup some docker containers
 
-Something easy to setup to route to, targeted using the **hostname** and the **exposed port**.</br>
+Something light and easy to setup to route to.</br>
 Assuming for this testing these compose files are in the same directory with Caddy,
 so they make use of the same `.env` file and so be on the same network.
 
@@ -191,12 +192,12 @@ networks:
     external:
       name: $DEFAULT_NETWORK
 ```
-#### - editing hosts file
+### - editing hosts file
 
 You are likely on your local network and you are running docker host
 inside the same network.
 Without [editing the hosts file](https://support.rackspace.com/how-to/modify-your-hosts-file/)
-shit will not work when trying to access using domain name. 
+shit will not work when trying to access services using domain name. 
 
 so just edit `hosts` as root/administrator,
 adding whatever is the local IP of the docker host and the hostname:
@@ -206,7 +207,7 @@ adding whatever is the local IP of the docker host and the hostname:
 
 Or use Opera browser and enable the build in VPN if it's for quick testing.
 
-#### - Run it all
+### - Run it all
 
 Caddy
 
@@ -254,7 +255,7 @@ b.blabla.org {
 But there are some cases that want something extra,
 as shown in following examples.
 
-#### Reverse proxy without names just for LAN
+### Reverse proxy without names just for LAN
 
 If some containers should be accessed only from LAN with no interest in
 domains and https and all that noise.
@@ -270,13 +271,13 @@ localhost:55414 {
 ```
 
 Prometheus entry uses short-hand notation.</br>
-TLS is automaticly disabled in localhost use.
+TLS is automatically disabled in localhost use.
 
 With this Caddyfile and assuming docker host having ip: `192.168.1.222`,
 writing `192.168.1.222:55414` in to browser will go to to urbackup,
 and `192.168.1.222:9090` gets to prometheus.
 
-#### Backend communication
+### Backend communication
 
 Some containers might be set to communicate only through https 443 port.
 But since they are behind proxy, their certificates wont be singed, wont be trusted.
