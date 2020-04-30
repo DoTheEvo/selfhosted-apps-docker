@@ -258,10 +258,25 @@ b.blabla.org {
 But there are some cases that want something extra,
 as shown in following examples.
 
-### Reverse proxy without names just for LAN
+### Routing traffic to other machines on the LAN
 
-If some containers should be accessed only from LAN with no interest in
-domains and https and all that noise.
+If not targeting a docker container but a dedicated machine on the network.</br>
+Nothing really changes, if you can ping the machine from Caddy container
+by its hostname or its IP, it will work. 
+
+```
+blue.{$MY_DOMAIN} {
+  reverse_proxy server-blue:80
+}
+
+violet.{$MY_DOMAIN} {
+  reverse_proxy 192.168.1.100:80
+}
+```
+
+### Reverse proxy without domain and https
+
+You can always just use localhost, which will translates in to docker hosts IP address.
 
 ```
 localhost:55414 {
