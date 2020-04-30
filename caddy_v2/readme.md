@@ -34,11 +34,11 @@ or machines on the network.
 └── ~
     └── docker
         └── caddy
-            ├── 🗁 config
-            ├── 🗁 data
-            ├── 🗋 .env
-            ├── 🗋 Caddyfile
-            └── 🗋 docker-compose.yml
+            ├── 📁 config
+            ├── 📁 data
+            ├── 📄 .env
+            ├── 📄 Caddyfile
+            └── 📄 docker-compose.yml
 ```
 
 * `config` - directory containing configs that Caddy generates,
