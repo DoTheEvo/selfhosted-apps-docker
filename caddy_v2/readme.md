@@ -16,7 +16,7 @@ and bitwarden.blabla.org takes you to your password manager.
 # Caddy as a reverse proxy in docker
 
 Caddy will be running as a docker container and will route traffic to other containers,
-or servers on the network.
+or machines on the network.
 
 ### - Requirements
 
@@ -46,10 +46,10 @@ or servers on the network.
 * `data` - directory storing TLS certificates
 * `.env` - file containing environmental variables for docker compose
 * `Caddyfile` - configuration file for Caddy
-* `docker-compose.yml` - docker compose file, telling docker how to build the container
+* `docker-compose.yml` - docker compose file, telling docker how to build Caddy container
 
-The diretories are created by docker on the first run, 
-the conten is visible on only for docker host root user.
+The directories are created by docker on the first run, 
+the content is visible on only as root of docker host.
 
 ### - Create a new docker network
 
@@ -57,7 +57,7 @@ the conten is visible on only for docker host root user.
   
 All the containers and Caddy must be on the same network.
 
-### - Create `.env` file
+### - Create .env file
 
 You want to change `blabla.org` to your domain.
 
@@ -79,7 +79,7 @@ and changes are done to the `.env` file.
 
 Often variable should be available also inside the running container.
 For that it must be declared in the `environment` section of the compose file,
-as can be seen next in caddie's `docker-compose.yml`
+as can be seen next in Caddie's `docker-compose.yml`
 
 *extra info:*</br>
 `docker-compose config` shows how compose will look
@@ -113,12 +113,12 @@ networks:
       name: $DEFAULT_NETWORK
 ```
 
-In this compose port 80 and 443 are mapped for http and https.</br>
-MY_DOMAIN variable is passed in to the container so that it can be used
-in Caddyfile.</br>
-The `Caddyfile` is read-only bind-mounted from the docker host.</br>
-Directories `config` and `data` are bind mounted so that their content persists.</br>
-The same network is joined as for all other containers.
+* port 80 and 443 are mapped for http and https
+* MY_DOMAIN variable is passed in to the container so that it can be used
+  in `Caddyfile`
+* the `Caddyfile` is read-only bind-mounted from the docker host
+* directories `data` and `config` are bind mounted so that their content persists
+* the same network is joined as for all other containers
 
 ### - Create Caddyfile
 
@@ -153,9 +153,12 @@ Something light and easy to setup to route to.</br>
 Assuming for this testing these compose files are in the same directory with Caddy,
 so they make use of the same `.env` file and so be on the same network.
 
-Note the lack of published/mapped ports in the compose.</br>
-Since the containers are all on the same bridge network, they can access each other on any port.
-Exposed ports are basicly [just documentation.](https://maximorlov.com/exposing-a-port-in-docker-what-does-it-do/)</br>
+Note the lack of published/mapped ports in the compose,
+as they will be accessed only through Caddy, which has it's ports published.</br>
+And since the containers and Caddy are all on the same bridge docker network,
+they can access each other on any port.</br>
+Exposed ports are just documentation,
+[don't confuse expose and publish](https://maximorlov.com/exposing-a-port-in-docker-what-does-it-do/).
 
 *extra info:*</br>
 To know which ports containers have exposed - `docker ps`, or `docker inspect`,
@@ -196,7 +199,7 @@ networks:
 
 You are likely on your local network and you are running docker host
 inside the same network.
-Without [editing the hosts file](https://support.rackspace.com/how-to/modify-your-hosts-file/)
+Without [editing the hosts file,](https://support.rackspace.com/how-to/modify-your-hosts-file/)
 shit will not work when trying to access services using domain name. 
 
 so just edit `hosts` as root/administrator,
@@ -273,7 +276,37 @@ localhost:55414 {
 Prometheus entry uses short-hand notation.</br>
 TLS is automatically disabled in localhost use.
 
-With this Caddyfile and assuming docker host having ip: `192.168.1.222`,
+But for this to work Caddy's compose file needs to have those ports **published** too.
+
+`docker-compose.yml`
+```yml
+version: "3.7"
+services:
+
+  caddy:
+    image: "caddy/caddy"
+    container_name: "caddy"
+    hostname: "caddy"
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "55414:55414"
+      - "9090:9090"
+    environment:
+      - MY_DOMAIN
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+      - ./config:/config
+
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
+
+With this setup, and assuming docker host at: `192.168.1.222`,
 writing `192.168.1.222:55414` in to browser will go to to urbackup,
 and `192.168.1.222:9090` gets to prometheus.
 
@@ -284,7 +317,7 @@ But since they are behind proxy, their certificates wont be singed, wont be trus
 
 Caddies sub-directive `transport` sets how to communicate with the backend.
 Setting port to 443 or declaring `tls` makes it use https.
-Setting `tls_insecure_skip_verify` makes Cady trust whatever certificate
+Setting `tls_insecure_skip_verify` makes Caddy trust whatever certificate
 is coming from the backend.
 
 ```
@@ -299,10 +332,11 @@ example.{$MY_DOMAIN} {
 }
 ```
 
-**HSTS and redirects**</br>
-Running Nextcloud behind any proxy likely shows few warning in its status page.
-It requires some redirects for service discovery to work and would really
-like if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set</br> 
+### HSTS and redirects
+
+Running Nextcloud behind any proxy likely shows few warning on its status page.
+It requires some redirects for service discovery to work and would like 
+if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.</br> 
 Like so:
 
 ```
@@ -314,11 +348,12 @@ nextcloud.{$MY_DOMAIN} {
 }
 ```
 
-**gzip and headers**</br>
-This example is with Bitwarden password manager, which comes with its reverse proxy
+### gzip and headers
+
+This example is with bitwarden_rs password manager, which comes with its reverse proxy
 [recommendations](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples).
 
-`encode gzip` enables compression.
+`encode gzip` enables compression.</br>
 This lowers the bandwith use and speeds up loading of the sites.
 It is often set on the webserver running inside the docker container,
 but if not it can be enabled on caddy.
@@ -354,7 +389,8 @@ bitwarden.{$MY_DOMAIN} {
 }
 ```
 
-**logging**</br>
+### Logging
+
 [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)</br>
 If access logs for specific site are desired
 
@@ -379,70 +415,26 @@ bookstack.{$MY_DOMAIN} {
   even with port 80/443 blocked by ISP. Also being able to use wildcard certificate.
 
   It could be also useful in security, as Cloudflare offers 5 firewall rules in the free tier.
-  Which means one can geoblock any traffick that is not from your own country.
-  But I assume in the default HTTP challenge it would also block certification renewal.</br>
+  Which means one can geoblock any traffic that is not from your own country.</br>
+  But I assume Caddy's default HTTP challenge would be also blocked so no certification renewal.</br>
   But with DNS challenge the communication is entirely between letsencrypt
   and Cloudflare.
 
-  Anyway, I assume the configuration would go something like this:
-
-  - **DNS record**</br>
-    Using cloudflare.</br>
-    Make sure A-Type record pointing test.blabla.org to the correct public IP exists,
-    and that it is all properly forwarded from there to the docker host.
-
-  - **Caddyfile**</br>
-
-    `Caddyfile`
-    ```
-    {
-        # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-    }
-
-    test.{$MY_DOMAIN} {
-        reverse_proxy whoami:80
-        tls {
-          dns cloudflare
-        }
-    }
-    ```
-
-  - **.env file**
-
-    `.env`
-    ```
-    # GENERAL
-    MY_DOMAIN=blabla.org
-    DEFAULT_NETWORK=caddy_net
-    TZ=Europe/Prague
-
-    # CLOUDFLARE    
-    CLOUDFLARE_EMAIL=bastard@whatever.org
-    CLOUDFLARE_API_KEY=global-api-key-goes-here
-    ```
-
-
 # Caddy basicauth
 
-  [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
-  If username/password check before accessing a service is required. 
+[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
+If username/password check before accessing a service is required. 
   
-  - **Add basicauth section to the Caddyfile**</br>
+Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) encrypted
+and then [base64](https://www.base64encode.org/) hashed.</br>
+In this case username and password are *bastard* / *bastard*
 
-    Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) encrypted
-    and then [base64](https://www.base64encode.org/) salted.</br>
-    In this case username and password are *bastard* / *bastard*
-
-    `Caddyfile`
-    ```
-    {
-        # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+`Caddyfile`
+```
+b.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+    basicauth {
+      bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
     }
-
-    b.{$MY_DOMAIN} {
-        reverse_proxy whoami:80
-        basicauth {
-          bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
-        }
-    }
-    ```
+}
+```
