@@ -55,8 +55,8 @@ TZ=Europe/Prague
 
 # reverse proxy
 
-Caddy v2 is used,
-details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup).
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 `Caddyfile`
 ```

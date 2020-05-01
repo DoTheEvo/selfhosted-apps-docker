@@ -78,8 +78,10 @@ If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
-Caddy v2 is used, details [here.](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup)</br>
-Bitwarden_rs documentation has a [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+Bitwarden_rs documentation has a 
+[section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
 
 `Caddyfile`
 ```

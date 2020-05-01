@@ -98,10 +98,10 @@ blabla.net,*.blabla.net,whatever.blabla.org
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-   updates the image automaticly
+* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+ updates the image automaticly
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+* manual image update</br>
+  `docker-compose pull`</br>
+  `docker-compose up -d`</br>
+  `docker image prune`
