@@ -28,7 +28,8 @@ Documentation and notes.
 
 # docker-compose
 
-Dockerhub linuxserver/bookstack [example compose.](https://hub.docker.com/r/linuxserver/bookstack)
+Dockerhub linuxserver/bookstack 
+[example compose.](https://hub.docker.com/r/linuxserver/bookstack)
 
 `docker-compose.yml`
 ```yml
@@ -100,8 +101,8 @@ If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
-Caddy v2 is used,
-details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 `Caddyfile`
 ```

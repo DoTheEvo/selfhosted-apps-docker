@@ -59,9 +59,9 @@ WATCHTOWER_INCLUDE_STOPPED=false
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates itself automaticly
+* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates itself automaticly
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+* manual image update</br>
+  `docker-compose pull`</br>
+  `docker-compose up -d`</br>
+  `docker image prune`

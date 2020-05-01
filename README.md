@@ -2,7 +2,11 @@
 
 ###### guide by example
 
+---
+
 ![logo](https://i.imgur.com/u5LH0jI.png)
+
+---
 
 * [bitwarden_rs](bitwarden_rs/) - password manager
 * [bookstack](bookstack/) - notes and documentation

@@ -138,8 +138,8 @@ If one does not exist yet: `docker network create caddy_net`
 [Nextcloud official documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/reverse_proxy_configuration.html)
 regarding reverse proxy.
 
-Caddy v2 is used,
-details [here](https://github.com/DoTheEvo/Caddy-v2-docker-example-setup).</br>
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 There are few extra directives here to fix some nextcloud warnings.
 
 `Caddyfile`

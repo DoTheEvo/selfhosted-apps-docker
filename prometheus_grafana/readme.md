@@ -264,8 +264,8 @@ for host network monitoring not showing traffick.
 
 # Reverse proxy
 
-Caddy v2 is used,
-details [here](https://github.com/DoTheEvo/Caddy-v2-examples)
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 The setup is accessed through grafana.
 But occasionally there might be need to check with prometheus,
