@@ -13,13 +13,13 @@ Automatic DNS entries update. Useful if no static IP from ISP.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── ddclient
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 ddclient.conf
+/home/
+└── ~/
+    └── docker/
+        └── ddclient/
+            ├── .env
+            ├── docker-compose.yml
+            └── ddclient.conf
 ```              
 
 # docker-compose

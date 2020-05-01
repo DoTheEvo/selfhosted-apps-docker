@@ -15,14 +15,14 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── bitwarden
-            ├── 🗁 bitwarden-data
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 bitwarden-backup-script.sh
+/home/
+└── ~/
+    └── docker/
+        └── bitwarden/
+            ├── bitwarden-data/
+            ├── .env
+            ├── docker-compose.yml
+            └── bitwarden-backup-script.sh
 ```
 
 # docker-compose

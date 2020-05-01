@@ -12,13 +12,13 @@ networks, volumes, images,... the work.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── portainer
-            ├── 🗁 portainer_data
-            ├── 🗋 .env
-            └── 🗋 docker-compose.yml
+/home/
+└── ~/
+    └── docker/
+        └── portainer/
+            ├── portainer_data/
+            ├── .env
+            └── docker-compose.yml
 ```
 
 # docker-compose
