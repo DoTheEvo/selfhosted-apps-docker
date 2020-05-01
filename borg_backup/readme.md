@@ -14,14 +14,14 @@ Backups.
 # files and directory structure
 
 ```
-/home
-└── ~
-    ├── borg
-    │    ├── 🗁 docker_backup
-    │    ├── 🗋 borg_backup.sh
-    │    └── 🗋 borg_backup.log
+/home/
+└── ~/
+    ├── borg/
+    │    ├── docker_backup/
+    │    ├── borg_backup.sh
+    │    └── borg_backup.log
     │
-    └── docker
+    └── docker/
         ├── container-setup #1
         ├── container-setup #2
         ├── ...

@@ -14,14 +14,14 @@ Homepage.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── homer
-            ├── 🗁 assets
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 config.yml
+/home/
+└── ~/
+    └── docker/
+        └── homer/
+            ├── assets/
+            ├── .env
+            ├── docker-compose.yml
+            └── config.yml
 ```
 
 # docker-compose

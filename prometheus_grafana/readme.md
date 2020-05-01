@@ -18,28 +18,28 @@ Everything here is based on the magnificent
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── prometheus
+/home/
+└── ~/
+    └── docker/
+        └── prometheus/
             │ 
-            ├── 🗁 grafana
-            │   └── 🗁 provisioning
-            │       ├── 🗁 dashboards
-            │       │   ├── 🗋 dashboard.yml            
-            │       │   ├── 🗋 docker_host.json
-            │       │   ├── 🗋 docker_containers.json
-            │       │   └── 🗋 monitor_services.json
+            ├── grafana/
+            │   └── provisioning/
+            │       ├── dashboards/
+            │       │   ├── dashboard.yml            
+            │       │   ├── docker_host.json
+            │       │   ├── docker_containers.json
+            │       │   └── monitor_services.json
             │       │
-            │       └── 🗁 datasources 
-            │           └── 🗋 datasource.yml
+            │       └── datasources/ 
+            │           └── datasource.yml
             │
-            ├── 🗁 grafana-data
-            ├── 🗁 prometheus-data
+            ├── grafana-data/
+            ├── prometheus-data/
             │
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 prometheus.yml
+            ├── .env
+            ├── docker-compose.yml
+            └── prometheus.yml
 ```
 
 # docker-compose

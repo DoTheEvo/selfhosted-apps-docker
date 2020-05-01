@@ -15,15 +15,15 @@ Documentation and notes.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── bookstack
-            ├── 🗁 bookstack-data
-            ├── 🗁 bookstack-db-data
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 bookstack-backup-script.sh
+/home/
+└── ~/
+    └── docker/
+        └── bookstack/
+            ├── bookstack-data/
+            ├── bookstack-db-data/
+            ├── .env
+            ├── docker-compose.yml
+            └── bookstack-backup-script.sh
 ```
 
 # docker-compose

@@ -15,15 +15,15 @@ File share & sync.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── nextcloud
-            ├── 🗁 nextcloud-data
-            ├── 🗁 nextcloud-db-data
-            ├── 🗋 .env
-            ├── 🗋 docker-compose.yml
-            └── 🗋 nextcloud-backup-script.sh
+/home/
+└── ~/
+    └── docker/
+        └── nextcloud/
+            ├── nextcloud-data/
+            ├── nextcloud-db-data/
+            ├── .env
+            ├── docker-compose.yml
+            └── nextcloud-backup-script.sh
 ```
 
 # docker-compose

@@ -14,10 +14,10 @@ Automatic updates of containers.
 # Files and directory structure
 
 ```
-/home
-└── ~
-    └── docker
-        └── watchtower
+/home/
+└── ~/
+    └── docker/
+        └── watchtower/
             └── 🗋 docker-compose.yml
 ```
 
