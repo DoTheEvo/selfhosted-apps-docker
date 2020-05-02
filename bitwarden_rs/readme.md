@@ -55,7 +55,7 @@ networks:
 # GENERAL
 MY_DOMAIN=blabla.org
 DEFAULT_NETWORK=caddy_net
-TZ=Europe/Prague
+TZ=Europe/Bratislava
 
 # BITWARDEN
 ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9

@@ -51,7 +51,7 @@ networks:
 # GENERAL
 MY_DOMAIN=blabla.org
 DEFAULT_NETWORK=caddy_net
-TZ=Europe/Prague
+TZ=Europe/Bratislava
 ```
 
 # Reverse proxy

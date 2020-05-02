@@ -148,7 +148,7 @@ networks:
 # GENERAL
 MY_DOMAIN=blabla.org
 DEFAULT_NETWORK=caddy_net
-TZ=Europe/Prague
+TZ=Europe/Bratislava
 
 # GRAFANA
 GF_SECURITY_ADMIN_USER=admin
@@ -270,6 +270,8 @@ Caddy v2 is used, details
 The setup is accessed through grafana.
 But occasionally there might be need to check with prometheus,
 which will be available on \<docker-host-ip>:9090.
+
+Caddy will also need port 9090 published.
 
 `Caddyfile`
 ```
