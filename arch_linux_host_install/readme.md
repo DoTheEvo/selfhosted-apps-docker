@@ -36,7 +36,7 @@ The above command will fuck your machine up if you dunno what you are doing
 
 # Boot from the usb
 
-This is BIOS/MBR setup as I am running on and old thinkpad with a busted screen,
+This is BIOS/MBR setup as I am running on an old thinkpad with a busted screen,
 plus I like the simplicity of it.</br>
 So if theres boot menu option choose non-uefi.
 
@@ -129,6 +129,17 @@ it's the fastest zsh framework and out of the box setup nicely
   `chsh -s /bin/zsh`</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 
+I like to to add this to `.zshrc` for ctrl+f prepending sudo
+
+```
+add_sudo (){
+    BUFFER="sudo $BUFFER"
+    zle -w end-of-line
+}
+zle -N add_sudo
+bindkey "^f" add_sudo
+```
+
 ### Setup docker
 
 * have `docker` and `docker-compose` packages installed</br>
@@ -147,3 +158,4 @@ it's the fastest zsh framework and out of the box setup nicely
   `cd yay-bin && makepkg -si`</br>
   `cd .. && rm -rf yay-bin`</br>
 
+`ctop` and `inxi` are good packages from yay
