@@ -129,17 +129,6 @@ it's the fastest zsh framework and out of the box setup nicely
   `chsh -s /bin/zsh`</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 
-I like to to add this to `.zshrc` for ctrl+f prepending sudo
-
-```
-add_sudo (){
-    BUFFER="sudo $BUFFER"
-    zle -w end-of-line
-}
-zle -N add_sudo
-bindkey "^f" add_sudo
-```
-
 ### Setup docker
 
 * have `docker` and `docker-compose` packages installed</br>
@@ -150,12 +139,25 @@ bindkey "^f" add_sudo
   `sudo gpasswd -a bastard docker`
 
 
-### extra stuff
+### Extra stuff
 
-* `sudo pacman -S git cronie curl borg htop lm_sensors nnn`
+* `sudo pacman -S vim git cronie curl borg htop lm_sensors nnn bind-tools`
 * install yay for access to AUR packages</br>
   `git clone https://aur.archlinux.org/yay-bin.git`</br>
   `cd yay-bin && makepkg -si`</br>
   `cd .. && rm -rf yay-bin`</br>
 
 `ctop` and `inxi` are good packages from yay
+
+### Adding stuff to .zshrc
+
+* `export EDITOR=vim`
+* for ctrl+f prepending sudo
+  ```bash
+  add_sudo (){
+      BUFFER="sudo $BUFFER"
+      zle -w end-of-line
+  }
+  zle -N add_sudo
+  bindkey "^f" add_sudo
+  ```

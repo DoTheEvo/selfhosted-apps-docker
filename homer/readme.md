@@ -74,7 +74,7 @@ Homepage is configured in `config.yml` file.
 ```yml
 title: "Homepage"
 subtitle: "Homer"
-logo: "assets/homer.png"
+logo: "assets/logo.png"
 # icon: "fas fa-skull-crossbones"
 footer: '<p>less boring look with a footer</p>'
 

@@ -106,7 +106,7 @@ the script must be **executabe** - `chmod +x borg_backup.sh`
 #### • Automatic execution
 
 cron job, every day at 3:00</br>
-`crontab -e`
+`crontab -e`</br>
 `0 3 * * * /home/bastard/borg/borg_backup.sh`
 
 # Remote backup
