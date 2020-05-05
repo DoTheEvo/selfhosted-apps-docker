@@ -25,6 +25,14 @@ Password manager. RS version is simpler and lighter than the official bitwarden.
             └── bitwarden-backup-script.sh
 ```
 
+* `bitwarden-data/` - a directory where bitwarden will store its database and other data
+* `.env` - a file containing environmental variables for docker compose
+* `docker-compose.yml` - a docker compose file, telling docker how to build bitwarden container
+* `bitwarden-backup-script.sh` - a backup script if you want it
+
+You only need to provide the files.</br>
+The directory is created by docker compose on the first run.
+
 # docker-compose
   
 [Documentation](https://github.com/dani-garcia/bitwarden_rs/wiki/Using-Docker-Compose) on compose.

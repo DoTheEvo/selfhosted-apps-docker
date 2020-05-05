@@ -41,15 +41,16 @@ or machines on the network.
             └── docker-compose.yml
 ```
 
-* `config` - directory containing configs that Caddy generates,
+* `config/` - a directory containing configs that Caddy generates,
   most notably `autosave.json` which is a json version of the last run `Caddyfile`
-* `data` - directory storing TLS certificates
-* `.env` - file containing environmental variables for docker compose
-* `Caddyfile` - configuration file for Caddy
-* `docker-compose.yml` - docker compose file, telling docker how to build Caddy container
+* `data/` - a directory storing TLS certificates
+* `.env` - a file containing environmental variables for docker compose
+* `Caddyfile` - a configuration file for Caddy
+* `docker-compose.yml` - a docker compose file, telling docker how to build Caddy container
 
-The directories are created by docker on the first run, 
-the content is visible on only as root of docker host.
+You only need to provide the three files.</br>
+The directories are created by docker compose on the first run, 
+the content of these is visible only as root of the docker host.
 
 ### - Create a new docker network
 
@@ -231,6 +232,9 @@ For example trying to ping hosts that are suppose to be reachable,
 `ping nginx` should work.
 
 There's also other possible issues, like bad port forwarding towards docker host.
+
+*extra info:*</br>
+`docker exec -w /etc/caddy caddy caddy reload` reloads config.
 
 # Caddy more info and various configurations
 
