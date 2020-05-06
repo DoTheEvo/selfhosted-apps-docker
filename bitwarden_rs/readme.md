@@ -4,7 +4,7 @@
 
 ![logo](https://i.imgur.com/tT3FQLJ.png)
 
-# Purpose
+# Purpose & Overview
 
 Password manager. 
 
