@@ -4,13 +4,21 @@
 
 ![logo](https://i.imgur.com/qDXwqaU.png)
 
-# Purpose
+# Purpose & Overview
 
 Documentation and notes.
 
 * [Official site](https://www.bookstackapp.com/)
 * [Github](https://github.com/BookStackApp/BookStack)
 * [DockerHub](https://hub.docker.com/r/linuxserver/bookstack)
+
+BookStack is a modern, open source, good looking wiki platform
+for storing and organising information and documentation.
+
+Writen in PHP, with MySQL storing the user data.</br>
+There is no official Dockerhub image so the one mainted by
+[linuxserver.io](https://www.linuxserver.io/) is used,
+which uses nginx as a web server.
 
 # Files and directory structure
 
@@ -137,7 +145,7 @@ book.{$MY_DOMAIN} {
 
 # Backup of just user data
 
-User-data daily export using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
+Users data daily export using the [official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
 For bookstack it means database dump and backing up several directories
 containing user uploaded files.
 
