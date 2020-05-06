@@ -6,11 +6,26 @@
 
 # Purpose
 
-Password manager. RS version is simpler and lighter than the official bitwarden.
+Password manager. 
 
 * [Official site](https://bitwarden.com/)
 * [Github](https://github.com/dani-garcia/bitwarden_rs)
 * [DockerHub](https://hub.docker.com/r/bitwardenrs/server)
+
+Bitwarden is a modern popular open source password manager
+with wide cross platform support.
+
+But the official Bitwarden server is not really fit for smaller deployment and
+requires Microsoft SQL server among other things.</br>
+So here is where Bitwarden_rs by Daniel García comes in.</br>
+It is a Bitwarden API implementation written in Rust.
+It's very resource efficient, uses about 10MB of RAM,
+and close to no CPU.</br>
+It's build using Rocket a web framework for Rust
+and user data are stored in a simple sqlite database file.
+
+All the client apps are still officials coming from bitwarden,
+only the server is a different implementation.
 
 # Files and directory structure
 
@@ -119,7 +134,7 @@ same as port 80 and 443 are forwarded.
 
 To test if websocket works, have the desktop app open
 and make changes through browser extension, or through the website.
-Changes should immediatly appear in the desktop app. If it is not working,
+Changes should immediatly appear in the desktop app. If it's not working,
 you need to manually sync for changes to appear.
  
 # Extra info
@@ -156,7 +171,7 @@ to invite users.
 
 # Backup of just user data
 
-User-data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
+Users data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
 
 Daily run of [BorgBackup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
