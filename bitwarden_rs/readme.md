@@ -23,7 +23,7 @@ So here is where Bitwarden_rs by Daniel García comes in.</br>
 It is a Bitwarden API implementation written in Rust.
 It's very resource efficient, uses about 10MB of RAM,
 and close to no CPU.</br>
-It's build using Rocket, a web framework for Rust,
+Webapp part is build using Rocket, a web framework for Rust,
 and user data are stored in a simple sqlite database file.
 
 All the client apps are still officials coming from bitwarden,
