@@ -20,9 +20,17 @@ Lightweight DHCP and DNS server.
 └── resolve.conf
 ```              
 
+* `dnsmasq.conf` - the main config file for dnsmasq where dns and dhcp server is set
+* `resolve.conf` - a file containing ip addresses of dns nameservers to be used
+   by the machine it resides on
+* `hosts` - a file that can provide additional hostname-ip mapping
+
+`hosts` and `resolve.conf` are just normal system files always in use on any linux
+system.
+
 # Installation
 
-Install dnsmasq from your linux official repos
+Install dnsmasq from your linux official repos.
 
 # Configuration
 
@@ -95,7 +103,7 @@ Check if the content is what was set.
 
 * `cat /etc/resolv.conf`
 
-If it was changed by dhcpcd, edit `/etc/dhcpcd.conf`
+If it was changed by dhcpcd before the +i flag took effect, edit `/etc/dhcpcd.conf`
 and add `nohook resolv.conf` at the end.</br>
 Restart the machine, disable the immutability, edit it again,
 add immutability, and check.
@@ -108,11 +116,11 @@ add immutability, and check.
 # /etc/hosts
 
 dnsmasq reads `/etc/hosts` for IP hostname pairs entries.
-This is where you can add hostnames you wish to route to local servers.
+This is where you can add hostnames you wish to route to any ip you want.
 
 Unfortunately no wildcard support.
 But as seen in the `dnsmasq.conf` there is a wildcard section solving this,
-so blabla stuff here is redundant. 
+so blabla stuff here is just for show. 
 
 `hosts`
 ```
@@ -134,14 +142,16 @@ so blabla stuff here is redundant.
 
 #### DHCP
 
-Set some machine to use DHCP for its network setting.
-
+Set some machine to use DHCP for its network setting.</br>
 It should just work. 
 
 You can check on the dnsmasq host, file `/var/lib/misc/dnsmasq.leases`
-for the active leases.
+for the active leases. Location of the file can vary base on your linux distro.
 
 #### DNS
+
+nslookup is utility that checks DNS mapping, part of `bind-utils` or `bind-tools`,
+again depending on the distro.
 
 * `nslookup google.com`
 * `nslookup gateway`
