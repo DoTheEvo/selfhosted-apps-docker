@@ -30,7 +30,7 @@ to use this DNS.
 └── resolve.conf
 ```              
 
-* `dnsmasq.conf` - the main config file for dnsmasq where DNS and DHCP server is set
+* `dnsmasq.conf` - the main config file for dnsmasq where DNS and DHCP functionality is set
 * `resolve.conf` - a file containing ip addresses of DNS nameservers to be used
    by the machine it resides on
 * `hosts` - a file that can provide additional hostname-ip mapping
@@ -44,8 +44,6 @@ system.</br>
 Install dnsmasq from your linux official repos.
 
 # Configuration
-
-Configuration file location: /etc/dnsmasq.conf
 
 `dnsmasq.conf`
 
@@ -98,6 +96,12 @@ dhcp-host=08:00:27:68:f9:bf,192.168.1.150
 
 # resolv.conf
 
+`resolv.conf`
+```
+nameserver ::1
+nameserver 127.0.0.1
+```
+
 A file that contains DNS nameservers to be used by the linux machine,
 specifically its glibc resolver library.</br>
 Since dnsmasq, a DNS server, is running right on this machine,
@@ -110,11 +114,6 @@ which prevents all possible changes to it unless the attribute is removed.
 
 Edit /`etc/resolv.conf` and set localhost as the DNS nameserver.
 
-`resolv.conf`
-```
-nameserver ::1
-nameserver 127.0.0.1
-```
 
 Make it immutable to prevent any changes to it.
 
@@ -136,15 +135,6 @@ add immutability, and check.
 
 # /etc/hosts
 
-This is a file present on every system, linux, windows, mac, android,... 
-where you can assign a hostname to an IP.</br>
-dnsmasq reads `/etc/hosts` for IP hostname pairs and adds them to its own
-resolve records.
-
-Unfortunately no wildcard support.
-But as seen in the `dnsmasq.conf` there is a wildcard section solving this,
-so blabla stuff here is just for show. 
-
 `hosts`
 ```
 127.0.0.1       docker-host
@@ -156,6 +146,16 @@ so blabla stuff here is just for show.
 192.168.1.2     passwd.blabla.org
 192.168.1.2     grafana.blabla.org
 ```
+
+This is a file present on every system, linux, windows, mac, android,... 
+where you can assign a hostname to an IP.</br>
+dnsmasq reads `/etc/hosts` for IP hostname pairs and adds them to its own
+resolve records.
+
+Unfortunately no wildcard support.
+But as seen in the `dnsmasq.conf` there is a wildcard section solving this,
+so `blabla.org` stuff here is just for show. 
+
 
 # Start the service
 
