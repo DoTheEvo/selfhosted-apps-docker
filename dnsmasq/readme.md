@@ -15,15 +15,14 @@ Lightweight DHCP and DNS server.
 
 ```
 /etc/
-└── dnsmasq.conf
+├── dnsmasq.conf
+├── hosts
+└── resolve.conf
 ```              
 
 # Installation
 
-* Install dnsmasq from your linux official repos.
-* configuration
-* enable and start the service</br>
-  `sudo systemctl enable --now dnsmasq`
+* Install dnsmasq from your linux official repos
 
 # Configuration
 
@@ -33,59 +32,138 @@ Configuration file location: /etc/dnsmasq.conf
 `dnsmasq.conf`
 
 ```bash
-# dont use resolv.conf as it gets changed by DHCP
-resolv-file=/etc/resolv.conf.dnsmasq
+# DNS --------------------------------------------------------------------------
 
-# DHCP netmask
-# CLients get 255.255.255.0 as netmask
-dhcp-option=1,255.255.255.0
+# Never forward plain names (without a dot or domain part)
+domain-needed
+# Never forward addresses in the non-routed address spaces.
+bogus-priv
 
-# default gateway
-# clients get  192.168.1.251 as gateway
-dhcp-option=3,192.168.1.69
+# If you don't want dnsmasq to read /etc/resolv.conf
+no-resolv
+no-poll
 
-# dns
-# clients get 192.168.1.69 as DNS (this is the IP of the Pi itself)
-dhcp-option=6,192.168.1.69
+# DHCP and DNS interface and address
+interface=enp0s25
+listen-address=::1,127.0.0.1
 
+# Upstream Google and Cloudflare nameservers
+server=8.8.8.8
+server=1.1.1.1
 
-#you can assign fixed ip adresses to hosts based on mac address
-dhcp-host=ma:ca:dr:e:ss:00,mycomp192.168.1.1,12h
+# DNS wildcard -----------------------------------------------------------------
 
+# wildcard dns entry sending domain and all its subdomains to an ip
+address=/blabla.org/192.168.1.2
+# subdomain override
+address=/plex.blabla.org/192.168.1.3
 
-# all hosts not identified by mac get a dynamic ip out of this range:
-dhcp-range=192.168.1.120,192.168.1.200,12h 
+# DHCP -------------------------------------------------------------------------
+
+dhcp-range=192.168.1.51,192.168.1.199,255.255.255.0,480h
+# gateway
+dhcp-option=3,192.168.1.1
+
+dhcp-authoritative
+
+#dhcp-leasefile=/var/lib/misc/dnsmasq.leases
 ```
 
 # resolv.conf
 
-Edit /etc/resolv.conf to send all requests to dnsmasq, then prevent c
+Contains DNS nameservers to be used by this linux machine.</br>
+Since dnsmasq, a DNS server, is running right on this machine,
+the entries should point to localhost.
 
-* `nameserver 127.0.0.1`
+Bit of an issue is that this file is often dynamically generated and changed
+by various system services like systemd or dhcpcd.
+To prevent this,
+it will be flagged as immutable, which prevents all possible changes to it
+unless the attribute is removed.
 
-Then make it immutable to prevent other services from making changes to it
+Edit /`etc/resolv.conf` and set localhost as the dns nameserver.
+
+`resolv.conf`
+```
+nameserver ::1
+nameserver 127.0.0.1
+```
+
+Make it immutable to prevent any changes to it.
 
 * `chattr +i /etc/resolv.conf`
 
+Check if the content is what was set.
+
+* `cat /etc/resolv.conf`
+
+If it was changed by dhcpcd, edit `/etc/dhcpcd.conf`
+and add `nohook resolv.conf` at the end.</br>
+Restart the machine, disable the immutability, edit it again,
+add immutability, and check.
+
+* `sudo chattr -i /etc/resolv.conf`
+* `sudo nano /etc/resolv.conf`
+* `sudo chattr +i /etc/resolv.conf`
+* `cat /etc/resolv.conf`
+
 # /etc/hosts
 
-dnsmasq reads all the DNS hosts and names from the /etc/hosts file,
-so add your DNS hosts IP addresses and name pairs as shown.
+dnsmasq reads `/etc/hosts` for IP hostname pairs entries.
+This is where you can add hostnames you wish to route to local servers.
 
-127.0.0.1       dnsmasq
-192.168.56.10   dnsmasq 
-192.168.56.1    gateway
-192.168.56.100  maas-controller 
-192.168.56.20   nagios
-192.168.56.25   webserver1
+Unfortunately no wildcard support.
+But as seen in the `dnsmasq.conf` there is a wildcard section solving this,
+so blabla stuff here is redundant. 
 
+`hosts`
+```
+127.0.0.1       docker-host
+192.168.1.2     docker-host 
+192.168.1.1     gateway
+192.168.1.2     blabla.org
+192.168.1.2     nextcloud.blabla.org
+192.168.1.2     book.blabla.org
+192.168.1.2     passwd.blabla.org
+192.168.1.2     grafana.blabla.org
+```
+
+# Start the services
+
+`sudo systemctl enable --now dnsmasq`
+
+# Test it
+
+##### DHCP
+
+Set some machine to use DHCP for its network setting.
+
+It should just work. 
+
+You can check on the dnsmasq host file `/var/lib/misc/dnsmasq.leases`
+for the active leases.
+
+##### DNS
+
+* `nslookup google.com`
+* `nslookup gateway`
+* `nslookup docker-host`
+* `nslookup blabla.org`
+* `nslookup whateverandom.blabla.org`
+* `nslookup plex.blabla.org`
 
 # Update
 
-* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
- updates the image automaticly
+During host linux packages update.
 
-* manual image update</br>
-  `docker-compose pull`</br>
-  `docker-compose up -d`</br>
-  `docker image prune`
+# Backup and restore
+
+##### Backup
+
+Using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the entire /etc directory
+which contains the config files.
+
+##### restore
+
+Replace the config files with the one from backup
