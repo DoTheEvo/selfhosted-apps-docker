@@ -4,12 +4,24 @@
 
 ![logo](https://i.imgur.com/dR50bkP.png)
 
-# purpose
+# Purpose & Overview
 
 Backups.
 
 * [Official site](https://www.borgbackup.org/)
 * [Github](https://github.com/borgbackup/borg)
+
+Borg is an open source deduplicating archiver with compression and encryption.</br>
+Written in python with performance critical code implemented in C/Cython.
+
+Highlight of borg is the deduplication, where files are cut in to variable size
+chunks, and only new chunks are stored. 
+This allows to keep snapshots from several days, weeks and months,
+while not wasting disk space.
+
+In this setup borg is installed directly on the host system.</br>
+A script is created that backs up the entire docker directory locally.</br>
+Cronjob is executing this script daily.
 
 # files and directory structure
 
@@ -27,20 +39,22 @@ Backups.
         ├── ...
 ```
 
+* `docker_backup/` - borg repository, created by borg init command
+* `borg_backup.sh` - the backup script that adds archive in to the repository
+* `borg_backup.log` - log file with dates of backups
+
 # The setup
 
-BorgBackup is installed directly on the host system.</br>
-A script is created that backs up the entire docker directory locally.</br>
-Cronjob is executing this script daily.
+#### Install BorgBackup
 
-#### • Install BorgBackup
+Borg is likely in your linux repositories.
 
-#### • Create a new borg repo
+#### Create a new borg repo
   
 `mkdir ~/borg`</br>
 `borg init --encryption=none ~/borg/docker_backup`
 
-#### • The script
+#### The backup script
 
 `borg_backup.sh`
 ```bash
@@ -103,11 +117,13 @@ echo '------------------------------' >> $LOGFILE
 
 the script must be **executabe** - `chmod +x borg_backup.sh`
 
-#### • Automatic execution
+#### Automatic execution
 
-cron job, every day at 3:00</br>
+as root, cron job every day at 3:00</br>
+`su` - switch to root</br>
 `crontab -e`</br>
-`0 3 * * * /home/bastard/borg/borg_backup.sh`
+`0 3 * * * /home/bastard/borg/borg_backup.sh`</br>
+`crontab -l`</br>
 
 # Remote backup
 
