@@ -134,7 +134,7 @@ so blabla stuff here is just for show.
 192.168.1.2     grafana.blabla.org
 ```
 
-# Start the services
+# Start the service
 
 Make sure you disable other DHCP servers on the network beforehand,
 usually a router is running one.
