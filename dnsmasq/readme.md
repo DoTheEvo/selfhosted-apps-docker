@@ -20,8 +20,8 @@ Lightweight DHCP and DNS server.
 └── resolve.conf
 ```              
 
-* `dnsmasq.conf` - the main config file for dnsmasq where dns and dhcp server is set
-* `resolve.conf` - a file containing ip addresses of dns nameservers to be used
+* `dnsmasq.conf` - the main config file for dnsmasq where DNS and DHCP server is set
+* `resolve.conf` - a file containing ip addresses of DNS nameservers to be used
    by the machine it resides on
 * `hosts` - a file that can provide additional hostname-ip mapping
 
@@ -60,7 +60,7 @@ server=1.1.1.1
 
 # DNS wildcards ----------------------------------------------------------------
 
-# wildcard dns entry sending domain and all its subdomains to an ip
+# wildcard DNS entry sending domain and all its subdomains to an ip
 address=/blabla.org/192.168.1.2
 # subdomain override
 address=/plex.blabla.org/192.168.1.3
@@ -87,7 +87,7 @@ like systemd or dhcpcd.
 To prevent this, `resolv.conf` will be flagged as immutable,
 which prevents all possible changes to it unless the attribute is removed.
 
-Edit /`etc/resolv.conf` and set localhost as the dns nameserver.
+Edit /`etc/resolv.conf` and set localhost as the DNS nameserver.
 
 `resolv.conf`
 ```
@@ -135,6 +135,9 @@ so blabla stuff here is just for show.
 ```
 
 # Start the services
+
+Make sure you disable other DHCP servers on the network beforehand,
+usually a router is running one.
 
 `sudo systemctl enable --now dnsmasq`
 
