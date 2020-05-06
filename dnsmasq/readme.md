@@ -22,10 +22,9 @@ Lightweight DHCP and DNS server.
 
 # Installation
 
-* Install dnsmasq from your linux official repos
+Install dnsmasq from your linux official repos
 
 # Configuration
-
 
 Configuration file location: /etc/dnsmasq.conf
 
@@ -51,7 +50,7 @@ listen-address=::1,127.0.0.1
 server=8.8.8.8
 server=1.1.1.1
 
-# DNS wildcard -----------------------------------------------------------------
+# DNS wildcards ----------------------------------------------------------------
 
 # wildcard dns entry sending domain and all its subdomains to an ip
 address=/blabla.org/192.168.1.2
@@ -75,11 +74,10 @@ Contains DNS nameservers to be used by this linux machine.</br>
 Since dnsmasq, a DNS server, is running right on this machine,
 the entries should point to localhost.
 
-Bit of an issue is that this file is often dynamically generated and changed
-by various system services like systemd or dhcpcd.
-To prevent this,
-it will be flagged as immutable, which prevents all possible changes to it
-unless the attribute is removed.
+Bit of an issue is that this file is often changed by various system services,
+like systemd or dhcpcd.
+To prevent this, `resolv.conf` will be flagged as immutable,
+which prevents all possible changes to it unless the attribute is removed.
 
 Edit /`etc/resolv.conf` and set localhost as the dns nameserver.
 
@@ -134,16 +132,16 @@ so blabla stuff here is redundant.
 
 # Test it
 
-##### DHCP
+#### DHCP
 
 Set some machine to use DHCP for its network setting.
 
 It should just work. 
 
-You can check on the dnsmasq host file `/var/lib/misc/dnsmasq.leases`
+You can check on the dnsmasq host, file `/var/lib/misc/dnsmasq.leases`
 for the active leases.
 
-##### DNS
+#### DNS
 
 * `nslookup google.com`
 * `nslookup gateway`
@@ -158,12 +156,12 @@ During host linux packages update.
 
 # Backup and restore
 
-##### Backup
+#### Backup
 
 Using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
 that makes daily snapshot of the entire /etc directory
 which contains the config files.
 
-##### restore
+#### restore
 
 Replace the config files with the one from backup
