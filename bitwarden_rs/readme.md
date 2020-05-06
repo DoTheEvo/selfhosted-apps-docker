@@ -145,7 +145,12 @@ you need to manually sync for changes to appear.
 set in the `.env` file. Especially if signups are disabled it is the only way
 to invite users.
 
-**push notifications**
+**push notifications** do not work at this moment.
+[Github issue](https://github.com/dani-garcia/bitwarden_rs/issues/126).</br>
+The purpose of [Push notifications](https://www.youtube.com/watch?v=8D1NAezC-Dk)
+is the same to WebSocket, to tell the clients about the change on the server immediatly,
+but they are for apps on mobile devices.
+So you better manually sync before making changes.
 
 ---
 
