@@ -134,7 +134,8 @@ book.{$MY_DOMAIN} {
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+  updates the image automatically
 
   * manual image update</br>
     `docker-compose pull`</br>
