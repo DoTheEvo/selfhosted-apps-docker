@@ -99,7 +99,7 @@ SMTP_FROM=admin@blabla.org
 ```
 
 **All containers must be on the same network**.</br>
-If one does not exist yet: `docker network create caddy_net`
+If one does not exists yet: `docker network create caddy_net`
 
 # Reverse proxy
 
