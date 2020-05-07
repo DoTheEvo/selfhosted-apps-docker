@@ -126,13 +126,14 @@ passwd.{$MY_DOMAIN} {
 
 # Forward port 3012 TCP on your router
 
-[WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications,
-so that all web based clients can immediatly sync when a change happens on the server.
+[WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications
+so that all web based clients, including desktop app,
+can immediatly sync when a change happens on the server.
 
-* Enviromental variable `WEBSOCKET_ENABLED=true` needs to be set.</br>
-* Reverse proxy needs to route `/notifications/hub` to port 3012.</br>
-* Router needs to **forward port 3012** to docker host,
-same as port 80 and 443 are forwarded.
+* enviromental variable `WEBSOCKET_ENABLED=true` needs to be set in the `.env` file</br>
+* reverse proxy needs to route `/notifications/hub` to port 3012</br>
+* your router/firewall needs to **forward port 3012** to the docker host,
+same as port 80 and 443 are forwarded
 
 To test if websocket works, have the desktop app open
 and make changes through browser extension, or through the website.
@@ -141,15 +142,18 @@ you need to manually sync for changes to appear.
  
 # Extra info
 
-**bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
+**Bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
 set in the `.env` file. Especially if signups are disabled it is the only way
 to invite users.
 
-**push notifications** do not work at this moment.
+**Push notifications** are not working at this moment.
 [Github issue](https://github.com/dani-garcia/bitwarden_rs/issues/126).</br>
 The purpose of [Push notifications](https://www.youtube.com/watch?v=8D1NAezC-Dk)
-is the same to WebSocket, to tell the clients about the change on the server immediatly,
-but they are for apps on mobile devices.
+is the same as WebSocket notifications, to tell the clients that a change
+happened on the server so that they are synced immediatly.
+But they are for apps on mobile devices and it would likely take releasing and
+maintaing own bitwarden_rs version of the Android/iOS mobile apps
+to have them working.</br>
 So you better manually sync before making changes.
 
 ---
@@ -167,7 +171,7 @@ So you better manually sync before making changes.
 
 # Backup and restore
 
-  * **backup** using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+  * **backup** using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
   that makes daily snapshot of the entire directory
     
   * **restore**</br>
@@ -181,29 +185,35 @@ So you better manually sync before making changes.
 Users data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
 
-Daily run of [BorgBackup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
 takes care of backing up the directory.
 So only database dump is needed.
 The created backup sqlite3 file is overwriten on every run of the script,
-but that's ok since BorgBackup is making daily snapshots.
+but that's ok since borg is making daily snapshots.
 
-* **create a backup script**</br>
-    placed inside `bitwarden` directory on the host
-    
-    `bitwarden-backup-script.sh`
-    ```
-    #!/bin/bash
+#### Create a backup script
 
-    # CREATE SQLITE BACKUP
-    docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
-    ```
+Placed inside `bitwarden` directory on the host.
 
-    the script must be **executabe** - `chmod +x bitwarden-backup-script.sh`
+`bitwarden-backup-script.sh`
+```
+#!/bin/bash
 
-* **cronjob** on the host</br>
-  `crontab -e` - add new cron job</br>
-  `0 2 * * * /home/bastard/docker/bitwarden/bitwarden-backup-script.sh` - run it [at 02:00](https://crontab.guru/#0_2_*_*_*)</br>
-  `crontab -l` - list cronjobs
+# CREATE SQLITE BACKUP
+docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
+```
+
+the script must be **executabe** - `chmod +x bitwarden-backup-script.sh`
+
+#### Cronjob
+
+Runing on the host, so that the script will be periodicly run.
+
+* `su` - switch to root
+* `crontab -e` - add new cron job</br>
+* `0 21 * * * /home/bastard/docker/bitwarden/bitwarden-backup-script.sh`</br>
+  runs it every day [at 21:00](https://crontab.guru/#0_21_*_*_*) 
+* `crontab -l` - list cronjobs to check
 
 # Restore the user data
 
