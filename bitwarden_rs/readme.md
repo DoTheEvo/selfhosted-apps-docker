@@ -128,31 +128,31 @@ passwd.{$MY_DOMAIN} {
 
 [WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications
 so that all web based clients, including desktop app,
-can immediatly sync when a change happens on the server.
+can immediately sync when a change happens on the server.
 
-* enviromental variable `WEBSOCKET_ENABLED=true` needs to be set in the `.env` file</br>
+* environmental variable `WEBSOCKET_ENABLED=true` needs to be set in the `.env` file</br>
 * reverse proxy needs to route `/notifications/hub` to port 3012</br>
 * your router/firewall needs to **forward port 3012** to the docker host,
 same as port 80 and 443 are forwarded
 
 To test if websocket works, have the desktop app open
 and make changes through browser extension, or through the website.
-Changes should immediatly appear in the desktop app. If it's not working,
+Changes should immediately appear in the desktop app. If it's not working,
 you need to manually sync for changes to appear.
  
 # Extra info
 
 **Bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
-set in the `.env` file. Especially if signups are disabled it is the only way
+set in the `.env` file. Especially if sign ups are disabled it is the only way
 to invite users.
 
 **Push notifications** are not working at this moment.
 [Github issue](https://github.com/dani-garcia/bitwarden_rs/issues/126).</br>
 The purpose of [Push notifications](https://www.youtube.com/watch?v=8D1NAezC-Dk)
 is the same as WebSocket notifications, to tell the clients that a change
-happened on the server so that they are synced immediatly.
+happened on the server so that they are synced immediately.
 But they are for apps on mobile devices and it would likely take releasing and
-maintaing own bitwarden_rs version of the Android/iOS mobile apps
+maintaining own bitwarden_rs version of the Android/iOS mobile apps
 to have them working.</br>
 So you better manually sync before making changes.
 
@@ -188,7 +188,7 @@ For bitwarden_rs it means sqlite database dump and backing up `attachments` dire
 Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
 takes care of backing up the directory.
 So only database dump is needed.
-The created backup sqlite3 file is overwriten on every run of the script,
+The created backup sqlite3 file is overwritten on every run of the script,
 but that's ok since borg is making daily snapshots.
 
 #### Create a backup script
@@ -203,11 +203,11 @@ Placed inside `bitwarden` directory on the host.
 docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
 ```
 
-the script must be **executabe** - `chmod +x bitwarden-backup-script.sh`
+the script must be **executable** - `chmod +x bitwarden-backup-script.sh`
 
 #### Cronjob
 
-Runing on the host, so that the script will be periodicly run.
+Running on the host, so that the script will be periodically run.
 
 * `su` - switch to root
 * `crontab -e` - add new cron job</br>
@@ -217,13 +217,13 @@ Runing on the host, so that the script will be periodicly run.
 
 # Restore the user data
 
-  Assuming clean start.
+Assuming clean start.
 
-  * start the bitwarden container: `docker-compose up -d`
-  * let it run so it creates its file structure
-  * down the container `docker-compose down`
-  * in `bitwarden/bitwarden-data/`</br>
-    replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
-    replace `attachments` directory with the one from the BorgBackup repository 
-  * start the container `docker-compose up -d`
+* start the bitwarden container: `docker-compose up -d`
+* let it run so it creates its file structure
+* down the container `docker-compose down`
+* in `bitwarden/bitwarden-data/`</br>
+  replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
+  replace `attachments` directory with the one from the BorgBackup repository 
+* start the container `docker-compose up -d`
 
