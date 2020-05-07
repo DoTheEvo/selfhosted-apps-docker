@@ -99,7 +99,7 @@ SMTP_FROM=admin@blabla.org
 ```
 
 **All containers must be on the same network**.</br>
-If one does not exists yet: `docker network create caddy_net`
+If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
@@ -162,32 +162,36 @@ So you better manually sync before making changes.
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+* manual image update</br>
+  `docker-compose pull`</br>
+  `docker-compose up -d`</br>
+  `docker image prune`
 
 # Backup and restore
 
-  * **backup** using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-  that makes daily snapshot of the entire directory
-    
-  * **restore**</br>
-    down the bitwarden container `docker-compose down`</br>
-    delete the entire bitwarden directory</br>
-    from the backup copy back the bitwarden directortory</br>
-    start the container `docker-compose up -d`
+#### Backup
+
+Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the entire directory.
+  
+#### Restore
+
+* down the bitwarden container `docker-compose down`</br>
+* delete the entire bitwarden directory</br>
+* from the backup copy back the bitwarden directory</br>
+* start the container `docker-compose up -d`
 
 # Backup of just user data
 
-Users data daily export using the [official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
+Users data daily export using the
+[official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
 For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
 
 Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
 takes care of backing up the directory.
-So only database dump is needed.
+So only database dump is needed.</br>
 The created backup sqlite3 file is overwritten on every run of the script,
 but that's ok since borg is making daily snapshots.
 
@@ -196,7 +200,7 @@ but that's ok since borg is making daily snapshots.
 Placed inside `bitwarden` directory on the host.
 
 `bitwarden-backup-script.sh`
-```
+```bash
 #!/bin/bash
 
 # CREATE SQLITE BACKUP
@@ -224,6 +228,8 @@ Assuming clean start.
 * down the container `docker-compose down`
 * in `bitwarden/bitwarden-data/`</br>
   replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
-  replace `attachments` directory with the one from the BorgBackup repository 
+  replace `attachments` directory with the one from the borg repository 
 * start the container `docker-compose up -d`
 
+Again, the above steps are based on the 
+[official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)
