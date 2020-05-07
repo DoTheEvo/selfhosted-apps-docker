@@ -39,8 +39,8 @@ Cronjob is executing this script daily.
         ├── ...
 ```
 
-* `docker_backup/` - borg repository, created by borg init command
-* `borg_backup.sh` - the backup script that adds archive in to the repository
+* `docker_backup/` - borg repository directory, created by `borg init` command
+* `borg_backup.sh` - the backup script that adds new archive in to the repository
 * `borg_backup.log` - log file with dates of backups
 
 # The setup
@@ -124,6 +124,10 @@ as root, cron job every day at 3:00</br>
 `crontab -e`</br>
 `0 3 * * * /home/bastard/borg/borg_backup.sh`</br>
 `crontab -l`</br>
+
+# Extra info
+
+Test your backups, test your recovery procedure.
 
 # Remote backup
 
