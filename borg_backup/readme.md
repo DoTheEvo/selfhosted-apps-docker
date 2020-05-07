@@ -20,10 +20,15 @@ This allows to keep snapshots from several days, weeks and months,
 while not wasting disk space.
 
 In this setup borg is installed directly on the host system.</br>
-A script is created that backs up the entire docker directory locally.</br>
-Cronjob is executing this script daily.
+A script is created that backs up the entire docker directory and /etc locally.</br>
+Cronjob is set to execute this script daily.
 
-# files and directory structure
+The repository is also pruned on each run of the script -
+old archives are deleted while keeping the ones fitting the retention rules
+in the script.</br>
+One backup per day for last 7 days, last 4 weeks, last 6 months are kept.
+
+# Files and directory structure
 
 ```
 /home/
@@ -39,9 +44,14 @@ Cronjob is executing this script daily.
         ├── ...
 ```
 
-* `docker_backup/` - borg repository directory, created by `borg init` command
+* `docker_backup/` - borg repository directory
 * `borg_backup.sh` - the backup script that adds new archive in to the repository
-* `borg_backup.log` - log file with dates of backups
+* `borg_backup.log` - log file with the dates of backups
+
+Only `borg_backup.sh` has to be provided.</br>
+Repo directory is created by `borg init` command
+and the log file is created on the first run.
+
 
 # The setup
 
