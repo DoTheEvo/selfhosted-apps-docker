@@ -21,6 +21,10 @@ So the answer is running a DNS server that pairs the local machines IP with
 the correct hostnames, and a DHCP server that tells the devices on the network
 to use this DNS.
 
+# Prerequisites
+
+* machine that will be running it should have set static IP
+
 # Files and directory structure
 
 ```
@@ -59,7 +63,9 @@ bogus-priv
 no-resolv
 no-poll
 
-# DHCP and DNS interface and address
+cache-size=1000
+
+# interface and address
 interface=enp0s25
 listen-address=::1,127.0.0.1
 
@@ -93,6 +99,10 @@ dhcp-host=08:00:27:68:f9:bf,192.168.1.150
 
 * `dnsmasq --test` - validates the config
 * `dnsmasq --help dhcp` - lists all the DHCP options
+
+You can also run just DNS server, by deleting the DHCP section to the end.</br>
+Then on your router, in the DNS server settings, you just put in the ip address
+of the dnsmasq host.
 
 # resolv.conf
 
