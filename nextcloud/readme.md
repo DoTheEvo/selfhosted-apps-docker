@@ -4,13 +4,27 @@
 
 ![logo](https://i.imgur.com/VXSovC9.png)
 
-# Purpose
+# Purpose & Overview
 
 File share & sync.
 
 * [Official site](https://nextcloud.com/)
 * [Github](https://github.com/nextcloud/server)
 * [DockerHub](https://hub.docker.com/_/nextcloud/)
+
+Nextcloud is an open source suite of client-server software for creating
+and using file hosting services with wide cross platform support.
+
+The Nextcloud server is written in PHP and JavaScript.
+For remote access it employs sabre/dav, an open-source WebDAV server.
+It is designed to work with several database management systems,
+including SQLite, MariaDB, MySQL, PostgreSQL.
+
+There are many ways to deploy Nextcloud, this setup is going with the most goodies.</br>
+Like using [PHP-FPM](https://www.cloudways.com/blog/php-fpm-on-cloud/).
+Using [Redis](https://aws.amazon.com/redis/) for more reliable
+[transactional file locking](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/files_locking_transactional.html)
+and for [memory file caching](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/caching_configuration.html).
 
 # Files and directory structure
 
@@ -23,8 +37,19 @@ File share & sync.
             ├── nextcloud-db-data/
             ├── .env
             ├── docker-compose.yml
+            ├── nginx.conf
             └── nextcloud-backup-script.sh
 ```
+
+* `nextcloud-data/` - a directory where nextcloud will store users data and web app data
+* `nextcloud-db-data/` - a directory where nextcloud will store its database data
+* `.env` - a file containing environmental variables for docker compose
+* `docker-compose.yml` - a docker compose file, telling docker how to build the containers
+* `nginx.conf` - nginx web server configuration file
+* `nextcloud-backup-script.sh` - a backup script if you want it
+
+You only need to provide the files.</br>
+The directories are created by docker compose on the first run.
 
 # docker-compose
 
@@ -32,13 +57,13 @@ Official examples [here](https://github.com/nextcloud/docker/tree/master/.exampl
 
 Four containers to spin up
 
-* **nextcloud** - nextcloud app that stores uploaded files and runs
-  apache web server with php as a module.
-* **nextcloud-db** - mariadb database where files-metadata
-  and users-metadata are stored
+* **nextcloud-app** - nextcloud backend app that stores the files and facilitate 
+  the sync
+* **nextcloud-db** - mariadb database where files-metadata and users-metadata are stored
+* **nextcloud-web** - nginx web server setup to provide fastCGI PHP-FPM
 * **nextcloud-redis** - in memory file caching
   and more reliable transactional file locking
-* **nextcloud-cron** - for being able to run maintenance cronjobs
+* **nextcloud-cron** - for being able to run periodic maintenance cronjobs
 
 `docker-compose.yml`
 ```yml
@@ -65,10 +90,10 @@ services:
     hostname: nextcloud-redis
     restart: unless-stopped
 
-  nextcloud:
-    image: nextcloud:apache
-    container_name: nextcloud
-    hostname: nextcloud
+  nextcloud-app:
+    image: nextcloud:fpm-alpine
+    container_name: nextcloud-app
+    hostname: nextcloud-app
     restart: unless-stopped
     depends_on:
       - nextcloud-db
@@ -86,8 +111,17 @@ services:
       - SMTP_NAME
       - SMTP_PASSWORD
 
+  nextcloud-web:
+    image: nginx:alpine
+    container_name: nextcloud-web
+    hostname: nextcloud-web
+    restart: unless-stopped
+    volumes:
+      - ./nextcloud-data/:/var/www/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
   nextcloud-cron:
-    image: nextcloud:apache
+    image: nextcloud:fpm-alpine
     container_name: nextcloud-cron
     hostname: nextcloud-cron
     restart: unless-stopped
@@ -130,7 +164,28 @@ SMTP_PORT=465
 SMTP_NAME=apikey
 SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
 ```
+
+`nginx.conf`
+
+*I wont be pasting it here in full text, but it is included this github repo.*
+
+This is nginx web server configuration file, specifically setup
+to support fastCGI PHP-FPM.
+
+Taken from [this official nextcloud example
+setup](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose/insecure/mariadb-cron-redis/fpm/web)
+and changed one thing in it - the upstream hostname from `app` to `nextcloud-app`
+
+```
+upstream php-handler {
+    server nextcloud-app:9000;
+}
+```
+
+---
+
 **All containers must be on the same network**.</br>
+Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
