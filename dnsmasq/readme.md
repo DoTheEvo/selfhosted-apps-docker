@@ -100,9 +100,10 @@ dhcp-host=08:00:27:68:f9:bf,192.168.1.150
 * `dnsmasq --test` - validates the config
 * `dnsmasq --help dhcp` - lists all the DHCP options
 
-You can also run just DNS server, by deleting the DHCP section to the end.</br>
-Then on your router, in the DNS server settings, you just put in the ip address
-of the dnsmasq host.
+You can also run just DNS server, by deleting the DHCP section
+in the `dnsmasq.conf` to the end.</br>
+Then on your router, in the DNS settings, you just put in the ip address
+of the dnsmasq host as the DNS server.
 
 # resolv.conf
 
