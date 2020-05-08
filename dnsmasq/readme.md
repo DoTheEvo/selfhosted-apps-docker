@@ -102,18 +102,18 @@ nameserver ::1
 nameserver 127.0.0.1
 ```
 
-A file that contains DNS nameservers to be used by the linux machine,
-specifically its glibc resolver library.</br>
+A file that contains DNS nameservers to be used by the linux machine it sits on.</br>
 Since dnsmasq, a DNS server, is running right on this machine,
-the entries should just point to localhost.
+the entries just point to localhost:</br> 
+    `nameserver ::1`</br>
+    `nameserver 127.0.0.1`
 
 Bit of an issue is that this file is often managed by various system services,
 like dhcpcd, systemd, networkmanager... and they change it as they see fit.</br>
 To prevent this, `resolv.conf` will be flagged as immutable,
 which prevents all possible changes to it unless the attribute is removed.
 
-Edit /`etc/resolv.conf` and set localhost as the DNS nameserver.
-
+Edit /`etc/resolv.conf` and set localhost as the DNS nameserver, as shown above.
 
 Make it immutable to prevent any changes to it.
 
@@ -176,8 +176,8 @@ for the active leases. Location of the file can vary base on your linux distro.
 
 #### DNS
 
-nslookup is utility that checks DNS mapping, part of `bind-utils` or `bind-tools`,
-again depending on the distro.
+nslookup is utility that checks DNS mapping,
+part of `bind-utils` or `bind-tools` packages, again depending on the distro.
 
 * `nslookup google.com`
 * `nslookup gateway`
@@ -194,9 +194,8 @@ During host linux packages update.
 
 #### Backup
 
-Using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire /etc directory
-which contains the config files.
+Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the /etc directory which contains the config files.
 
 #### restore
 
