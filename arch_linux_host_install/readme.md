@@ -28,7 +28,7 @@ Google for plenty of tutorials and youtube videos alongside arch wiki.
 
 # Make installation usb
 
-* [wiki](https://wiki.archlinux.org/index.php/USB_flash_installation_media)
+[wiki](https://wiki.archlinux.org/index.php/USB_flash_installation_media)
 
 `sudo dd bs=4M if=archlinux-2020.05.01-x86_64.iso of=/dev/sdX status=progress oflag=direct`
 
@@ -73,7 +73,7 @@ So if theres boot menu option choose non-uefi.
 * add new user and set their password</br>
   `useradd -m -G wheel bastard`</br>
   `passwd bastard`
-* edit sudoers to allow users group wheel to sudo</br>
+* edit sudoers to allow users of the group wheel to sudo</br>
   `EDITOR=nano visudo`</br>
   *%wheel ALL=(ALL) ALL*
 * check the network interface name</br>
@@ -123,12 +123,14 @@ From now on its login as non-root user.
 I like [Zim](https://github.com/zimfw/zimfw),
 it's the fastest zsh framework and out of the box setup nicely
 
-* install zsh package</br>
-  `sudo pacman -S zsh`
+* install zsh and curl packages</br>
+  `sudo pacman -S zsh curl`
 * install zim, it changes users default shell to zsh</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 
 ### Setup docker
+
+[Wiki](https://wiki.archlinux.org/index.php/docker)
 
 * have `docker` and `docker-compose` packages installed</br>
   `sudo pacman -S docker docker-compose`
@@ -140,7 +142,7 @@ it's the fastest zsh framework and out of the box setup nicely
 
 ### Extra stuff
 
-* `sudo pacman -S vim git cronie curl borg htop lm_sensors nnn bind-tools python-llfuse`
+* `sudo pacman -S vim git cronie curl htop lm_sensors nnn bind-tools borg python-llfuse`
 * install yay for access to AUR packages</br>
   `git clone https://aur.archlinux.org/yay-bin.git`</br>
   `cd yay-bin && makepkg -si`</br>
