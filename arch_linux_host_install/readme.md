@@ -8,7 +8,9 @@
 
 Linux that will run docker.
 
-This is not a very hand holding guide.</br>
+This is not a hand hodling guide how to install arch.</br>
+It's more of a what to do if you already done it
+and know what you are doing.</br>
 Google for plenty of tutorials and youtube videos alongside arch wiki.
 
 * [Official site](https://www.archlinux.org/)
