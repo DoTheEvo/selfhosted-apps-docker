@@ -60,9 +60,11 @@ and the log file is created on the first run.
 Borg is likely in your linux repositories.
 
 #### Create a new borg repo
-  
+
 `mkdir ~/borg`</br>
-`borg init --encryption=none ~/borg/docker_backup`
+`sudo borg init --encryption=none ~/borg/docker_backup`
+
+Note the sudo. Borg commands should be run as root, so it can access everything.
 
 #### The backup script
 
@@ -125,15 +127,33 @@ echo '------------------------------' >> $LOGFILE
 #   borg delete .::1584472836
 ```
 
-the script must be **executabe** - `chmod +x borg_backup.sh`
+The script must be **executabe** - `chmod +x borg_backup.sh`
+
+`sudo /home/spravca/borg/borg_backup.sh`
+
+It could ask about
+*Attempting to access a previously unknown unencrypted repository*</br>
+Answer yes, this could be important as the automatic backup would stop at 
+this question otherwise.
 
 #### Automatic execution
 
-as root, cron job every day at 3:00</br>
-`su` - switch to root</br>
-`crontab -e`</br>
-`0 3 * * * /home/bastard/borg/borg_backup.sh`</br>
-`crontab -l`</br>
+Using [cron](https://wiki.archlinux.org/index.php/cron)
+
+* `su` - switch to root
+* `crontab -e` - add new cron job</br>
+* `0 3 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh`</br>
+  runs it every day [at 03:00](https://crontab.guru/#0_03_*_*_*) 
+* `crontab -l` - list cronjobs to check
+
+# Accessing the backup files
+
+* `cd /home/bastard/borg/docker_backup/` - go in to the borg repo
+* `sudo borg list .` - list the archives
+* choose one by the date, copy its identifier which is epoch time, e.g. 1588986941
+* `sudo borg mount .::1588986941 /mnt/temp` - mount it to some folder 
+* browse the directory where mounted and do whatever is needed
+* `sudo borg umount /mnt/temp` - umount the backup
 
 # Extra info
 

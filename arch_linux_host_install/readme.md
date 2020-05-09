@@ -32,7 +32,7 @@ Google for plenty of tutorials and youtube videos alongside arch wiki.
 
 `sudo dd bs=4M if=archlinux-2020.05.01-x86_64.iso of=/dev/sdX status=progress oflag=direct`
 
-The above command will fuck your machine up if you dunno what you are doing
+The above command will fuck your machine up if you dunno what you are doing.
 
 # Boot from the usb
 
@@ -71,7 +71,7 @@ So if theres boot menu option choose non-uefi.
 * set hostname</br>
   `echo docker-host > /etc/hostname`
 * add new user and set their password</br>
-  `useradd -m -G wheel bastard`
+  `useradd -m -G wheel bastard`</br>
   `passwd bastard`
 * edit sudoers to allow users group wheel to sudo</br>
   `EDITOR=nano visudo`</br>
@@ -98,7 +98,7 @@ So if theres boot menu option choose non-uefi.
   `nano /etc/fstab`</br>
   */swapfile none swap defaults 0 0*
 * enable colors in pacman.conf</br>
-  `nano /etc/pacman.conf`
+  `nano /etc/pacman.conf`</br>
   *Color*
 * reboot</br>
   `reboot`
@@ -125,8 +125,7 @@ it's the fastest zsh framework and out of the box setup nicely
 
 * install zsh package</br>
   `sudo pacman -S zsh`
-* change users default shell to zsh</br>
-  `chsh -s /bin/zsh`</br>
+* install zim, it changes users default shell to zsh</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 
 ### Setup docker
@@ -141,7 +140,7 @@ it's the fastest zsh framework and out of the box setup nicely
 
 ### Extra stuff
 
-* `sudo pacman -S vim git cronie curl borg htop lm_sensors nnn bind-tools`
+* `sudo pacman -S vim git cronie curl borg htop lm_sensors nnn bind-tools python-llfuse`
 * install yay for access to AUR packages</br>
   `git clone https://aur.archlinux.org/yay-bin.git`</br>
   `cd yay-bin && makepkg -si`</br>
