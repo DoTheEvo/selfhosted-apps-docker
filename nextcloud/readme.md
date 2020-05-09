@@ -348,14 +348,14 @@ Running on the host, so that the script will be periodically run.
 Assuming clean start.
 
 * start the containers: `docker-compose up -d`</br>
-  let it run so it creates its file structure
+  let them run so they create the file structure
 * down the containers: `docker-compose down`
-* delete the directories `configs`, `data`, `themes` in freshly created
+* delete the directories `configs`, `data`, `themes` in the freshly created
   `nextcloud/nextcloud-data/`
 * from the backup of /nextcloud/nextcloud-data/, copy the directories
-  `configs`, `data`, `themes` in to new `/nextcloud/nextcloud-data/`
+  `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud-data/`
 * from the backup of /nextcloud/nextcloud-data-db/, copy the backup database
-  named `BACKUP.nextcloud.database.sql` in to new `/nextcloud/nextcloud-data-db/`
+  named `BACKUP.nextcloud.database.sql` in to the new `/nextcloud/nextcloud-data-db/`
 * start the containers: `docker-compose up -d`
 * set the correct user ownership of the directories copied:</br>
   `docker exec --workdir /var/www/html nextcloud-app chown -R www-data:www-data config data themes`
