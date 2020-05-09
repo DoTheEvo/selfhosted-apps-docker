@@ -44,7 +44,7 @@ only the server is a different implementation.
 
 * `bitwarden-data/` - a directory where bitwarden will store its database and other data
 * `.env` - a file containing environmental variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build bitwarden container
+* `docker-compose.yml` - a docker compose file, telling docker how to build the container
 * `bitwarden-backup-script.sh` - a backup script if you want it
 
 You only need to provide the files.</br>
@@ -162,13 +162,14 @@ So you better manually sync before making changes.
 
 # Update
 
-* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically
+[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+updates the image automatically.
 
-* manual image update</br>
-  `docker-compose pull`</br>
-  `docker-compose up -d`</br>
-  `docker image prune`
+Manual image update:
+
+- `docker-compose pull`</br>
+- `docker-compose up -d`</br>
+- `docker image prune`
 
 # Backup and restore
 

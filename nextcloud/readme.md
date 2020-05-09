@@ -201,7 +201,7 @@ There are few extra directives here to fix some nextcloud warnings.
 `Caddyfile`
 ```
 nextcloud.{$MY_DOMAIN} {
-    reverse_proxy nextcloud:80
+    reverse_proxy nextcloud-web:80
     header Strict-Transport-Security max-age=31536000;
     redir /.well-known/carddav /remote.php/carddav 301
     redir /.well-known/caldav /remote.php/caldav 301

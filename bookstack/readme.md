@@ -37,7 +37,7 @@ which uses nginx as a web server.
 * `bookstack-data/` - a directory where bookstack will store its web app data
 * `bookstack-db-data/` - a directory where bookstack will store its MySQL database data
 * `.env` - a file containing environmental variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build bookstack container
+* `docker-compose.yml` - a docker compose file, telling docker how to build the containers
 * `bookstack-backup-script.sh` - a backup script if you want it
 
 You only need to provide the files.</br>
@@ -134,13 +134,14 @@ book.{$MY_DOMAIN} {
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-  updates the image automatically
+[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+updates the image automatically.
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+Manual image update:
+
+- `docker-compose pull`</br>
+- `docker-compose up -d`</br>
+- `docker image prune`
 
 # Backup and restore
 
