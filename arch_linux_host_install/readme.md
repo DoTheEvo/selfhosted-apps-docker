@@ -97,17 +97,16 @@ So if theres boot menu option choose non-uefi.
   `mkswap /swapfile`</br>
   `nano /etc/fstab`</br>
   */swapfile none swap defaults 0 0*
-* enable colors in pacman.conf</br>
-  `nano /etc/pacman.conf`</br>
-  *Color*
 * reboot</br>
   `reboot`
 
-# SSH, ZSH, Docker, and other goodies
+# SSH, ZSH, Docker, AUR
 
 From now on its login as non-root user.
 
 ### Setup SSH access
+
+[wiki](https://wiki.archlinux.org/index.php/OpenSSH)
 
 * install openssh package</br>
   `sudo pacman -S openssh`
@@ -120,6 +119,8 @@ From now on its login as non-root user.
 
 ### ZSH shell
 
+[wiki](https://wiki.archlinux.org/index.php/zsh)
+
 I like [Zim](https://github.com/zimfw/zimfw),
 it's the fastest zsh framework and out of the box setup nicely
 
@@ -127,6 +128,21 @@ it's the fastest zsh framework and out of the box setup nicely
   `sudo pacman -S zsh curl`
 * install zim, it changes users default shell to zsh</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
+
+##### Adding stuff to .zshrc
+
+`export EDITOR=nano`
+
+for ctrl+f prepending sudo
+
+```bash
+add_sudo (){
+    BUFFER="sudo $BUFFER"
+    zle -w end-of-line
+}
+zle -N add_sudo
+bindkey "^f" add_sudo
+```
 
 ### Setup docker
 
@@ -139,26 +155,55 @@ it's the fastest zsh framework and out of the box setup nicely
 * add non-root user to the docker group</br>
   `sudo gpasswd -a bastard docker`
 
+### Access to AUR
 
-### Extra stuff
+Using [Yay](https://github.com/Jguer/yay).
 
-* `sudo pacman -S vim git cronie curl htop lm_sensors nnn bind-tools borg python-llfuse`
-* install yay for access to AUR packages</br>
+* install git package</br>
+  `sudo pacman -S git`
+* install yay</br>
   `git clone https://aur.archlinux.org/yay-bin.git`</br>
   `cd yay-bin && makepkg -si`</br>
   `cd .. && rm -rf yay-bin`</br>
 
-`ctop` and `inxi` are good packages from yay
+`ctop` and `inxi` are good AUR packages.
 
-### Adding stuff to .zshrc
+# Extra stuff
 
-* `export EDITOR=vim`
-* for ctrl+f prepending sudo
-  ```bash
-  add_sudo (){
-      BUFFER="sudo $BUFFER"
-      zle -w end-of-line
-  }
-  zle -N add_sudo
-  bindkey "^f" add_sudo
-  ```
+[wiki - general general recommendations](https://wiki.archlinux.org/index.php/general_recommendations)</br>
+[wiki - improving performance](https://wiki.archlinux.org/index.php/Improving_performance)</br>
+
+### Some packages
+
+Tools 
+
+* `sudo pacman -S cronie fuse curl wget vim nnn bind-tools borg python-llfuse`
+
+Monitoring and testing
+
+* `sudo pacman -S htop lm_sensors iotop powertop iproute2`
+
+### Performance and maintenance
+
+* if ssd enable periodic trim</br>
+  `sudo pacman -S util-linux`</br>
+  `sudo systemctl enable --now fstrim.timer`
+* set noatime in fstab to prevent unnecessary keep of read times</br>
+  `sudo nano /etc/fstab`</br>
+  *UUID=cdd..addb / ext4 rw,noatime 0 1*
+* enable use of all cpu cores for makepkg jobs and disable compression</br>
+  `sudo nano /etc/makepkg`</br>
+  *MAKEFLAGS="-j$(nproc)"*</br>
+  *PKGEXT='.pkg.tar'*
+* clean up old packages weekly, keep last 3</br>
+  `sudo pacman -S pacman-contrib`</br>
+  `sudo systemctl enable --now paccache.timer`
+* use reflector to get the fastes mirrors based on country `-c <country code>`</br>
+  `sudo pacman -S reflector`</br>
+  `sudo reflector -l 200 -n 20 -c SK -c CZ -p http --sort rate --save /etc/pacman.d/mirrorlist`
+
+### Comfort
+
+* enable colors in pacman.conf</br>
+  `sudo nano /etc/pacman.conf`</br>
+  *Color*
