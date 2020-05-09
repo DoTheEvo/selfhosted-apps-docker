@@ -61,10 +61,10 @@ Five containers to spin up
 * **nextcloud-app** - nextcloud backend app that stores the files and facilitate 
   the sync and runs the apps
 * **nextcloud-db** - mariadb database where files-metadata and users-metadata are stored
-* **nextcloud-web** - nginx web server setup to provide fastCGI PHP-FPM
+* **nextcloud-web** - nginx web server with fastCGI PHP-FPM support
 * **nextcloud-redis** - in memory file caching
   and more reliable transactional file locking
-* **nextcloud-cron** - for being able to run periodic maintenance cronjobs
+* **nextcloud-cron** - for periodic maintenance in the background
 
 `docker-compose.yml`
 ```yml
@@ -167,15 +167,18 @@ SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
 ```
 
 `nginx.conf`
-
-*I wont be pasting it here in full text, but it is included this github repo.*
+```
+I wont be pasting it here
+in full text,
+but it is included this github repo.
+```
 
 This is nginx web server configuration file, specifically setup
 to support fastCGI PHP-FPM.
 
 Taken from [this official nextcloud example
 setup](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose/insecure/mariadb-cron-redis/fpm/web)
-and changed one thing in it - the upstream hostname from `app` to `nextcloud-app`
+and has one thing changed in it - the upstream hostname from `app` to `nextcloud-app`
 
 ```
 upstream php-handler {
@@ -257,7 +260,7 @@ At `https://<nexcloud url>/ocs/v2.php/apps/serverinfo/api/v1/info`</br>
 ctrl+f for `redis`, should be in memcache.distributed and memcache.locking
 
 You can also exec in to redis container:
-- `docker exec -it nextcloud-redis /bin/bash`
+- `docker exec -it nextcloud-redis /bin/sh`
 - start monitoring: `redis-cli MONITOR`
 - start browsing files on the nextcloud
 - there should be activity in the monitoring
@@ -323,7 +326,9 @@ docker container exec nextcloud-db bash -c 'mysqldump --single-transaction -h ne
 docker container exec --user www-data --workdir /var/www/html nextcloud-app php occ maintenance:mode --off
 ```
 
-the script must be **executable** - `chmod +x nextcloud-backup-script.sh`
+The script must be **executable** - `chmod +x nextcloud-backup-script.sh`
+
+Test run the script `sudo ./nextcloud-backup-script.sh`
 
 The resulting database dump is in 
 `nextcloud/nextcloud-data-db/BACKUP.nextcloud.database.sql`
@@ -345,8 +350,8 @@ Assuming clean start.
 * start the containers: `docker-compose up -d`</br>
   let it run so it creates its file structure
 * down the containers: `docker-compose down`
-* from the backup, copy the directories `data`, `configs`, `themes` in to
-  `nextcloud-data` replacing the ones in place
+* from the backup of nextcloud-data, copy the directories `configs`, `data`,
+  and `themes` in to new `nextcloud-data`, replacing the ones in place
 * from the backup, copy the backup database, found in
   `nextcloud/nextcloud-data-db/BACKUP.nextcloud.database.sql`
   in to the new `nextcloud/nextcloud-db-data/`
