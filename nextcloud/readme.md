@@ -310,7 +310,7 @@ hundreds gigabytes can be stored.
 
 #### Create a backup script
 
-Placed inside `nextcloud` directory on the host.
+Placed inside `~/docker/nextcloud/` directory on the host.
 
 `nextcloud-backup-script.sh`
 ```bash
@@ -328,8 +328,7 @@ docker container exec --user www-data --workdir /var/www/html nextcloud-app php 
 
 The script must be **executable** - `chmod +x nextcloud-backup-script.sh`
 
-Test run the script `sudo ./nextcloud-backup-script.sh`
-
+Test run the script `sudo ./nextcloud-backup-script.sh`</br>
 The resulting database dump is in 
 `nextcloud/nextcloud-data-db/BACKUP.nextcloud.database.sql`
 
@@ -352,9 +351,9 @@ Assuming clean start.
 * down the containers: `docker-compose down`
 * delete the directories `configs`, `data`, `themes` in the freshly created
   `nextcloud/nextcloud-data/`
-* from the backup of /nextcloud/nextcloud-data/, copy the directories
+* from the backup of `/nextcloud/nextcloud-data/`, copy the directories
   `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud-data/`
-* from the backup of /nextcloud/nextcloud-data-db/, copy the backup database
+* from the backup of `/nextcloud/nextcloud-data-db/`, copy the backup database
   named `BACKUP.nextcloud.database.sql` in to the new `/nextcloud/nextcloud-data-db/`
 * start the containers: `docker-compose up -d`
 * set the correct user ownership of the directories copied:</br>
