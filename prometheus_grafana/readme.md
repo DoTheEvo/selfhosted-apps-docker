@@ -330,7 +330,7 @@ grafana.{$MY_DOMAIN} {
 
 ---
 
-![interface-pic](https://i.imgur.com/RrK29wC.png)
+![interface-pic](https://i.imgur.com/wzwgBkp.png)
 
 # Update
 
