@@ -16,9 +16,11 @@ It makes sure that if you reset your router, or have a power outage,
 and you get a new public IP assigned, this IP gets automaticly set
 in the DNS records for your domains.
 
-In this setup it works by checking every 10 minutes
+This setup runs directly on the host machine.</br>
+It works by checking every 10 minutes
 [checkip.dyndns.org](http://checkip.dyndns.org/),
-and if the IP changed from the previous one, it updates the DNS records. 
+and if the IP changed from the previous one, it logs in to the DNS provider and
+updates the DNS records. 
 
 # Files and directory structure
 
@@ -74,6 +76,13 @@ blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
 # Start the service
 
 `sudo systemctl enable --now ddclient`
+
+# Troubleshooting
+
+If it would timeout on start, check the real location of ddclient.pid</br> 
+`sudo find / -name ddclient.pid`
+
+If it is correctly set in the `ddclient.conf`.
 
 # Update
 
