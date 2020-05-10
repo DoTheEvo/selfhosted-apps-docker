@@ -22,48 +22,17 @@ and if the IP changed from the previous one, it updates the DNS records.
 # Files and directory structure
 
 ```
-/home/
-└── ~/
-    └── docker/
-        └── ddclient/
-            ├── .env
-            ├── docker-compose.yml
-            └── ddclient.conf
+/etc/
+└── ddclient/
+    └── ddclient.conf
 ```              
 
-# docker-compose
-  
-[Based on linuxserver.io](https://hub.docker.com/r/linuxserver/ddclient)
+# Installation
 
-`docker-compose.yml`
+Install ddclient from your linux official repos.
 
-```yml
-version: "2.1"
-services:
-
-  ddclient:
-    image: linuxserver/ddclient
-    hostname: ddclient
-    container_name: ddclient
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ./ddclient.conf:/config/ddclient.conf
-    restart: unless-stopped
-```
-
-`.env`
-
-```bash
-# GENERAL
-MY_DOMAIN=blabla.org
-DEFAULT_NETWORK=caddy_net
-TZ=Europe/Bratislava
-
-#LINUXSERVER.IO
-PUID=1000
-PGID=1000
-```
+After configuration enable the service</br>
+`sudo systemctl enable --now ddclient`
 
 # Configuration
 
@@ -80,11 +49,10 @@ daemon=600
 syslog=yes
 mail=root
 mail-failure=root
-pid=/var/run/ddclient/ddclient.pid
+pid=/var/run/ddclient.pid
 ssl=yes
 
 use=web, web=checkip.dyndns.org/, web-skip='IP Address'
-wildcard=yes
 
 ##
 ## CloudFlare (www.cloudflare.com)
@@ -107,10 +75,15 @@ blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
 
 # Update
 
-* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
- updates the image automaticly
+During host linux packages update.
 
-* manual image update</br>
-  `docker-compose pull`</br>
-  `docker-compose up -d`</br>
-  `docker image prune`
+# Backup and restore
+
+#### Backup
+
+Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the /etc directory which contains the config files.
+
+#### restore
+
+Replace the content of the config files with the one from the backup.
