@@ -179,7 +179,7 @@ Using [Yay](https://github.com/Jguer/yay).
 
 Tools 
 
-* `sudo pacman -S cronie fuse curl wget vim nnn bind-tools borg python-llfuse`
+* `sudo pacman -S fuse curl wget vim nnn bind-tools borg python-llfuse`
 
 Monitoring and testing
 
@@ -187,6 +187,9 @@ Monitoring and testing
 
 ### Performance and maintenance
 
+* install cron and enable the service</br>
+  `sudo pacman -S cronie`</br>
+  `sudo systemctl enable --now cronie`
 * if ssd enable periodic trim</br>
   `sudo pacman -S util-linux`</br>
   `sudo systemctl enable --now fstrim.timer`
