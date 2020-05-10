@@ -13,10 +13,12 @@
 * [bookstack](bookstack/) - notes and documentation
 * [borg_backup](borg_backup/) - backup utility
 * [ddclient](ddclient/) - automatic DNS update
+* [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [homer](homer/) - homepage
 * [nextcloud](nextcloud/) - file share & sync
 * [portainer](portainer/) - docker managment
 * [prometheus_grafana](prometheus_grafana/) - monitoring
 * [watchtower](watchtower/) - automatic docker images update
+* [arch_linux_host_install](arch_linux_host_install)
 
 The core of the setup is Caddy reverse proxy.

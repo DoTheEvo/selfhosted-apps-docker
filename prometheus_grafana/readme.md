@@ -82,8 +82,8 @@ and consists of several components.
 * `docker-compose.yml` - a docker compose file, telling docker how to build the containers
 * `prometheus.yml` - a configuration file for prometheus
 
-All files need to be provided.</br>
-As well as `grafana` directory and its subdirectories and files
+All files must be provided.</br>
+As well as `grafana` directory and its subdirectories and files.
 
 the directories `grafana-data` and `prometheus-data` are created
 by docker compose on the first run.

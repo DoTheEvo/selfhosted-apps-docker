@@ -114,6 +114,7 @@ MAIL_ENCRYPTION=SSL
 ```
 
 **All containers must be on the same network**.</br>
+Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy

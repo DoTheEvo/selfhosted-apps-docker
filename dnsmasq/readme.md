@@ -186,8 +186,8 @@ for the active leases. Location of the file can vary base on your linux distro.
 #### DNS
 
 nslookup is a utility that checks DNS mapping,
-part of `bind-utils` or `bind-tools` packages, again depending on the distro.
-But also part of windows.
+part of `bind-utils` or `bind-tools` packages, again depending on the distro,
+nut also available on windows.
 
 * `nslookup google.com`
 * `nslookup gateway`
