@@ -13,7 +13,7 @@ Web based GUI for overview and management of docker environment.
 * [DockerHub image used](https://hub.docker.com/r/portainer/portainer/)
 
 Portainer is a lightweight management web UI, that allows to easily manage
-docker container, networks, volumes, images,... the work.
+docker containers, networks, volumes, images,... the work.
 
 In my use it is mostly information tool, rather than a management tool.
 
@@ -101,4 +101,7 @@ that makes daily snapshot of the entire directory.
   
 #### Restore
 
-Other than having backup of the `docker-compose.yml` there is not much to 
+* down the portainer container `docker-compose down`</br>
+* delete the entire portainer directory</br>
+* from the backup copy back the portainer directory</br>
+* start the container `docker-compose up -d`
