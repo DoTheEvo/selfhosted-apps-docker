@@ -1,4 +1,4 @@
-# DDclient in docker
+# DDclient
 
 ###### guide by example
 
@@ -11,9 +11,10 @@ Automatic DNS entries update.
 * [DockerHub](https://hub.docker.com/r/linuxserver/ddclient)
 
 DDclient is a Perl client used to update dynamic DNS records.</br>
-Useful if not having a static IP from ISP, so that if you reset your router,
-or have power outage, and you get a new public IP assigned,
-this IP gets automaticly set in the DNS records for your domains.
+Very useful if not having a static IP from the ISP. 
+It makes sure that if you reset your router, or have a power outage,
+and you get a new public IP assigned, this IP gets automaticly set
+in the DNS records for your domains.
 
 In this setup it works by checking every 10 minutes
 [checkip.dyndns.org](http://checkip.dyndns.org/),
@@ -30,9 +31,6 @@ and if the IP changed from the previous one, it updates the DNS records.
 # Installation
 
 Install ddclient from your linux official repos.
-
-After configuration enable the service</br>
-`sudo systemctl enable --now ddclient`
 
 # Configuration
 
@@ -72,6 +70,10 @@ login=bastard.blobloblo@gmail.com, \
 password=global-api-key-goes-here \
 blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
 ```
+
+# Start the service
+
+`sudo systemctl enable --now ddclient`
 
 # Update
 
