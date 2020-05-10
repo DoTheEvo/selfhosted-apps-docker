@@ -33,15 +33,15 @@ and consists of several components.
   * making metrics available through PromQL API
 * **Targets** - machines, services, applications that are monitored.</br>
   These needs to have an **exporter**.
-  *  **exporter** - a script or a service that fetches metrics from the target,
+  *  **exporter** - a script or a service that gathers metrics on the target,
      converts them for prometheus server format,
      and exposes them at an endpoint so they can be pulled
 * **AlertManager** - responsible for handling alerts from Prometheus Server,
-  and sending notification through email, slack, pushover,..
+  and sending notifications through email, slack, pushover,..
 * **pushgateway** - allows push type of monitoring.
-  Should be be used as a last resort. Most commonly it is used to collect data
-  from batch jobs or from services that have short execution time.
-  Like a backup script.
+  Should not be overused as it goes against the pull philosophy of prometheus.
+  Most commonly it is used to collect data from batch jobs, or from services
+  that have short execution time. Like a backup script.
 * **Grafana** - for web UI visualization of the collected metrics 
 
 [glossary](https://prometheus.io/docs/introduction/glossary/)
@@ -75,12 +75,25 @@ and consists of several components.
             └── prometheus.yml
 ```
 
+* `grafana/` - a directory containing grafanas configs and dashboards
+* `grafana-data/` - a directory where grafana stores its data
+* `prometheus-data/` - a directory where prometheus stores its database and data
+* `.env` - a file containing environmental variables for docker compose
+* `docker-compose.yml` - a docker compose file, telling docker how to build the containers
+* `prometheus.yml` - a configuration file for prometheus
+
+All files need to be provided.</br>
+As well as `grafana` directory and its subdirectories and files
+
+the directories `grafana-data` and `prometheus-data` are created
+by docker compose on the first run.
+
 # docker-compose
 
 Four containers to spin up.</br>
 While [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
-also got alertmanager and pushgateway, this is a simpler setup for now,
-just want pretty graphs.
+also got alertmanager and pushgateway, this is a simpler setup for now.</br>
+Just want pretty graphs.
 
 * **Prometheus** - prometheus server, pulling, storing, evaluating metrics
 * **Grafana** - web UI visualization of the collected metrics
