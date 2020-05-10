@@ -44,7 +44,7 @@ One backup per day for last 7 days, last 4 weeks, last 6 months are kept.
         ├── ...
 ```
 
-* `docker_backup/` - borg repository directory
+* `docker_backup/` - borg repository directory containg the backups
 * `borg_backup.sh` - the backup script that adds new archive in to the repository
 * `borg_backup.log` - log file with the dates of backups
 
@@ -129,31 +129,44 @@ echo '------------------------------' >> $LOGFILE
 
 The script must be **executabe** - `chmod +x borg_backup.sh`
 
-`sudo /home/spravca/borg/borg_backup.sh`
+### Manual run
+
+`sudo ./borg_backup.sh`
 
 It could ask about
 *Attempting to access a previously unknown unencrypted repository*</br>
 Answer yes, this could be important as the automatic backup would stop at 
 this question otherwise.
 
-#### Automatic execution
+### Automatic execution
 
-Using [cron](https://wiki.archlinux.org/index.php/cron)
+Using [cron](https://wiki.archlinux.org/index.php/cron).
 
-* `su` - switch to root
-* `crontab -e` - add new cron job</br>
-* `0 3 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh`</br>
-  runs it every day [at 03:00](https://crontab.guru/#0_03_*_*_*) 
+**Make sure cron is installed and the service is running**</br> 
+`sudo systemctl status cronie`
+
+Create a cron job that executes the script
+[at 03:00](https://crontab.guru/#0_03_*_*_*) 
+
+* switch to root</br>
+  `su`
+* add new cron job</br>
+  `crontab -e`</br>
+  `0 3 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh`
 * `crontab -l` - list cronjobs to check
 
 # Accessing the backup files
 
-* `cd /home/bastard/borg/docker_backup/` - go in to the borg repo
-* `sudo borg list .` - list the archives
+* go in to the borg repo</br>
+  `cd /home/bastard/borg/docker_backup/`
+* list the archives</br>
+  `sudo borg list .`
 * choose one by the date, copy its identifier which is epoch time, e.g. 1588986941
-* `sudo borg mount .::1588986941 /mnt/temp` - mount it to some folder 
+* mount it to some folder</br>
+  `sudo borg mount .::1588986941 /mnt/temp`
 * browse the directory where mounted and do whatever is needed
-* `sudo borg umount /mnt/temp` - umount the backup
+* umount the backup</br>
+  `sudo borg umount /mnt/temp`
 
 # Extra info
 
