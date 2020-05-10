@@ -11,6 +11,9 @@ Homepage.
 * [Github](https://github.com/bastienwirtz/homer)
 * [DockerHub image used](https://hub.docker.com/r/b4bz/homer)
 
+Homer is a simple static web page, configured using a yaml file.</br>
+The docker image uses darkhttpd simple web server on alpine linux.
+
 # Files and directory structure
 
 ```
@@ -122,17 +125,25 @@ services:
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+updates the image automatically.
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+Manual image update:
+
+- `docker-compose pull`</br>
+- `docker-compose up -d`</br>
+- `docker image prune`
 
 # Backup and restore
 
-  * **backup** using [BorgBackup setup](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-  that makes daily snapshot of the entire directory
-    
-  * **restore**</br>
-    copy config.yml and assets directory from a borg repository to a freshly spin container
+#### Backup
+
+Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the entire directory.
+  
+#### Restore
+
+* down the bookstack containers `docker-compose down`</br>
+* delete the entire bookstack directory</br>
+* from the backup copy back the bookstack directory</br>
+* start the containers `docker-compose up -d`
