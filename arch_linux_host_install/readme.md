@@ -183,7 +183,7 @@ Tools
 
 Monitoring and testing
 
-* `sudo pacman -S htop lm_sensors iotop powertop iproute2`
+* `sudo pacman -S htop lm_sensors iotop nload powertop iproute2`
 
 ### Performance and maintenance
 

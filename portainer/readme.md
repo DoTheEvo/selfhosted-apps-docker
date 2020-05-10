@@ -6,7 +6,7 @@
 
 # Purpose
 
-Web based GUI for overview and management of docker environment.
+Web UI for overview and management of docker environment.
 
 * [Official site](https://www.portainer.io)
 * [Github](https://github.com/portainer/portainer)
