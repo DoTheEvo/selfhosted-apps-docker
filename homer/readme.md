@@ -22,10 +22,19 @@ The docker image uses darkhttpd simple web server on alpine linux.
     └── docker/
         └── homer/
             ├── assets/
+            │   └── tools/
             ├── .env
             ├── docker-compose.yml
             └── config.yml
 ```
+
+* `assets/` - a directory containing icons and other directories with icons
+* `.env` - a file containing environmental variables for docker compose
+* `docker-compose.yml` - a docker compose file, telling docker how to build the container
+* `config.yml` - homer's configuration file bind mounted in to the container
+
+All files and folders need to be provided.</br>
+`assets` direcotry is part of this repo.
 
 # docker-compose
 
@@ -40,8 +49,8 @@ services:
     hostname: homer
     restart: unless-stopped
     volumes:
-      - ./config.yml:/www/config.yml
-      - ./assets/:/www/assets
+      - ./config.yml:/www/config.yml:ro
+      - ./assets/:/www/assets:ro
 
 networks:
   default:
@@ -71,7 +80,10 @@ Caddy v2 is used, details
 
 # Config
 
-Homepage is configured in `config.yml` file.
+Homer in this `config.yml` file.</br>
+This one is based on the example from
+the [github](https://github.com/bastienwirtz/homer).
+
 
 `config.yml`
 ```yml
@@ -143,7 +155,7 @@ that makes daily snapshot of the entire directory.
   
 #### Restore
 
-* down the bookstack containers `docker-compose down`</br>
-* delete the entire bookstack directory</br>
-* from the backup copy back the bookstack directory</br>
-* start the containers `docker-compose up -d`
+* down the homer container `docker-compose down`</br>
+* delete the entire homer directory</br>
+* from the backup copy back the homer directory</br>
+* start the container `docker-compose up -d`
