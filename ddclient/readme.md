@@ -70,7 +70,7 @@ zone=blobloblo.net,              \
 ttl=1,                      \
 login=bastard.blobloblo@gmail.com, \
 password=global-api-key-goes-here \
-blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
+blobloblo.net,*.blobloblo.net,whatever.blobloblo.net
 ```
 
 # Start the service
@@ -79,7 +79,7 @@ blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
 
 # Troubleshooting
 
-If it would timeout on start, check the real location of ddclient.pid</br> 
+If it would timeout on start, check the real location of `ddclient.pid`</br> 
 `sudo find / -name ddclient.pid`
 
 If it is correctly set in the `ddclient.conf`.
@@ -93,8 +93,8 @@ During host linux packages update.
 #### Backup
 
 Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the /etc directory which contains the config files.
+that makes daily snapshot of the /etc directory which contains the config file.
 
 #### restore
 
-Replace the content of the config files with the one from the backup.
+Replace the content of the config file with the one from the backup.
