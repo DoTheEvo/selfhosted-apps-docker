@@ -190,7 +190,7 @@ Monitoring and testing
 * install cron and enable the service</br>
   `sudo pacman -S cronie`</br>
   `sudo systemctl enable --now cronie`
-* if ssd enable periodic trim</br>
+* if ssd, enable periodic trim</br>
   `sudo pacman -S util-linux`</br>
   `sudo systemctl enable --now fstrim.timer`
 * set noatime in fstab to prevent unnecessary keep of read times</br>

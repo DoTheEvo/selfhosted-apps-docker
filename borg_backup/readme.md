@@ -153,7 +153,11 @@ Create a cron job that executes the script
 * add new cron job</br>
   `crontab -e`</br>
   `0 3 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh`
-* `crontab -l` - list cronjobs to check
+
+
+`crontab -l` - list current cronjobs</br>
+`journalctl | grep cron` - cron history
+
 
 # Accessing the backup files
 
