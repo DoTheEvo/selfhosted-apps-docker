@@ -6,7 +6,7 @@
 
 # Purpose
 
-Automatic updates of containers.
+Automatic updates of docker containers.
 
 * [Github](https://github.com/containrrr/watchtower)
 * [DockerHub image used](https://hub.docker.com/r/containrrr/watchtower)
@@ -31,7 +31,7 @@ This can be bandwidth intensive, so its scheduled checks should account for this
 ```
 
 * `.env` - a file containing environmental variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build the containers
+* `docker-compose.yml` - a docker compose file, telling docker how to build the container
 
 Only these two files must be provided.
 
@@ -73,7 +73,8 @@ WATCHTOWER_INCLUDE_STOPPED=false
 
 # Update
 
-* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates itself automaticly
+* [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+updates itself automatically
 
 * manual image update</br>
   `docker-compose pull`</br>
