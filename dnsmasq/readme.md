@@ -12,7 +12,7 @@ Lightweight DHCP and DNS server.
 * [Arch wiki](https://wiki.archlinux.org/index.php/dnsmasq)
 
 dnsmasq solves the problem of accessing self hosted stuff when you are inside
-your network. As asking googles DNS for `blabla.org` will return your
+your network. As asking google's DNS for `blabla.org` will return your
 very own public IP and most routers/firewalls wont allow this loopback,
 where your requests should go out and then right back.</br>
 Usual quick way to solve this issue is editing the `hosts` file on your machine,
@@ -107,17 +107,16 @@ of the dnsmasq host as the DNS server.
 
 # resolv.conf
 
+A file that contains DNS nameservers to be used by the linux machine it sits on.</br>
+Since dnsmasq, a DNS server, is running right on this machine,
+the entries just point to localhost.</br> 
+
 `resolv.conf`
 ```
 nameserver ::1
 nameserver 127.0.0.1
 ```
 
-A file that contains DNS nameservers to be used by the linux machine it sits on.</br>
-Since dnsmasq, a DNS server, is running right on this machine,
-the entries just point to localhost:</br> 
-    `nameserver ::1`</br>
-    `nameserver 127.0.0.1`
 
 Bit of an issue is that this file is often managed by various system services,
 like dhcpcd, systemd, networkmanager... and they change it as they see fit.</br>
@@ -163,32 +162,32 @@ where you can assign a hostname to an IP.</br>
 dnsmasq reads `/etc/hosts` for IP hostname pairs and adds them to its own
 resolve records.
 
-Unfortunately no wildcard support.
-But as seen in the `dnsmasq.conf` there is a wildcard section solving this,
-so `blabla.org` stuff here is just for show. 
-
+Unfortunately no wildcard support.</br>
+But as seen in the `dnsmasq.conf`, when domain is set it acts as a wildcard
+rule. So `blabla.org` stuff here is just for show. 
 
 # Start the service
 
 `sudo systemctl enable --now dnsmasq`
 
-*Make sure you disable other DHCP servers on the network,
-usually a router is running one.*
+Make sure you **disable other DHCP servers** on the network,
+usually a router is running one.
 
 # Test it
 
 #### DHCP
 
 Set some machine on the network to use DHCP for its network setting.</br>
-It should just work. 
+Network connection should just work with full connectivity.
 
 You can check on the dnsmasq host, file `/var/lib/misc/dnsmasq.leases`
 for the active leases. Location of the file can vary base on your linux distro.
 
 #### DNS
 
-nslookup is utility that checks DNS mapping,
+nslookup is a utility that checks DNS mapping,
 part of `bind-utils` or `bind-tools` packages, again depending on the distro.
+But also part of windows.
 
 * `nslookup google.com`
 * `nslookup gateway`
