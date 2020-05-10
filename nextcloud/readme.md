@@ -251,6 +251,14 @@ The lines:</br>
 
 ![status-pic](https://i.imgur.com/wjjd5CJ.png)
 
+# Troubleshooting
+
+If there is a problem accesing nextcloud from a mobile app,
+*"Please log in before granting access"*,
+and being stuck after logging in with the circle animation:
+
+Edit `nextcloud-data/config/config.php`</br>
+adding as the last line: `'overwriteprotocol' => 'https',`
 
 # Extra info
 
