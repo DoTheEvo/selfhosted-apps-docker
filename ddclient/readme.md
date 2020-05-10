@@ -2,13 +2,22 @@
 
 ###### guide by example
 
-# Purpose
+# Purpose & Overview
 
-Automatic DNS entries update. Useful if no static IP from ISP.
+Automatic DNS entries update. 
 
 * [Official site](https://sourceforge.net/p/ddclient/wiki/usage/)
 * [Github](https://github.com/ddclient/ddclient)
 * [DockerHub](https://hub.docker.com/r/linuxserver/ddclient)
+
+DDclient is a Perl client used to update dynamic DNS records.</br>
+Useful if not having a static IP from ISP, so that if you reset your router,
+or have power outage, and you get a new public IP assigned,
+this IP gets automaticly set in the DNS records for your domains.
+
+In this setup it works by checking every 10 minutes
+[checkip.dyndns.org](http://checkip.dyndns.org/),
+and if the IP changed from the previous one, it updates the DNS records. 
 
 # Files and directory structure
 
@@ -61,8 +70,8 @@ PGID=1000
 Official ddclient config example
 [here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf).
 
-This setup assumes the DNS are managed Cloudflare.
-Make sure all subdomains in the config have A-records on Cloudflare.
+This setup assumes the DNS records are managed Cloudflare.</br>
+Make sure all subdomains in the config have A-records.
 
 `ddclient.conf`
 
@@ -89,11 +98,11 @@ blabla.org,*.blabla.org,subdomain.blabla.org
 
 ##
 protocol=cloudflare,        \
-zone=blabla.net,              \
+zone=blobloblo.net,              \
 ttl=1,                      \
-login=bastard.blabla@gmail.com, \
+login=bastard.blobloblo@gmail.com, \
 password=global-api-key-goes-here \
-blabla.net,*.blabla.net,whatever.blabla.org
+blobloblo.net,*.blobloblo.net,whatever.blobloblo.org
 ```
 
 # Update
