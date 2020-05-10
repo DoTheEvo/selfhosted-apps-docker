@@ -6,8 +6,16 @@
 
 # Purpose
 
-User friendly overview and managment of the running containers,
-networks, volumes, images,... the work.
+Web based GUI for overview and management of docker environment.
+
+* [Official site](https://www.portainer.io)
+* [Github](https://github.com/portainer/portainer)
+* [DockerHub image used](https://hub.docker.com/r/portainer/portainer/)
+
+Portainer is a lightweight management web UI, that allows to easily manage
+docker container, networks, volumes, images,... the work.
+
+In my use it is mostly information tool, rather than a management tool.
 
 # Files and directory structure
 
@@ -16,10 +24,18 @@ networks, volumes, images,... the work.
 └── ~/
     └── docker/
         └── portainer/
-            ├── portainer_data/
+            ├── portainer-data/
             ├── .env
             └── docker-compose.yml
 ```
+
+* `portainer-data/` - a directory where portainer stores its peristent data
+* `.env` - a file containing environmental variables for docker compose
+* `docker-compose.yml` - a docker compose file, telling docker
+  how to build the containers
+
+You only need to provide the files.</br>
+The directory is created by docker compose on the first run.
 
 # docker-compose
 
@@ -37,7 +53,7 @@ services:
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./portainer_data:/data
+      - ./portainer-data:/data
 
 networks:
   default:
@@ -67,9 +83,22 @@ portainer.{$MY_DOMAIN} {
 
 # Update
 
-  * [watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower) updates the image automaticly
+[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
+updates the image automatically.
 
-  * manual image update</br>
-    `docker-compose pull`</br>
-    `docker-compose up -d`</br>
-    `docker image prune`
+Manual image update:
+
+- `docker-compose pull`</br>
+- `docker-compose up -d`</br>
+- `docker image prune`
+
+# Backup and restore
+
+#### Backup
+
+Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+that makes daily snapshot of the entire directory.
+  
+#### Restore
+
+Other than having backup of the `docker-compose.yml` there is not much to 
