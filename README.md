@@ -60,7 +60,7 @@ But `env_file: .env` is just easier, prettier... and mostly painless.
 
 All images are without any tag, which defaults to `latest` tag being used.
 
-This is [very frown uppon](https://vsupalov.com/docker-latest-tag/),
+This is [frowned upon](https://vsupalov.com/docker-latest-tag/),
 but feel free to choose a version and sticking with it.
 
 ---
