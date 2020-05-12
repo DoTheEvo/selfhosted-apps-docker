@@ -170,8 +170,10 @@ SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
 ```
 I wont be pasting it here
 in full text,
-but it is included this github repo.
+but it is included in this github repo.
 ```
+
+[nginx.conf](https://raw.githubusercontent.com/DoTheEvo/selfhosted-apps-docker/master/nextcloud/nginx.conf)
 
 This is nginx web server configuration file, specifically setup
 to support fastCGI PHP-FPM.
