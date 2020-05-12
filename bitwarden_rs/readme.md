@@ -94,7 +94,7 @@ SMTP_EXPLICIT_TLS=true
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
 SMTP_USERNAME=apikey
-SMTP_PASSWORD=SG.MOQQegA3bgfodRN4IG2Wqwe.s23Ld4odqhOQQegf4466A4
+SMTP_PASSWORD=SG.asdasdasdasdasdasd
 SMTP_FROM=admin@blabla.org
 ```
 
