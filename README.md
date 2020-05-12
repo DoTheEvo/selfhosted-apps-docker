@@ -16,7 +16,7 @@
 * [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [homer](homer/) - homepage
 * [nextcloud](nextcloud/) - file share & sync
-* [portainer](portainer/) - docker managment
+* [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
 * [watchtower](watchtower/) - automatic docker images update
 * [arch_linux_host_install](arch_linux_host_install)
@@ -24,17 +24,17 @@
 The core of the setup is Caddy reverse proxy.</br>
 It's described in most details.
 
-# Some docker bacics and some info
+# Some docker basics and some info
 
 You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
 
-You **do need** to fuck with `.env` file, that's where all your variables are.
+You **do need** to fuck with `.env` file, that's where all the variables are.
   
 Also sometimes the `.env` file is used as `env_file`
 
-* `.env` - name of the file used only by compose.</br>
-  It is used automaticly just by being in the directory
+* `.env` - actual name of a file, used only by compose.</br>
+  It is used automatically just by being in the directory
   with the `docker-compose.yml`</br>
   Variables set there are only available during the building of the container.
 * `env_file` - an option in compose that defines existing external file.</br>
@@ -42,12 +42,12 @@ Also sometimes the `.env` file is used as `env_file`
   but not in compose.
 
 So to not have polluted huge ass compose file, or to not have multiple places
-where changes need to be made...  `env_file: .env` BAM.
+where changes need to be made when adding a variable...  `env_file: .env` BAM.
 
-Only issue is that all variables are avaialble in all containers.</br>
-So that can lead to potential conflicts and clashes, looking at you nextcloud.
+Only issue is that all variables are available in all containers in the compose.</br>
+That can lead to potential conflicts and clashes, looking at you nextcloud.
 
-In those cases variables names to be used are declared per container.
+In those cases variables names are declared per container.
 
-But it is just so much easier, pretier to `env_file: .env`, and mostly painless.
+But `env_file: .env` is just easier, prettier... and mostly painless.
 
