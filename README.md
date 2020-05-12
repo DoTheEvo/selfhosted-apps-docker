@@ -26,7 +26,7 @@ It's described in most details.
 
 # Some docker basics and some info
 
-### compose and enviroment variables
+### Compose and environment variables
 
 You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
@@ -62,6 +62,9 @@ All images are without any tag, which defaults to `latest` tag being used.
 
 This is [very frown uppon](https://vsupalov.com/docker-latest-tag/),
 but feel free to choose a version and sticking with it.
+
+---
+
 
 ### Bind mount
 
