@@ -26,6 +26,8 @@ It's described in most details.
 
 # Some docker basics and some info
 
+### compose and enviroment variables
+
 You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
 
@@ -44,10 +46,39 @@ Also sometimes the `.env` file is used as `env_file`
 So to not have polluted huge ass compose file, or to not have multiple places
 where changes need to be made when adding a variable...  `env_file: .env` BAM.
 
-Only issue is that all variables are available in all containers in the compose.</br>
+Only issue is that all variables from `.env` are available in
+containers that use this.</br>
 That can lead to potential conflicts and clashes, looking at you nextcloud.
 
 In those cases variables names are declared per container.
 
 But `env_file: .env` is just easier, prettier... and mostly painless.
+
+---
+
+### Images latest tag
+
+All images are without any tag, which defaults to `latest` tag being used.
+
+This is [very frown uppon](https://vsupalov.com/docker-latest-tag/),
+but feel free to choose a version and sticking with it.
+
+### Bind mount
+
+No volumes are used. Direcotires and files from host
+are bind mounted in to containers.
+
+Don't feel like I know all of aspects of this,
+but I know its easier to edit random file from bind mount,
+or to back it up.
+
+### ctop
+
+[https://github.com/bcicen/ctop](https://github.com/bcicen/ctop)
+
+This utility is really handy. Especially for noobs to exec in to containers, 
+to check logs of containers
+
+![ctop](https://i.imgur.com/G4XcbFW.png)
+
 
