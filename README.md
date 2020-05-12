@@ -65,20 +65,8 @@ but feel free to choose a version and sticking with it.
 
 ### Bind mount
 
-No volumes are used. Direcotires and files from host
-are bind mounted in to containers.
-
-Don't feel like I know all of aspects of this,
-but I know its easier to edit random file from bind mount,
+No volumes are used. Directories and files from host
+are bind mounted in to containers.</br>
+Don't feel like I know all of the aspects of this,
+but I know its easier to edit a random file from bind mount,
 or to back it up.
-
-### ctop
-
-[https://github.com/bcicen/ctop](https://github.com/bcicen/ctop)
-
-This utility is really handy. Especially for noobs to exec in to containers, 
-to check logs of containers
-
-![ctop](https://i.imgur.com/G4XcbFW.png)
-
-
