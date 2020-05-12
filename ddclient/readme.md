@@ -39,7 +39,7 @@ Install ddclient from your linux official repos.
 Official ddclient config example
 [here](https://github.com/ddclient/ddclient/blob/master/sample-etc_ddclient.conf).
 
-This setup assumes the DNS records are managed Cloudflare.</br>
+This setup assumes the DNS records are managed on Cloudflare.</br>
 Make sure all subdomains in the config have A-records.
 
 `ddclient.conf`
