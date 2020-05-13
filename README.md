@@ -31,14 +31,16 @@ It's described in most details.
 You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
 
-You **do need** to fuck with `.env` file, that's where all the variables are.
+You **do** need to fuck with `.env` file, that's where all the variables are.
   
-Also sometimes the `.env` file is used as `env_file`
+Sometimes the `.env` file is used as `env_file`
 
 * `.env` - actual name of a file, used only by compose.</br>
   It is used automatically just by being in the directory
   with the `docker-compose.yml`</br>
-  Variables set there are only available during the building of the container.
+  Variables set there are available during the building of the container,
+  but unless named in the `Enviroment:` option they are not available
+  in the running containers.
 * `env_file` - an option in compose that defines existing external file.</br>
   Variables set in this file will be available in the running container,
   but not in compose.
@@ -61,15 +63,31 @@ But `env_file: .env` is just easier, prettier... and mostly painless.
 All images are without any tag, which defaults to `latest` tag being used.
 
 This is [frowned upon](https://vsupalov.com/docker-latest-tag/),
-but feel free to choose a version and sticking with it.
+but feel free to choose a version and sticking with it once it goes to real use.
 
 ---
 
-
 ### Bind mount
 
-No volumes are used. Directories and files from host
+No docker volumes are used. Directories and files from host
 are bind mounted in to containers.</br>
 Don't feel like I know all of the aspects of this,
-but I know its easier to edit a random file from bind mount,
-or to back it up.
+but I know its easier to edit a random file on a host,
+or backup a directory when its just there, sitting on the host.
+
+### SendGrid
+
+For sending emails free sendgrid account is used, which provides 100 free emails
+a day.
+
+The configuration in `.env` files is almost universal, `apikey` is really username.
+Only the password changes as it is one of yours accounts apikey value.
+
+### Cloudflare
+
+For managing DNS records. The free tier provides lot of managment options and 
+benefits. Like proxy between your domain/subdomain and your server, so no one
+can get your public IP just from your domain name. Or 5 firewall rules that allow
+you to geoblock whole world except your country.
+
+[How to move to cloudflare.](https://support.cloudflare.com/hc/en-us/articles/205195708-Changing-your-domain-nameservers-to-Cloudflare)
