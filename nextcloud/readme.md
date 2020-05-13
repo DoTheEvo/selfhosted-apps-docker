@@ -315,7 +315,7 @@ For nextcloud it means entering the maintenance mode, doing a database dump
 and backing up several directories containing data, configs, themes.</br>
 
 For the script it just means database dump as borg backup and its deduplication
-will deal with the directories, especially in the case of nextcloud where 
+will deal with the directories, especially useful in the case of nextcloud where 
 hundreds gigabytes can be stored.
 
 #### Create a backup script
