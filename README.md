@@ -41,9 +41,9 @@ Sometimes the `.env` file is used as `env_file`
   Variables set there are available during the building of the container,
   but unless named in the `enviroment:` option they are not available
   in the running containers.
-* `env_file` - an option in compose that defines existing external file.</br>
-  Variables set in this file will be available in the running container,
-  but not in compose.
+* `env_file` - an option in compose that defines an existing external file.</br>
+  Variables in this file will be available in the running container,
+  but not during building of the container.
 
 So to not have polluted huge ass compose file, or to not have multiple places
 where changes need to be made when adding a variable...  `env_file: .env` BAM.
@@ -82,8 +82,9 @@ or backup a directory when its just there, sitting on the host.
 For sending emails free sendgrid account is used, which provides 100 free emails
 a day.
 
-The configuration in `.env` files is almost universal, `apikey` is really username.
-Only the password changes as it is one of yours accounts apikey value.
+The configuration in `.env` files is almost universal, `apikey` is
+really the username, not some placeholder.
+Only the password changes, which you generate in apikey section on SendGrid website.
 
 ---
 
