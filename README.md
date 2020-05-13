@@ -39,7 +39,7 @@ Sometimes the `.env` file is used as `env_file`
   It is used automatically just by being in the directory
   with the `docker-compose.yml`</br>
   Variables set there are available during the building of the container,
-  but unless named in the `Enviroment:` option they are not available
+  but unless named in the `enviroment:` option they are not available
   in the running containers.
 * `env_file` - an option in compose that defines existing external file.</br>
   Variables set in this file will be available in the running container,
@@ -75,6 +75,8 @@ Don't feel like I know all of the aspects of this,
 but I know its easier to edit a random file on a host,
 or backup a directory when its just there, sitting on the host.
 
+---
+
 ### SendGrid
 
 For sending emails free sendgrid account is used, which provides 100 free emails
@@ -82,6 +84,8 @@ a day.
 
 The configuration in `.env` files is almost universal, `apikey` is really username.
 Only the password changes as it is one of yours accounts apikey value.
+
+---
 
 ### Cloudflare
 
