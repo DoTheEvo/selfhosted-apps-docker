@@ -495,7 +495,7 @@ and Cloudflare servers.
 ### - Create API token on Cloudflare
 
 On Cloudflare create a new API Token with two permsisions,
-[pic of it here](https://i.imgur.com/TXrFQdo.png)
+[pic of it here](https://i.imgur.com/YWxgUiO.png)
 
 * zone/zone/read</br>
 * zone/dns/edit</br>
