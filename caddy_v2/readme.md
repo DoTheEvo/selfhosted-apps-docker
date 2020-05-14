@@ -4,19 +4,51 @@
 
 ![logo](https://i.imgur.com/xmSY5qu.png)
 
+
+1. [Purpose & Overview](Purpose-&-Overview)
+2. [Caddy as a reverse proxy in docker](Caddy-as-a-reverse-proxy-in-docker)
+3. [Caddy more info and various configurations](Caddy-more-info-and-various-configurations)
+4. [Caddy DNS challenge](Caddy-DNS-challenge)
+
+# Purpose & Overview
+
+Reverse proxy setup that allows hosting many services and access them
+based on the host name.</br>
+For example `nextcloud.example.com` takes you to your nextcloud file sharing,
+and `bitwarden.example.com` takes you to your password manager,
+all hosted on your local network.
+
 * [Official site](https://caddyserver.com/v2)
 * [Official documentation](https://caddyserver.com/docs/)
 * [Forum](https://caddy.community/)
 * [Github](https://github.com/caddyserver/caddy)
 
-# Purpose
+Caddy is a powerful, enterprise-ready, open source web server with automatic
+HTTPS written in Go.</br>
 
-Reverse proxy setup that allows hosting many services and access them
-based on the host name.</br>
-For example nextcloud.example.com takes you to your nextcloud file sharing,
-and bitwarden.example.com takes you to your password manager.
+Web servers are build to deal with http traffic, so they are an obvious choice
+for the function of reverse proxy.
 
-![logo](https://i.imgur.com/rzhNJ23.png)
+In this setup Caddy is used mostly as
+[a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).</br> 
+Https encrypted tunel ends with it, so that the traffic can be analyzed 
+and dealt with based on the settings in `Caddyfile`.
+
+By default, Caddy passes through Host header and adds X-Forwarded-For
+for the client IP. This means that 90% of the time a simple config
+is all that is needed for https secured reverse proxy to work.
+    
+```
+whatever.example.com {
+  reverse_proxy server-blue:80
+}
+
+blabla.example.com {
+  reverse_proxy 192.168.1.20:80
+}
+```
+
+![url](https://i.imgur.com/rzhNJ23.png)
 
 # Caddy as a reverse proxy in docker
 
@@ -255,22 +287,6 @@ Worth reading the official documentation, especially these short pages
 * [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
 * [conventions](https://caddyserver.com/docs/conventions)
 
-Caddy when used as a reverse proxy functions as a [TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).</br> 
-Https encrypted tunel ends with it, and the traffic can be analyzed 
-and dealt with based on the settings.
-
-By default, Caddy passes through Host header and adds X-Forwarded-For
-for the client IP.
-This means that 90% of the time the simple config just works
-    
-```
-b.example.com {
-  reverse_proxy server-blue:80
-}
-```
-
-But there are some cases that want something extra,
-as shown in following examples.
 
 ### Routing traffic to other machines on the LAN
 
@@ -344,16 +360,15 @@ and `192.168.1.222:9090` gets to prometheus.
 Some containers might be set to communicate only through https 443 port.
 But since they are behind proxy, their certificates wont be singed, wont be trusted.
 
-Caddies sub-directive `transport` sets how to communicate with the backend.
+Caddies sub-directive `transport` sets how to communicate with the backend.</br>
 Setting the upstream's scheme to `https://`
 or declaring the `tls` transport subdirective makes it use https.
 Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to
 untrusted certificates coming from the backend.
-Avoid this if at all possible, since it disables TLS security.
 
 ```
-example.{$MY_DOMAIN} {
-    reverse_proxy https://example:443 {
+whatever.{$MY_DOMAIN} {
+    reverse_proxy https://server-blue:443 {
         transport http {
             tls_insecure_skip_verify
         }
@@ -377,7 +392,7 @@ nextcloud.{$MY_DOMAIN} {
 }
 ```
 
-### gzip and headers
+### Headers and gzip
 
 This example is with bitwarden_rs password manager, which comes with its reverse proxy
 [recommendations](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples).
@@ -415,6 +430,29 @@ bitwarden.{$MY_DOMAIN} {
 }
 ```
 
+### Basic authentication
+
+[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
+Directive `basicauth` can be used when one needs to add
+a username/password check before accessing a service. 
+
+Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) hashed
+and then [base64](https://www.base64encode.org/) encoded.</br>
+You can use the [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password)
+command to hash passwords for use in the config.
+
+Config bellow has login/password : `bastard`/`bastard`
+
+`Caddyfile`
+```
+b.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+    basicauth {
+        bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
+    }
+}
+```
+
 ### Logging
 
 [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)</br>
@@ -434,47 +472,119 @@ bookstack.{$MY_DOMAIN} {
 
 # Caddy DNS challenge
 
-Caddy needs to be compiled with a [DNS plugin](https://github.com/caddy-dns/lego-deprecated) to add support for DNS providers.
-This can be easily done by using your own Dockerfile using the `builder` image.
-  
+This setup only works for Cloudflare.
+
+To add support, Caddy needs to be compiled with
+[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).
+This is done by using your own Dockerfile, using the `builder` image.
+
+### - Create API token on Cloudflare
+
+On Cloudflare create a new API Token with two permsisions,
+[pic of it here](https://i.imgur.com/TXrFQdo.png)
+
+* zone/zone/read</br>
+* zone/dns/edit</br>
+* include all zones
+
+### - Create Dockerfile
+
+Create a directory `dns-dockerfile` in the caddy directory.</br>
+Inside create a file named `Dockerfile`.
+
 `Dockerfile`:
 ```Dockerfile
 FROM caddy:2.0.0-builder AS builder
 
 RUN caddy-builder \
-    github.com/caddy-dns/lego-deprecated
+    github.com/caddy-dns/cloudflare
 
 FROM caddy:2.0.0
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ```
 
+### - Edit .env file
+
+Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
+
+`.env`
+```
+MY_DOMAIN=example.com
+DEFAULT_NETWORK=caddy_net
+
+CLOUDFLARE_API_TOKEN=asdasdasdasdasasdasdasdasdas
+```
+
+### - Edit docker-compose.yml
+
+`image` replaced with `build` option pointing at the `Dockerfile` location</br>
+and `CLOUDFLARE_API_TOKEN` variable added.
+
+`docker-compose.yml`
+```yml
+version: "3.7"
+services:
+
+  caddy:
+    build: ./dns-dockerfile
+    container_name: caddy
+    hostname: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - MY_DOMAIN
+      - CLOUDFLARE_API_TOKEN
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+      - ./config:/config
+
+networks:
+  default:
+    external:
+      name: $DEFAULT_NETWORK
+```
+
+
+### - Edit Caddyfile
+
+Add `tls` directive to the site-blocks, forcing the use of tls dns challange.
+
+`Caddyfile`
+```
+{
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+a.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
+b.{$MY_DOMAIN} {
+    reverse_proxy nginx:80
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+```
+
 Benefit of using DNS challenge is being able to to use Let's Encrypt for HTTPS
-even with port 80/443 inaccessible from outside networks. Also allows for issuance of wildcard certificates.
+even with port 80/443 inaccessible from outside networks.
+
+Also allows for issuance of wildcard certificates.
+Though with the free Cloudflare tier,
+wildcard record is not proxied, so your public IP is exposed.
 
 It could be also useful in security, as Cloudflare offers 5 firewall rules in the free tier.
 Which means one can geoblock any traffic that is not from your own country.</br>
 But I assume Caddy's default HTTP challenge would be also blocked so no certification renewal.</br>
 But with DNS challenge the communication is entirely between Let's Encrypt
-and Cloudflare.
+and Cloudflare servers.
 
-# Caddy basicauth
 
-[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
-Use this if you need to add a username/password check before accessing a service. 
-
-Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) hashed
-and then [base64](https://www.base64encode.org/) encoded.</br>
-You can use the [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password)
-command to hash passwords for use in the config.
-In this case the username and password are `bastard` / `bastard`
-
-`Caddyfile`
-```
-b.{$MY_DOMAIN} {
-    reverse_proxy whoami:80
-    basicauth {
-        bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
-    }
-}
-```
