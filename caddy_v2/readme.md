@@ -492,10 +492,6 @@ so no certification renewal.</br>
 But with DNS challenge the communication is entirely between Let's Encrypt
 and Cloudflare servers.
 
-To add support, Caddy needs to be compiled with
-[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).</br>
-This is done by using your own Dockerfile, using the `builder` image.
-
 ### - Create API token on Cloudflare
 
 On Cloudflare create a new API Token with two permsisions,
@@ -506,6 +502,10 @@ On Cloudflare create a new API Token with two permsisions,
 * include all zones
 
 ### - Create Dockerfile
+
+To add support, Caddy needs to be compiled with
+[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).</br>
+This is done by using your own Dockerfile, using the `builder` image.
 
 Create a directory `dns-dockerfile` in the caddy directory.</br>
 Inside create a file named `Dockerfile`.
