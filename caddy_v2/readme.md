@@ -499,7 +499,8 @@ On Cloudflare create a new API Token with two permsisions,
 
 * zone/zone/read</br>
 * zone/dns/edit</br>
-* include all zones
+
+Include all zones needs to be set.
 
 ### - Create Dockerfile
 
