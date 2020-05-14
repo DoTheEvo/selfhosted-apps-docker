@@ -5,7 +5,7 @@
 ![logo](https://i.imgur.com/xmSY5qu.png)
 
 
-1. [Purpose & Overview](#Purpose-&-Overview)
+1. [Purpose & Overview](#Purpose--Overview)
 2. [Caddy as a reverse proxy in docker](#Caddy-as-a-reverse-proxy-in-docker)
 3. [Caddy more info and various configurations](#Caddy-more-info-and-various-configurations)
 4. [Caddy DNS challenge](#Caddy-DNS-challenge)
