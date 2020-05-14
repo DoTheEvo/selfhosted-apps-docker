@@ -6,6 +6,11 @@
 
 # Purpose
 
+* [Official site](https://caddyserver.com/v2)
+* [Official documentation](https://caddyserver.com/docs/)
+* [Forum](https://caddy.community/)
+* [Github](https://github.com/caddyserver/caddy)
+
 Reverse proxy setup that allows hosting many services and access them
 based on the host name.</br>
 For example nextcloud.blabla.org takes you to your nextcloud file sharing,
@@ -209,7 +214,11 @@ adding whatever is the local IP of the docker host and the hostname:
   * `192.168.1.222 a.blabla.org`
   * `192.168.1.222 b.blabla.org`
 
-Or use Opera browser and enable the build in VPN if it's for quick testing.
+Or use Opera browser and enable the build in VPN if it's for quick testing.</br>
+One can also run a dns/dhcp server on the network, to solve this for all
+devices,
+[here's how to run dnsmasq](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
+
 
 ### - Run it all
 
@@ -234,7 +243,8 @@ For example trying to ping hosts that are suppose to be reachable,
 There's also other possible issues, like bad port forwarding towards docker host.
 
 *extra info:*</br>
-`docker exec -w /etc/caddy caddy caddy reload` reloads config.
+`docker exec -w /etc/caddy caddy caddy reload` reloads config
+if you made changes and want them to take effect.
 
 # Caddy more info and various configurations
 
