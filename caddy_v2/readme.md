@@ -13,8 +13,8 @@
 
 Reverse proxy setup that allows hosting many services and access them
 based on the host name.</br>
-For example nextcloud.blabla.org takes you to your nextcloud file sharing,
-and bitwarden.blabla.org takes you to your password manager.
+For example nextcloud.example.com takes you to your nextcloud file sharing,
+and bitwarden.example.com takes you to your password manager.
 
 ![logo](https://i.imgur.com/rzhNJ23.png)
 
@@ -27,7 +27,7 @@ or machines on the network.
 
 * have a docker host and some vague docker knowledge
 * have port 80 and 443 forwarded on the router/firewall to the docker host
-* have a domain, `blabla.org`, you can buy one for 2€ annually on namecheap
+* have a domain, `example.com`, you can buy one for 2€ annually on namecheap
 * have corectly set type-A DNS records pointing at your public IP address,
   preferably using Cloudflare
 
@@ -47,11 +47,11 @@ or machines on the network.
 ```
 
 * `config/` - a directory containing configs that Caddy generates,
-  most notably `autosave.json` which is a json version of the last run `Caddyfile`
+  most notably `autosave.json` which is a backup of the last loaded config
 * `data/` - a directory storing TLS certificates
-* `.env` - a file containing environmental variables for docker compose
-* `Caddyfile` - a configuration file for Caddy
-* `docker-compose.yml` - a docker compose file, telling docker how to build Caddy container
+* `.env` - a file containing environment variables for docker compose
+* `Caddyfile` - the Caddy configuration file
+* `docker-compose.yml` - a docker compose file, telling docker how to run containers
 
 You only need to provide the three files.</br>
 The directories are created by docker compose on the first run, 
@@ -65,11 +65,11 @@ All the containers and Caddy must be on the same network.
 
 ### - Create .env file
 
-You want to change `blabla.org` to your domain.
+You want to change `example.com` to your domain.
 
 `.env`
 ```bash
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 ```
     
@@ -99,9 +99,7 @@ version: "3.7"
 services:
 
   caddy:
-    image: "caddy/caddy"
-    container_name: "caddy"
-    hostname: "caddy"
+    image: caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -146,7 +144,7 @@ b.{$MY_DOMAIN} {
 `a` and `b` are the subdomains, can be named whatever.
 For them to work they must have type-A DNS record
 pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.</br>
-Can also be a wild card `*.blabla.org -> 104.17.436.89`
+Can also be a wild card `*.example.com -> 104.17.436.89`
 
 The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.</br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
@@ -211,8 +209,8 @@ shit will not work when trying to access services using domain name.
 so just edit `hosts` as root/administrator,
 adding whatever is the local IP of the docker host and the hostname:
 
-  * `192.168.1.222 a.blabla.org`
-  * `192.168.1.222 b.blabla.org`
+  * `192.168.1.222 a.example.com`
+  * `192.168.1.222 b.example.com`
 
 Or use Opera browser and enable the build in VPN if it's for quick testing.</br>
 One can also run a dns/dhcp server on the network, to solve this for all
@@ -231,19 +229,19 @@ Services
 * `docker-compose -f whoami-compose.yml up -d`
 * `docker-compose -f nginx-compose.yml up -d`
 
-Give it time to get certificates, checking `docker logs caddy` as it goes,
+Give it time to get certificates, checking `docker-compose logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
 
-If something is fucky use `docker logs caddy` to see what is happening.</br>
-Restarting the container `docker container restart caddy` can help.
-Or investigate inside `docker exec -it caddy /bin/sh`.
+If something is fucky use `docker-compose logs caddy` to see what is happening.</br>
+Restarting the container `docker-compose restart caddy` can help.
+Or investigate inside `docker-compose exec caddy /bin/sh`.
 For example trying to ping hosts that are suppose to be reachable,
 `ping nginx` should work.
 
 There's also other possible issues, like bad port forwarding towards docker host.
 
 *extra info:*</br>
-`docker exec -w /etc/caddy caddy caddy reload` reloads config
+`docker-compose exec -w /etc/caddy caddy caddy reload` reloads config
 if you made changes and want them to take effect.
 
 # Caddy more info and various configurations
@@ -264,7 +262,7 @@ for the client IP.
 This means that 90% of the time the simple config just works
     
 ```
-b.blabla.org {
+b.example.com {
   reverse_proxy server-blue:80
 }
 ```
@@ -313,9 +311,7 @@ version: "3.7"
 services:
 
   caddy:
-    image: "caddy/caddy"
-    container_name: "caddy"
-    hostname: "caddy"
+    image: caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -345,16 +341,14 @@ Some containers might be set to communicate only through https 443 port.
 But since they are behind proxy, their certificates wont be singed, wont be trusted.
 
 Caddies sub-directive `transport` sets how to communicate with the backend.
-Setting port to 443 or declaring `tls` makes it use https.
-Setting `tls_insecure_skip_verify` makes Caddy trust whatever certificate
-is coming from the backend.
+Setting the upstream's scheme to `https://` or declaring the `tls` transport subdirective makes it use https.
+Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to untrusted certificates
+coming from the backend. Avoid this if at all possible, since it disables TLS security.
 
 ```
 example.{$MY_DOMAIN} {
-    reverse_proxy {
-        to example:443
+    reverse_proxy https://example:443 {
         transport http {
-            tls
             tls_insecure_skip_verify
         }
     }
@@ -363,7 +357,7 @@ example.{$MY_DOMAIN} {
 
 ### HSTS and redirects
 
-Running Nextcloud behind any proxy likely shows few warning on its status page.
+Running NextCloud behind any proxy likely shows few warning on its status page.
 It requires some redirects for service discovery to work and would like 
 if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.</br> 
 Like so:
@@ -396,7 +390,7 @@ We can also see its use of websocket protocol for notifications at port 3012.</b
 bitwarden.{$MY_DOMAIN} {
     encode gzip
 
-    header / {
+    header {
         # Enable cross-site filter (XSS) and tell browser to block detected attacks
         X-XSS-Protection "1; mode=block"
         # Disallow the site to be rendered within a frame (clickjacking protection)
@@ -406,9 +400,6 @@ bitwarden.{$MY_DOMAIN} {
         # Server name removing
         -Server
     }
-
-    # The negotiation endpoint is also proxied to Rocket
-    reverse_proxy /notifications/hub/negotiate bitwarden:80
 
     # Notifications redirected to the websockets server
     reverse_proxy /notifications/hub bitwarden:3012
@@ -431,39 +422,53 @@ bookstack.{$MY_DOMAIN} {
             roll_keep 5
         }
     }
-    reverse_proxy to bookstack:80
+    reverse_proxy bookstack:80
 }
 ```
 
-# Caddy dns challenge
+# Caddy DNS challenge
 
-  Caddy [needs](https://github.com/caddyserver/tls.dns) to be compiled with dns module imported.
-  So since this feels like too much work for now, it is untested.
+Caddy needs to be compiled with a [DNS plugin](https://github.com/caddy-dns/lego-deprecated) to add support for DNS providers.
+This can be easily done by using your own Dockerfile using the `builder` image.
+  
+`Dockerfile`:
+```Dockerfile
+FROM caddy:2.0.0-builder AS builder
 
-  Benefit of using DNS challenge is being able to to use letsencrypt for https
-  even with port 80/443 blocked by ISP. Also being able to use wildcard certificate.
+RUN caddy-builder \
+    github.com/caddy-dns/lego-deprecated
 
-  It could be also useful in security, as Cloudflare offers 5 firewall rules in the free tier.
-  Which means one can geoblock any traffic that is not from your own country.</br>
-  But I assume Caddy's default HTTP challenge would be also blocked so no certification renewal.</br>
-  But with DNS challenge the communication is entirely between letsencrypt
-  and Cloudflare.
+FROM caddy:2.0.0
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+```
+
+Benefit of using DNS challenge is being able to to use Let's Encrypt for HTTPS
+even with port 80/443 inaccessible from outside networks. Also allows for issuance of wildcard certificates.
+
+It could be also useful in security, as Cloudflare offers 5 firewall rules in the free tier.
+Which means one can geoblock any traffic that is not from your own country.</br>
+But I assume Caddy's default HTTP challenge would be also blocked so no certification renewal.</br>
+But with DNS challenge the communication is entirely between Let's Encrypt
+and Cloudflare.
 
 # Caddy basicauth
 
 [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
-If username/password check before accessing a service is required. 
-  
-Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) encrypted
-and then [base64](https://www.base64encode.org/) hashed.</br>
-In this case username and password are *bastard* / *bastard*
+Use this if you need to add a username/password check before accessing a service. 
+
+Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) hashed
+and then [base64](https://www.base64encode.org/) encoded.</br>
+You can use the [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password)
+command to hash passwords for use in the config.
+In this case the username and password are `bastard` / `bastard`
 
 `Caddyfile`
 ```
 b.{$MY_DOMAIN} {
     reverse_proxy whoami:80
     basicauth {
-      bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
+        bastard JDJhJDA0JDVkeTFJa1VjS3pHU3VHQ2ZSZ0pGMU9FeWdNcUd0Wk9RdWdzSzdXUXNhWFFLWW5pYkxXVEU2
     }
 }
 ```
