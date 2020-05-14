@@ -100,6 +100,8 @@ services:
 
   caddy:
     image: caddy
+    container_name: caddy
+    hostname: caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -229,19 +231,19 @@ Services
 * `docker-compose -f whoami-compose.yml up -d`
 * `docker-compose -f nginx-compose.yml up -d`
 
-Give it time to get certificates, checking `docker-compose logs caddy` as it goes,
+Give it time to get certificates, checking `docker logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
 
-If something is fucky use `docker-compose logs caddy` to see what is happening.</br>
-Restarting the container `docker-compose restart caddy` can help.
-Or investigate inside `docker-compose exec caddy /bin/sh`.
+If something is fucky use `docker logs caddy` to see what is happening.</br>
+Restarting the container `docker container restart caddy` can help.
+Or investigate inside `docker exec -it caddy /bin/sh`.
 For example trying to ping hosts that are suppose to be reachable,
 `ping nginx` should work.
 
 There's also other possible issues, like bad port forwarding towards docker host.
 
 *extra info:*</br>
-`docker-compose exec -w /etc/caddy caddy caddy reload` reloads config
+`docker exec -w /etc/caddy caddy caddy reload` reloads config
 if you made changes and want them to take effect.
 
 # Caddy more info and various configurations
@@ -312,6 +314,8 @@ services:
 
   caddy:
     image: caddy
+    container_name: caddy
+    hostname: caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -341,9 +345,11 @@ Some containers might be set to communicate only through https 443 port.
 But since they are behind proxy, their certificates wont be singed, wont be trusted.
 
 Caddies sub-directive `transport` sets how to communicate with the backend.
-Setting the upstream's scheme to `https://` or declaring the `tls` transport subdirective makes it use https.
-Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to untrusted certificates
-coming from the backend. Avoid this if at all possible, since it disables TLS security.
+Setting the upstream's scheme to `https://`
+or declaring the `tls` transport subdirective makes it use https.
+Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to
+untrusted certificates coming from the backend.
+Avoid this if at all possible, since it disables TLS security.
 
 ```
 example.{$MY_DOMAIN} {
