@@ -34,9 +34,8 @@ In this setup Caddy is used mostly as
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and dealt with based on the settings in `Caddyfile`.
 
-By default, Caddy passes through Host header and adds X-Forwarded-For
-for the client IP. This means that 90% of the time a simple config
-is all that is needed for https secured reverse proxy to work.
+Caddy with its build in https and and sane config approach
+allows a simple config to just work.
     
 ```
 whatever.example.com {
@@ -404,8 +403,12 @@ but if not it can be enabled on caddy.
 You can check if your stuff has it enabled by using one of
 [many online tools](https://varvy.com/tools/gzip/)
 
-Bitwarden also asks for some extra headers.</br>
-We can also see its use of websocket protocol for notifications at port 3012.</br>
+By default, Caddy passes through Host header and adds X-Forwarded-For
+for the client IP. This means that 90% of the time a simple config
+is all that is needed but sometimes some extra headers might be desired.
+
+Here we see bitwarden make use of some extra headers.</br>
+We can also see its use of websocket protocol for notifications at port 3012.
 
 ```
 bitwarden.{$MY_DOMAIN} {
@@ -474,8 +477,23 @@ bookstack.{$MY_DOMAIN} {
 
 This setup only works for Cloudflare.
 
+Benefit of using DNS challenge is being able to to use Let's Encrypt for HTTPS
+even with port 80/443 inaccessible from outside networks.
+
+Also allows for issuance of wildcard certificates.
+Though with the free Cloudflare tier, wildcard record is not proxied,
+so your public IP is exposed.
+
+It could be also useful in security,
+as Cloudflare offers 5 firewall rules in the free tier.
+Which means one can geoblock any traffic that is not from your own country.</br>
+But I assume Caddy's default HTTP challenge would be also blocked,
+so no certification renewal.</br>
+But with DNS challenge the communication is entirely between Let's Encrypt
+and Cloudflare servers.
+
 To add support, Caddy needs to be compiled with
-[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).
+[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).</br>
 This is done by using your own Dockerfile, using the `builder` image.
 
 ### - Create API token on Cloudflare
@@ -492,7 +510,7 @@ On Cloudflare create a new API Token with two permsisions,
 Create a directory `dns-dockerfile` in the caddy directory.</br>
 Inside create a file named `Dockerfile`.
 
-`Dockerfile`:
+`Dockerfile`
 ```Dockerfile
 FROM caddy:2.0.0-builder AS builder
 
@@ -573,18 +591,4 @@ b.{$MY_DOMAIN} {
     }
 }
 ```
-
-Benefit of using DNS challenge is being able to to use Let's Encrypt for HTTPS
-even with port 80/443 inaccessible from outside networks.
-
-Also allows for issuance of wildcard certificates.
-Though with the free Cloudflare tier,
-wildcard record is not proxied, so your public IP is exposed.
-
-It could be also useful in security, as Cloudflare offers 5 firewall rules in the free tier.
-Which means one can geoblock any traffic that is not from your own country.</br>
-But I assume Caddy's default HTTP challenge would be also blocked so no certification renewal.</br>
-But with DNS challenge the communication is entirely between Let's Encrypt
-and Cloudflare servers.
-
 
