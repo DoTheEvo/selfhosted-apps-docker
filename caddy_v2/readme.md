@@ -4,12 +4,12 @@
 
 ![logo](https://i.imgur.com/xmSY5qu.png)
 
-# Purpose
-
 * [Official site](https://caddyserver.com/v2)
 * [Official documentation](https://caddyserver.com/docs/)
 * [Forum](https://caddy.community/)
 * [Github](https://github.com/caddyserver/caddy)
+
+# Purpose
 
 Reverse proxy setup that allows hosting many services and access them
 based on the host name.</br>
