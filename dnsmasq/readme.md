@@ -12,7 +12,7 @@ Lightweight DHCP and DNS server.
 * [Arch wiki](https://wiki.archlinux.org/index.php/dnsmasq)
 
 dnsmasq solves the problem of accessing self hosted stuff when you are inside
-your network. As asking google's DNS for `blabla.org` will return your
+your network. As asking google's DNS for `example.com` will return your
 very own public IP and most routers/firewalls wont allow this loopback,
 where your requests should go out and then right back.</br>
 Usual quick way to solve this issue is editing the `hosts` file on your machine,
@@ -76,9 +76,9 @@ server=1.1.1.1
 # DNS wildcards ----------------------------------------------------------------
 
 # wildcard DNS entry sending domain and all its subdomains to an ip
-address=/blabla.org/192.168.1.2
+address=/example.com/192.168.1.2
 # subdomain override
-address=/plex.blabla.org/192.168.1.3
+address=/plex.example.com/192.168.1.3
 
 # DHCP -------------------------------------------------------------------------
 
@@ -150,11 +150,11 @@ add immutability, and check.
 127.0.0.1       docker-host
 192.168.1.2     docker-host 
 192.168.1.1     gateway
-192.168.1.2     blabla.org
-192.168.1.2     nextcloud.blabla.org
-192.168.1.2     book.blabla.org
-192.168.1.2     passwd.blabla.org
-192.168.1.2     grafana.blabla.org
+192.168.1.2     example.com
+192.168.1.2     nextcloud.example.com
+192.168.1.2     book.example.com
+192.168.1.2     passwd.example.com
+192.168.1.2     grafana.example.com
 ```
 
 This is a file present on every system, linux, windows, mac, android,... 
@@ -164,7 +164,7 @@ resolve records.
 
 Unfortunately no wildcard support.</br>
 But as seen in the `dnsmasq.conf`, when domain is set it acts as a wildcard
-rule. So `blabla.org` stuff here is just for show. 
+rule. So `example.com` stuff here is just for show. 
 
 # Start the service
 
@@ -192,9 +192,9 @@ nut also available on windows.
 * `nslookup google.com`
 * `nslookup gateway`
 * `nslookup docker-host`
-* `nslookup blabla.org`
-* `nslookup whateverandom.blabla.org`
-* `nslookup plex.blabla.org`
+* `nslookup example.com`
+* `nslookup whateverandom.example.com`
+* `nslookup plex.example.com`
 
 # Update
 

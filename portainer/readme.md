@@ -64,7 +64,7 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 TZ=Europe/Bratislava
 ```

@@ -142,7 +142,7 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
@@ -157,7 +157,7 @@ MYSQL_HOST=nextcloud-db
 REDIS_HOST=nextcloud-redis
 
 # USING SENDGRID FOR SENDING EMAILS
-MAIL_DOMAIN=blabla.org
+MAIL_DOMAIN=example.com
 MAIL_FROM_ADDRESS=nextcloud
 SMTP_SECURE=ssl
 SMTP_HOST=smtp.sendgrid.net

@@ -58,19 +58,19 @@ use=web, web=checkip.dyndns.org/, web-skip='IP Address'
 ## CloudFlare (www.cloudflare.com)
 ##
 protocol=cloudflare,        \
-zone=blabla.org,              \
+zone=example.com,              \
 ttl=1,                      \
-login=bastard.blabla@gmail.com, \
+login=bastard@gmail.com, \
 password=global-api-key-goes-here \
-blabla.org,*.blabla.org,subdomain.blabla.org
+example.com,*.example.com,subdomain.example.com
 
 ##
 protocol=cloudflare,        \
-zone=blobloblo.net,              \
+zone=example.org,              \
 ttl=1,                      \
-login=bastard.blobloblo@gmail.com, \
+login=bastard@gmail.com, \
 password=global-api-key-goes-here \
-blobloblo.net,*.blobloblo.net,whatever.blobloblo.net
+example.org,*.example.org,whatever.example.org
 ```
 
 # Start the service
