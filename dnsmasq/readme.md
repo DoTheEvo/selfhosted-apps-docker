@@ -15,8 +15,10 @@ dnsmasq solves the problem of accessing self hosted stuff when you are inside
 your network. As asking google's DNS for `example.com` will return your
 very own public IP and most routers/firewalls wont allow this loopback,
 where your requests should go out and then right back.</br>
-Usual quick way to solve this issue is editing the `hosts` file on your machine,
-but if more devices should "just work" it is a no-go.</br>
+Usual quick way to solve this issue is
+[editing the `hosts` file](
+https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2#--editing-hosts-file)
+on your machine, but if more devices should "just work" it is a no-go.</br>
 So the answer is running a DNS server that pairs the local machines IP with 
 the correct hostnames, and a DHCP server that tells the devices on the network
 to use this DNS.
