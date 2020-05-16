@@ -234,22 +234,30 @@ networks:
 ```
 ### - editing hosts file
 
-You are likely on your local network and you are running docker host
-inside the same network.
-Without [editing the hosts file,](https://support.rackspace.com/how-to/modify-your-hosts-file/)
-shit will not work when trying to access services using domain name. 
+You are on your local network and you are likely running the docker host
+inside the same network.</br>
+If that's the case then shit will not work without editing the hosts file.</br> 
+Reason being that when you write that `a.example.com` in to your browser,
+you are asking google's DNS for `a.example.com` IP address.
+It will give you your own public IP, and most routers/firewalls wont allow
+this loopback, where your requests should go out and then right back.
 
-so just edit `hosts` as root/administrator,
+So just [edit](https://support.rackspace.com/how-to/modify-your-hosts-file/)
+`hosts` as root/administrator,
 adding whatever is the local IP of the docker host and the hostname:
 
-  * `192.168.1.222 a.example.com`
-  * `192.168.1.222 b.example.com`
+```
+192.168.1.222     a.example.com
+192.168.1.222     b.example.com
+```
 
-Or use Opera browser and enable the build in VPN if it's for quick testing.</br>
+If it is just quick testing one can use Opera browser
+and enable the build in VPN.</br>
+
 One can also run a dns/dhcp server on the network, to solve this for all
-devices,
-[here's how to run dnsmasq](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
-
+devices,</br>
+[here's guide by example for dnsmasq](
+https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
 
 ### - Run it all
 
