@@ -255,9 +255,9 @@ If it is just quick testing one can use Opera browser
 and enable the build in VPN.</br>
 
 One can also run a dns/dhcp server on the network, to solve this for all
-devices,</br>
-[here's guide by example for dnsmasq](
-https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
+devices.</br>
+[Here's guide by example for dnsmasq](
+https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq).
 
 ### - Run it all
 
