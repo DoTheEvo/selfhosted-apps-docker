@@ -82,7 +82,7 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
@@ -103,11 +103,11 @@ DB_PASS=bookstack
 DB_DATABASE=bookstack
 
 # USING SENDGRID FOR SENDING EMAILS
-APP_URL=https://book.blabla.org
+APP_URL=https://book.example.com
 MAIL_DRIVER=smtp
 MAIL_HOST=smtp.sendgrid.net
 MAIL_PORT=465
-MAIL_FROM=book@blabla.org
+MAIL_FROM=book@example.com
 MAIL_USERNAME=apikey
 MAIL_PASSWORD=SG.2FA24asaddasdasdasdsadasdasdassadDEMBzuh9e43
 MAIL_ENCRYPTION=SSL

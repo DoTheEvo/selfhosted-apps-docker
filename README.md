@@ -69,7 +69,7 @@ but feel free to choose a version and sticking with it once it goes to real use.
 
 ### Bind mount
 
-No docker volumes are used. Directories and files from host
+No docker volumes are used. Directories and files from the host
 are bind mounted in to containers.</br>
 Don't feel like I know all of the aspects of this,
 but I know its easier to edit a random file on a host,

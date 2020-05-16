@@ -61,7 +61,7 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 TZ=Europe/Bratislava
 ```
@@ -111,26 +111,26 @@ services:
       - name: "Bookstack"
         logo: "/assets/tools/bookstack.png"
         subtitle: "Notes and Documentation"
-        url: "https://book.blabla.org"
+        url: "https://book.example.com"
       - name: "Bitwarden"
         logo: "/assets/tools/bitwarden.png"
         subtitle: "Password Manager"
-        url: "https://passwd.blabla.org"
+        url: "https://passwd.example.com"
       - name: "Nextcloud"
         logo: "/assets/tools/nextcloud.png"
         subtitle: "File Sync & Share"
-        url: "https://nextcloud.blabla.org"
+        url: "https://nextcloud.example.com"
   - name: "Monitoring"
     icon: "fas fa-heartbeat"
     items:
       - name: "Prometheus + Grafana"
         logo: "/assets/tools/grafana.png"
         subtitle: "Metric analytics & dashboards"
-        url: "https://grafana.blabla.org"
+        url: "https://grafana.example.com"
       - name: "Portainer"
         logo: "/assets/tools/portainer.png"
         subtitle: "Docker Manager"
-        url: "https://portainer.blabla.org"
+        url: "https://portainer.example.com"
 ```
 
 ![look](https://i.imgur.com/hrggtcZ.png)
