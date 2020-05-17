@@ -216,6 +216,6 @@ Monitoring and testing
 ### Notebook
 
 * control power events, lid close for example</br>
-  `sudo nano /etc/systemd/logind.conf`
+  `sudo nano /etc/systemd/logind.conf`</br>
   *HandleLidSwitch=ignore*
 
