@@ -212,3 +212,10 @@ Monitoring and testing
 * enable colors in pacman.conf</br>
   `sudo nano /etc/pacman.conf`</br>
   *Color*
+
+### Notebook
+
+* control power events, lid close for example</br>
+  `sudo nano /etc/systemd/logind.conf`
+  *HandleLidSwitch=ignore*
+
