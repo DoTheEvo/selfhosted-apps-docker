@@ -1,6 +1,6 @@
 # Nextcloud in docker
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/VXSovC9.png)
 

@@ -1,6 +1,6 @@
 # DDclient
 
-###### guide by example
+###### guide-by-example
 
 # Purpose & Overview
 

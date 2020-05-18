@@ -1,6 +1,6 @@
 # Bitwarden_rs in docker
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/tT3FQLJ.png)
 
@@ -78,7 +78,7 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=blabla.org
+MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
@@ -88,14 +88,14 @@ SIGNUPS_ALLOWED=false
 WEBSOCKET_ENABLED=true
 
 # USING SENDGRID FOR SENDING EMAILS
-DOMAIN=https://passwd.blabla.org
+DOMAIN=https://passwd.example.com
 SMTP_SSL=true
 SMTP_EXPLICIT_TLS=true
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
 SMTP_USERNAME=apikey
 SMTP_PASSWORD=SG.asdasdasdasdasdasd
-SMTP_FROM=admin@blabla.org
+SMTP_FROM=admin@example.com
 ```
 
 **All containers must be on the same network**.</br>

@@ -1,6 +1,6 @@
 # Selfhosted-Apps-Docker
 
-###### guide by example
+###### guide-by-example
 
 ---
 
