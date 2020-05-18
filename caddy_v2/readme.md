@@ -256,7 +256,7 @@ and enable the build in VPN.</br>
 
 One can also run a dns/dhcp server on the network, to solve this for all
 devices.</br>
-[Here's guide by example for dnsmasq](
+[Here's guide-by-example for dnsmasq](
 https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq).
 
 ### - Run it all
