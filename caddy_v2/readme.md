@@ -1,6 +1,6 @@
 # Caddy v2 Reverse Proxy
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/xmSY5qu.png)
 

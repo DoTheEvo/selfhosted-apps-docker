@@ -1,6 +1,6 @@
 # Arch Linux installation to serve as a docker host
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/SkENpGn.png)
 

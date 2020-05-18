@@ -1,6 +1,6 @@
 # Watchtower in docker
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/xXS2bzZ.png)
 

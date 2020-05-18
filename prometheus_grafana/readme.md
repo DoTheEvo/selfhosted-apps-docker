@@ -1,6 +1,6 @@
 # Prometheus+Grafana in docker
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/e03aF8d.png)
 

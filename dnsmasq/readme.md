@@ -1,6 +1,6 @@
 # dnsmasq
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/SOa4kRd.png)
 
@@ -75,7 +75,7 @@ listen-address=::1,127.0.0.1
 server=8.8.8.8
 server=1.1.1.1
 
-# DNS wildcards ----------------------------------------------------------------
+# DNS entries ------------------------------------------------------------------
 
 # wildcard DNS entry sending domain and all its subdomains to an ip
 address=/example.com/192.168.1.2
@@ -189,7 +189,7 @@ for the active leases. Location of the file can vary base on your linux distro.
 
 nslookup is a utility that checks DNS mapping,
 part of `bind-utils` or `bind-tools` packages, again depending on the distro,
-nut also available on windows.
+but also available on windows.
 
 * `nslookup google.com`
 * `nslookup gateway`
@@ -197,6 +197,13 @@ nut also available on windows.
 * `nslookup example.com`
 * `nslookup whateverandom.example.com`
 * `nslookup plex.example.com`
+
+### Troubleshooting
+
+If you have fast nslookup, but slow ping
+try to [disable ipv6](https://wiki.archlinux.org/index.php/IPv6#Disable_IPv6).
+
+
 
 # Update
 

@@ -1,6 +1,6 @@
 # Portainer in docker
 
-###### guide by example
+###### guide-by-example
 
 ![logo](https://i.imgur.com/QxnuB1g.png)
 
