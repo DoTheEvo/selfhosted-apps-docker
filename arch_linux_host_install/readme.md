@@ -45,7 +45,7 @@ So if theres boot menu option choose non-uefi.
 # Installation 
 
 * create a single partition and mark it bootable</br>
-  `cfdisk /dev/sda`
+  `cfdisk -z /dev/sda`
 * build ext4 filesystem on it</br>
   `mkfs.ext4 /dev/sda1`
 * mount the new partition</br>
