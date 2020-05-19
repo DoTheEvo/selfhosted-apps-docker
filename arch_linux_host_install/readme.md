@@ -150,18 +150,20 @@ it's the fastest zsh framework and out of the box setup nicely
 
 ##### Adding stuff to .zshrc
 
-`export EDITOR=vim`
+`vim .zshrc`
 
-for ctrl+f prepending sudo
+* `export EDITOR=vim`
 
-```bash
-add_sudo (){
-    BUFFER="sudo $BUFFER"
-    zle -w end-of-line
-}
-zle -N add_sudo
-bindkey "^f" add_sudo
-```
+* for ctrl+f prepending sudo
+
+  ```bash
+  add_sudo (){
+      BUFFER="sudo $BUFFER"
+      zle -w end-of-line
+  }
+  zle -N add_sudo
+  bindkey "^f" add_sudo
+  ```
 
 ### Setup docker
 
@@ -185,7 +187,7 @@ Using [Yay](https://github.com/Jguer/yay).
   `cd yay-bin && makepkg -si`</br>
   `cd .. && rm -rf yay-bin`</br>
 
-`ctop` and `inxi` are good AUR packages.
+`ctop-bin` and `inxi` are good AUR packages.
 
 # Extra stuff
 
@@ -214,7 +216,7 @@ Monitoring and testing
   `sudo vim /etc/fstab`</br>
   *UUID=cdd..addb / ext4 rw,noatime 0 1*
 * enable use of all cpu cores for makepkg jobs and disable compression</br>
-  `sudo vim /etc/makepkg`</br>
+  `sudo vim /etc/makepkg.conf`</br>
   *MAKEFLAGS="-j$(nproc)"*</br>
   *PKGEXT='.pkg.tar'*
 * clean up old packages weekly, keep last 3</br>
