@@ -172,10 +172,11 @@ rule. So `example.com` stuff here is just for show.
 `sudo systemctl enable --now dnsmasq`
 
 * Check if it started without errors: `journalctl -u dnsmasq.service`
-* If you get port already in use error, check which service</br>
+* If you get "port already in use" error, check which service is responsible</br>
   `sudo ss -tulwnp`</br>
   If you are using `systemd-networkd` along with `systemd-resolved`,
-  it will likely be `systemd-resolved`.</br>
+  it will likely be `systemd-resolved` so stop it and disable it.</br>
+  `sudo systemctl disable --now systemd-resolved`
 * Make sure you **disable other DHCP servers** on the network,
   usually a router is running one.
 
