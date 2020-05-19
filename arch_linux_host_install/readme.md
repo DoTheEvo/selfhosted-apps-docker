@@ -142,9 +142,11 @@ I like [Zim](https://github.com/zimfw/zimfw),
 it's the fastest zsh framework and out of the box setup nicely
 
 * install zsh and curl packages</br>
-  `sudo pacman -S zsh curl`
+  `sudo pacman -S zsh git curl`
 * install zim, it changes users default shell to zsh</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
+* change the default shell to zsh </br>
+  `chsh -s /bin/zsh`
 
 ##### Adding stuff to .zshrc
 
