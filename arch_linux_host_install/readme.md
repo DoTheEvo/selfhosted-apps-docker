@@ -50,10 +50,10 @@ So if theres boot menu option choose non-uefi.
   `mkfs.ext4 /dev/sda1`
 * mount the new partition</br>
   `mount /dev/sda1 /mnt`
-* choose geographicly close mirror, ctrl+k deletes a line in nano</br>
-  `nano /etc/pacman.d/mirrorlist` 
+* choose geographicly close mirror, `dd` deletes entire line in vim</br>
+  `vim /etc/pacman.d/mirrorlist` 
 * install the base system </br>
-  `pacstrap /mnt base linux linux-firmware base-devel grub nano`
+  `pacstrap /mnt base linux linux-firmware base-devel grub vim`
 * gnerate fstab</br>
   `genfstab -U /mnt > /mnt/etc/fstab`
 * chroot in to the new system</br>
@@ -76,13 +76,13 @@ So if theres boot menu option choose non-uefi.
   `useradd -m -G wheel bastard`</br>
   `passwd bastard`
 * edit sudoers to allow users of the group wheel to sudo</br>
-  `EDITOR=nano visudo`</br>
+  `EDITOR=vim visudo`</br>
   *%wheel ALL=(ALL) ALL*
 * check the network interface name</br>
   `ip link`
 * set static IP systemd-networkd</br>
   
-  `nano /etc/systemd/network/20-wired.network`
+  `vim /etc/systemd/network/20-wired.network`
   
   ```
   [Match]
@@ -99,7 +99,7 @@ So if theres boot menu option choose non-uefi.
   `systemctl enable --now systemd-resolved`
 
 * uncomment desidred locales in locale.gen</br>
-  `nano /etc/locale.gen`</br>
+  `vim /etc/locale.gen`</br>
 * generate new locales and set one system wide</br>
   `locale-gen`</br>
   `localectl set-locale LANG=en_US.UTF-8`
@@ -113,7 +113,7 @@ So if theres boot menu option choose non-uefi.
   `fallocate -l 8G /swapfile`</br>
   `chmod 600 /swapfile`</br>
   `mkswap /swapfile`</br>
-  `nano /etc/fstab`</br>
+  `vim /etc/fstab`</br>
   */swapfile none swap defaults 0 0*
 * reboot</br>
   `reboot`
@@ -129,8 +129,7 @@ From now on its login as non-root user.
 * install openssh package</br>
   `sudo pacman -S openssh`
 * edit sshd_config</br>
-  `sudo nano /etc/ssh/sshd_config`</br>
-  *PermitRootLogin prohibit-password*</br>
+  `sudo vim /etc/ssh/sshd_config`</br>
   *PasswordAuthentication yes*
 * enable sshd service</br>
   `sudo systemctl enable --now sshd`
@@ -149,7 +148,7 @@ it's the fastest zsh framework and out of the box setup nicely
 
 ##### Adding stuff to .zshrc
 
-`export EDITOR=nano`
+`export EDITOR=vim`
 
 for ctrl+f prepending sudo
 
@@ -210,10 +209,10 @@ Monitoring and testing
   `sudo pacman -S util-linux`</br>
   `sudo systemctl enable --now fstrim.timer`
 * set noatime in fstab to prevent unnecessary keep of read times</br>
-  `sudo nano /etc/fstab`</br>
+  `sudo vim /etc/fstab`</br>
   *UUID=cdd..addb / ext4 rw,noatime 0 1*
 * enable use of all cpu cores for makepkg jobs and disable compression</br>
-  `sudo nano /etc/makepkg`</br>
+  `sudo vim /etc/makepkg`</br>
   *MAKEFLAGS="-j$(nproc)"*</br>
   *PKGEXT='.pkg.tar'*
 * clean up old packages weekly, keep last 3</br>
@@ -226,12 +225,12 @@ Monitoring and testing
 ### Comfort
 
 * enable colors in pacman.conf</br>
-  `sudo nano /etc/pacman.conf`</br>
+  `sudo vim /etc/pacman.conf`</br>
   *Color*
 
 ### Notebook
 
 * control power events, lid close for example</br>
-  `sudo nano /etc/systemd/logind.conf`</br>
+  `sudo vim /etc/systemd/logind.conf`</br>
   *HandleLidSwitch=ignore*
 
