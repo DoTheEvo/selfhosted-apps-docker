@@ -53,7 +53,7 @@ So if theres boot menu option choose non-uefi.
 * choose geographicly close mirror, ctrl+k deletes a line in nano</br>
   `nano /etc/pacman.d/mirrorlist` 
 * install the base system </br>
-  `pacstrap /mnt base linux linux-firmware base-devel grub dhcpcd nano`
+  `pacstrap /mnt base linux linux-firmware base-devel grub nano`
 * gnerate fstab</br>
   `genfstab -U /mnt > /mnt/etc/fstab`
 * chroot in to the new system</br>
@@ -80,8 +80,24 @@ So if theres boot menu option choose non-uefi.
   *%wheel ALL=(ALL) ALL*
 * check the network interface name</br>
   `ip link`
-* enable aquiring dynamic IP</br>
-  `systemctl enable --now dhcpcd@enp0s25`
+* set static IP systemd-networkd</br>
+  
+  `nano /etc/systemd/network/20-wired.network`
+  
+  ```
+  [Match]
+  Name=enp0s25
+
+  [Network]
+  Address=10.0.19.2/24
+  Gateway=10.0.19.1
+  DNS=8.8.8.8
+  DNS=1.1.1.1
+  ```
+
+  `systemctl enable --now systemd-networkd`</br>
+  `systemctl enable --now systemd-resolved`
+
 * uncomment desidred locales in locale.gen</br>
   `nano /etc/locale.gen`</br>
 * generate new locales and set one system wide</br>
