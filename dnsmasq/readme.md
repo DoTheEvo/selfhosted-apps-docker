@@ -125,11 +125,11 @@ like dhcpcd, systemd, networkmanager... and they change it as they see fit.</br>
 To prevent this, `resolv.conf` will be flagged as immutable,
 which prevents all possible changes to it unless the attribute is removed.
 
-Edit /`etc/resolv.conf` and set localhost as the DNS nameserver, as shown above.
+Edit `/etc/resolv.conf` and set localhost as the DNS nameserver, as shown above.
 
 Make it immutable to prevent any changes to it.
 
-* `chattr +i /etc/resolv.conf`
+* `sudo chattr +i /etc/resolv.conf`
 
 Check if the content is what was set.
 
@@ -149,7 +149,6 @@ add immutability, and check.
 
 `hosts`
 ```
-127.0.0.1       docker-host
 192.168.1.2     docker-host 
 192.168.1.1     gateway
 192.168.1.2     example.com
@@ -172,7 +171,12 @@ rule. So `example.com` stuff here is just for show.
 
 `sudo systemctl enable --now dnsmasq`
 
-Make sure you **disable other DHCP servers** on the network,
+
+
+* Check if it start without errors: `journalctl -u dnsmasq.service`
+* If you are using `systemd-networkd` along with `systemd-resolved`,
+you need to stop and disable `systemd-resolved`.
+* Make sure you **disable other DHCP servers** on the network,
 usually a router is running one.
 
 # Test it
@@ -200,10 +204,12 @@ but also available on windows.
 
 ### Troubleshooting
 
-If you have fast nslookup, but slow ping
-try to [disable ipv6](https://wiki.archlinux.org/index.php/IPv6#Disable_IPv6).
+If using the default config, which is without domain,
+pinging just hostname will not work as windows is stupid
+and does not do dns lookup.</br>
+It can be forced to by adding dot behind hostname in ping `ping meh-pc.`
 
-
+It seems to be just quirk of windows ping as far as I know.
 
 # Update
 
