@@ -174,8 +174,8 @@ rule. So `example.com` stuff here is just for show.
 * Check if it started without errors: `journalctl -u dnsmasq.service`
 * If you get "port already in use" error, check which service is responsible</br>
   `sudo ss -tulwnp`</br>
-  If you are using `systemd-networkd` along with `systemd-resolved`,
-  it will likely be `systemd-resolved` so stop it and disable it.</br>
+  If you are running `systemd-networkd` and `systemd-resolved`,
+  it will likely be `systemd-resolved`, so stop it and disable it.</br>
   `sudo systemctl disable --now systemd-resolved`
 * Make sure you **disable other DHCP servers** on the network,
   usually a router is running one.
