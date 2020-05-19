@@ -205,12 +205,17 @@ but also available on windows.
 
 ### Troubleshooting
 
-If using the default config, which is without domain,
-pinging just hostname will not work as windows is stupid
-and does not do dns lookup.</br>
-It can be forced to by adding dot behind hostname in ping `ping meh-pc.`
+* **ping fails from windows when using hostname**</br>
+  windows ping does not do dns lookup when just plain hostname is used</br>
+  `ping meh-pc`</br>
+  it's a [quirk](https://superuser.com/questions/495759/why-is-ping-unable-to-resolve-a-name-when-nslookup-works-fine/1257512#1257512)
+  of windows ping utility, can be solved by adding dot forcing it to do it</br>
+  `ping meh-pc.`</br>
 
-It seems to be just quirk of windows ping as far as I know.
+* **slow ping of a hostname, but fast nslookup on a linux machine**</br>
+  for me it was `systemd-resolved` running on the machine I was doing ping from.</br>
+  It can be stopped and disabled.</br>
+  `sudo systemctl disable --now systemd-resolved`
 
 # Update
 
