@@ -43,8 +43,8 @@ Often the `.env` file is used as `env_file`
 * `.env` - actual name of a file that is used only by compose.</br>
   It is used automatically just by being in the directory
   with the `docker-compose.yml`</br>
-  Variables set there are available during the building of the container,
-  but unless named in the `environment:` option they are not available
+  Variables in it are available during the building of the container,
+  but unless named in the `environment:` option, they are not available
   in the running containers.
 * `env_file` - an option in compose that defines an existing external file.</br>
   Variables in this file will be available in the running container,
@@ -56,7 +56,7 @@ to also go in to compose to add/change it there..</br>
 Also the compose file looks less cramped.
 
 Only issue is that **all** variables from `.env` are available in
-containers that use this method.</br>
+containers that use this `env_file: .env` method.</br>
 That can lead to potential issues if you try to use this approach elsewhere,
 universally.
 
@@ -64,8 +64,7 @@ universally.
 
 ### Images latest tag
 
-All images are without any tag, which defaults to `latest` tag being used.
-
+All images are without any tag, which defaults to `latest` tag being used.</br>
 This is [frowned upon](https://vsupalov.com/docker-latest-tag/),
 but feel free to choose a version and sticking with it once it goes to real use.
 
@@ -76,8 +75,8 @@ but feel free to choose a version and sticking with it once it goes to real use.
 No docker volumes are used. Directories and files from the host
 are bind mounted in to containers.</br>
 Don't feel like I know all of the aspects of this,
-but I know its easier to edit a random file on a host,
-or backup a directory when its just there, sitting on the host.
+but I know it's easier to edit a random file on a host,
+or backup a directory when it's just there, sitting on the host.
 
 ---
 
@@ -88,7 +87,8 @@ a day.
 
 The configuration in `.env` files is almost universal, `apikey` is
 really the username, not some placeholder.
-Only the password changes, which you generate in apikey section on SendGrid website.
+Only the password(actual value of apikey) changes,
+which you generate in apikey section on SendGrid website.
 
 ---
 

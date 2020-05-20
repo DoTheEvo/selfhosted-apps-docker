@@ -93,9 +93,9 @@ SMTP_SSL=true
 SMTP_EXPLICIT_TLS=true
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
-SMTP_USERNAME=apikey
-SMTP_PASSWORD=SG.asdasdasdasdasdasd
 SMTP_FROM=admin@example.com
+SMTP_USERNAME=apikey
+SMTP_PASSWORD=<sendgrip-api-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
