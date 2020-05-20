@@ -77,13 +77,9 @@ services:
     hostname: nextcloud-db
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
+    env_file: .env
     volumes:
       - ./nextcloud-data-db:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
 
   nextcloud-redis:
     image: redis:alpine
@@ -96,21 +92,12 @@ services:
     container_name: nextcloud-app
     hostname: nextcloud-app
     restart: unless-stopped
+    env_file: .env
     depends_on:
       - nextcloud-db
       - nextcloud-redis
     volumes:
       - ./nextcloud-data/:/var/www/html
-    environment:
-      - MYSQL_HOST
-      - REDIS_HOST
-      - MAIL_DOMAIN
-      - MAIL_FROM_ADDRESS
-      - SMTP_SECURE
-      - SMTP_HOST
-      - SMTP_PORT
-      - SMTP_NAME
-      - SMTP_PASSWORD
 
   nextcloud-web:
     image: nginx:alpine
@@ -163,7 +150,7 @@ SMTP_SECURE=ssl
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
 SMTP_NAME=apikey
-SMTP_PASSWORD=SG.asdasdasdasdasdasdsaasdasdsa
+SMTP_PASSWORD=<sendgrip-api-key-goes-here>
 ```
 
 `nginx.conf`
@@ -215,10 +202,12 @@ nextcloud.{$MY_DOMAIN} {
 
 # First run
 
-Nextcloud needs few minutes to start, then there is the initial configuration,
-creating admin account and giving the database details as set in the `.env` file
+Nextcloud needs few moments to start, then there is the initial configuration,
+creating admin account.</br>
+If not database variables were passed from the `.env` file in to nextcloud-app
+then also database info would be required here.
 
-![first-run-pic](https://i.imgur.com/EygHgKa.png)
+![first-run-pic](https://i.imgur.com/lv1x9GF.png)
 
 The domain or IP you access nextcloud on this first run is added
 to `trusted_domains` in `config.php`. 
