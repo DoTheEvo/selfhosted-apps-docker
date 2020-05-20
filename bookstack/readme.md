@@ -109,7 +109,7 @@ MAIL_HOST=smtp.sendgrid.net
 MAIL_PORT=465
 MAIL_FROM=book@example.com
 MAIL_USERNAME=apikey
-MAIL_PASSWORD=SG.2FA24asaddasdasdasdsadasdasdassadDEMBzuh9e43
+MAIL_PASSWORD=SG.asaddasdasdasdsaasdasd
 MAIL_ENCRYPTION=SSL
 ```
 
@@ -128,6 +128,10 @@ book.{$MY_DOMAIN} {
     reverse_proxy bookstack:80
 }
 ```
+
+# First run
+
+Default login: `admin@admin.com` // `password`
 
 ---
 
