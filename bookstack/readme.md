@@ -110,7 +110,7 @@ MAIL_HOST=smtp.sendgrid.net
 MAIL_PORT=465
 MAIL_FROM=book@example.com
 MAIL_USERNAME=apikey
-SMTP_PASSWORD=<sendgrip-api-key-goes-here>
+SMTP_PASSWORD=<sendgrid-api-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
