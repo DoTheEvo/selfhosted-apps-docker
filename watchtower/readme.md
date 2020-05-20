@@ -59,7 +59,6 @@ services:
 `.env`
 ```bash
 # GENERAL
-DEFAULT_NETWORK=caddy_net
 
 # WATCHTOWER
 WATCHTOWER_SCHEDULE=0 0 0 * * SAT

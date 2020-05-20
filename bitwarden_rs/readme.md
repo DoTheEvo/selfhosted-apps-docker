@@ -72,14 +72,14 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 
 `.env`
 ```bash
 # GENERAL
 MY_DOMAIN=example.com
-DEFAULT_NETWORK=caddy_net
+DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # BITWARDEN
