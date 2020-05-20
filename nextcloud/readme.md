@@ -204,8 +204,8 @@ nextcloud.{$MY_DOMAIN} {
 
 Nextcloud needs few moments to start, then there is the initial configuration,
 creating admin account.</br>
-If not database variables were passed from the `.env` file in to nextcloud-app
-then also database info would be required here.
+If database env variables were not passed in to nextcloud-app
+then also the database info would be required here.
 
 ![first-run-pic](https://i.imgur.com/lv1x9GF.png)
 
