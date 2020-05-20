@@ -96,7 +96,6 @@ So if theres boot menu option choose non-uefi.
   ```
 
   `systemctl enable --now systemd-networkd`</br>
-  `systemctl enable --now systemd-resolved`
 
 * uncomment desidred locales in locale.gen</br>
   `vim /etc/locale.gen`</br>

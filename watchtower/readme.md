@@ -59,9 +59,7 @@ services:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
 DEFAULT_NETWORK=caddy_net
-TZ=Europe/Bratislava
 
 # WATCHTOWER
 WATCHTOWER_SCHEDULE=0 0 0 * * SAT

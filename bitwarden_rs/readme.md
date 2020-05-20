@@ -111,16 +111,24 @@ Bitwarden_rs documentation has a
 
 `Caddyfile`
 ```
-passwd.{$MY_DOMAIN} {
-    header / {
-       X-XSS-Protection "1; mode=block"
-       X-Frame-Options "DENY"
-       X-Robots-Tag "none"
-       -Server
-    }
+bitwarden.{$MY_DOMAIN} {
     encode gzip
-    reverse_proxy /notifications/hub/negotiate bitwarden:80
+
+    header {
+        # Enable cross-site filter (XSS) and tell browser to block detected attacks
+        X-XSS-Protection "1; mode=block"
+        # Disallow the site to be rendered within a frame (clickjacking protection)
+        X-Frame-Options "DENY"
+        # Prevent search engines from indexing (optional)
+        X-Robots-Tag "none"
+        # Server name removing
+        -Server
+    }
+
+    # Notifications redirected to the websockets server
     reverse_proxy /notifications/hub bitwarden:3012
+
+    # Proxy the Root directory to Rocket
     reverse_proxy bitwarden:80
 }
 ```

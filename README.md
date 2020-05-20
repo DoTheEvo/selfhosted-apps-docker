@@ -28,6 +28,8 @@ It's described in most details.
 
 ### Compose and environment variables
 
+When making changes use `docker-compose down`, not just restart or stop.
+
 You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
 
