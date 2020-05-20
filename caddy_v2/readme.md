@@ -198,8 +198,8 @@ Exposed ports are just documentation,
 [don't confuse expose and publish](https://maximorlov.com/exposing-a-port-in-docker-what-does-it-do/).
 
 *extra info:*</br>
-To know which ports containers have exposed - `docker ps`, or `docker inspect`,
-or use [ctop](https://github.com/bcicen/ctop).
+To know which ports containers have exposed - `docker ps`, or
+`docker port <container-name>`, or use [ctop](https://github.com/bcicen/ctop).
 
 `whoami-compose.yml`
 ```yaml

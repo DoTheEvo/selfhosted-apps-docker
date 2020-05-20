@@ -97,13 +97,13 @@ MYSQL_USER=bookstack
 MYSQL_PASSWORD=bookstack
 
 # BOOKSTACK
+APP_URL=https://book.example.com
 DB_HOST=bookstack-db
 DB_USER=bookstack
 DB_PASS=bookstack
 DB_DATABASE=bookstack
 
 # USING SENDGRID FOR SENDING EMAILS
-APP_URL=https://book.example.com
 MAIL_DRIVER=smtp
 MAIL_HOST=smtp.sendgrid.net
 MAIL_PORT=465
