@@ -101,7 +101,7 @@ You want to change `example.com` to your domain.
 `.env`
 ```bash
 MY_DOMAIN=example.com
-DEFAULT_NETWORK=caddy_net
+DOCKER_MY_NETWORK=caddy_net
 ```
     
 Domain names, api keys, email settings, ip addresses, database credentials, ... 
@@ -147,7 +147,7 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 
 * port 80 and 443 are mapped for http and https
@@ -214,7 +214,7 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 
 `nginx-compose.yml`
@@ -230,7 +230,7 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 ### - editing hosts file
 
@@ -355,7 +355,7 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 
 With this setup, and assuming docker host at: `192.168.1.222`,
@@ -538,7 +538,7 @@ Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
 `.env`
 ```
 MY_DOMAIN=example.com
-DEFAULT_NETWORK=caddy_net
+DOCKER_MY_NETWORK=caddy_net
 
 CLOUDFLARE_API_TOKEN=asdasdasdasdasasdasdasdasdas
 ```
@@ -572,7 +572,7 @@ services:
 networks:
   default:
     external:
-      name: $DEFAULT_NETWORK
+      name: $DOCKER_MY_NETWORK
 ```
 
 

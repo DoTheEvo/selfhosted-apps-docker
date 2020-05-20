@@ -28,35 +28,37 @@ It's described in most details.
 
 ### Compose and environment variables
 
-When making changes use `docker-compose down`, not just restart or stop.
+When making changes use `docker-compose down` and `docker-compose up -d`,
+not just restart or stop/start.
 
-You **do not** need to fuck with `docker-compose.yml` to get something up,
+* You **do not** need to fuck with `docker-compose.yml` to get something up,
 simple copy paste should suffice.
 
-You **do** need to fuck with `.env` file, that's where all the variables are.
+* You **do** need to fuck with `.env` file, that's where all the variables are.
   
-Sometimes the `.env` file is used as `env_file`
+Often the `.env` file is used as `env_file`
 
-* `.env` - actual name of a file, used only by compose.</br>
+`env_file: .env`
+
+* `.env` - actual name of a file that is used only by compose.</br>
   It is used automatically just by being in the directory
   with the `docker-compose.yml`</br>
   Variables set there are available during the building of the container,
-  but unless named in the `enviroment:` option they are not available
+  but unless named in the `environment:` option they are not available
   in the running containers.
 * `env_file` - an option in compose that defines an existing external file.</br>
   Variables in this file will be available in the running container,
   but not during building of the container.
 
-So to not have polluted huge ass compose file, or to not have multiple places
-where changes need to be made when adding a variable...  `env_file: .env` BAM.
+Benefit is that you do not need to make changes at multiple places,
+adding variable or changing its name in `.env` does not require
+to also go in to compose to add/change it there..</br>
+Also the compose file looks less cramped.
 
-Only issue is that all variables from `.env` are available in
-containers that use this.</br>
-That can lead to potential conflicts and clashes, looking at you nextcloud.
-
-In those cases variables names are declared per container.
-
-But `env_file: .env` is just easier, prettier... and mostly painless.
+Only issue is that **all** variables from `.env` are available in
+containers that use this method.</br>
+That can lead to potential issues if you try to use this approach elsewhere,
+universally.
 
 ---
 
