@@ -104,13 +104,13 @@ DB_PASS=bookstack
 DB_DATABASE=bookstack
 
 # USING SENDGRID FOR SENDING EMAILS
+MAIL_ENCRYPTION=SSL
 MAIL_DRIVER=smtp
 MAIL_HOST=smtp.sendgrid.net
 MAIL_PORT=465
 MAIL_FROM=book@example.com
 MAIL_USERNAME=apikey
-MAIL_PASSWORD=SG.asaddasdasdasdsaasdasd
-MAIL_ENCRYPTION=SSL
+SMTP_PASSWORD=<sendgrip-api-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
