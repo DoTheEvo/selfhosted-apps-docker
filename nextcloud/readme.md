@@ -232,12 +232,12 @@ There are likely several warnings on a freshly spun containers.
 
 ##### The database is missing some indexes
 
-On the docker hust execute:</br>
+On the docker host execute:</br>
 `docker exec --user www-data --workdir /var/www/html nextcloud-app php occ db:add-missing-indices`
 
 ##### Some columns in the database are missing a conversion to big int
 
-On the docker hust execute:</br>
+On the docker host execute:</br>
 `docker exec --user www-data --workdir /var/www/html nextcloud-app php occ db:convert-filecache-bigint`
 
 ##### The "Strict-Transport-Security" HTTP header is not set to at least "15552000" seconds.
