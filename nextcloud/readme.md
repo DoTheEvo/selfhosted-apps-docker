@@ -150,7 +150,7 @@ SMTP_SECURE=ssl
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
 SMTP_NAME=apikey
-SMTP_PASSWORD=<sendgrip-api-key-goes-here>
+SMTP_PASSWORD=<sendgrid-api-key-goes-here>
 ```
 
 `nginx.conf`

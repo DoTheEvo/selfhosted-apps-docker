@@ -95,7 +95,7 @@ SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=465
 SMTP_FROM=admin@example.com
 SMTP_USERNAME=apikey
-SMTP_PASSWORD=<sendgrip-api-key-goes-here>
+SMTP_PASSWORD=<sendgrid-api-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
