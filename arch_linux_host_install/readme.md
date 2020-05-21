@@ -100,9 +100,9 @@ So if theres boot menu option choose non-uefi.
   nameserver 1.1.1.1
   ```
 
-  `systemctl enable --now systemd-networkd`</br>
+  `systemctl enable --now systemd-networkd`
 
-  No troublesome `systemd-resolved` in this setup</br>
+  No troublesome `systemd-resolved` in this setup.
 
 * uncomment desidred locales in locale.gen</br>
   `vim /etc/locale.gen`</br>
