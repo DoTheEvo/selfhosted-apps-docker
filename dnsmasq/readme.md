@@ -28,6 +28,9 @@ So the answer is running a DNS server that does this
 paring of IPs with hostnames, and a DHCP server that tells the devices
 on the network to use this DNS.
 
+*extra info*</br>
+DNS servers run on port 53.
+
 # Prerequisites
 
 * the machine that will be running it should have set static IP
@@ -166,7 +169,7 @@ rule. So `example.com` stuff here is just for show.
 
 * Check if it started without errors</br>
   `journalctl -u dnsmasq.service`
-* If you get "port already in use" error, check which service is responsible</br>
+* If you get "port already in use" error, check which service is using port 53</br>
   `sudo ss -tulwnp`</br>
   stop and disable that service, for example if it is `systemd-resolved`</br>
   `sudo systemctl disable --now systemd-resolved`
