@@ -62,7 +62,7 @@ Borg is likely in your linux repositories.
 #### Create a new borg repo
 
 `mkdir ~/borg`</br>
-`sudo borg init --encryption=none ~/borg/docker_backup`
+`borg init --encryption=none ~/borg/docker_backup`
 
 Note the sudo. Borg commands should be run as root, so it can access everything.
 
@@ -135,8 +135,9 @@ The script must be **executabe** - `chmod +x borg_backup.sh`
 
 It could ask about
 *Attempting to access a previously unknown unencrypted repository*</br>
-Answer yes, this could be important as the automatic backup would stop at 
-this question otherwise.
+Answer yes.</br>
+If we would initialize the repo with sudo then it would be no issue,
+but then non root user would not be able to enter the repo directory.
 
 ### Automatic execution
 
@@ -156,7 +157,7 @@ Create a cron job that executes the script
 
 
 `crontab -l` - list current cronjobs</br>
-`journalctl | grep cron` - cron history
+`journalctl -u cronie` - cron history
 
 
 # Accessing the backup files
@@ -168,7 +169,7 @@ Create a cron job that executes the script
 * choose one by the date, copy its identifier which is epoch time, e.g. 1588986941
 * mount it to some folder</br>
   `sudo borg mount .::1588986941 /mnt/temp`
-* browse the directory where mounted and do whatever is needed
+* browse the directory where the archive is mounted and do whatever is needed
 * umount the backup</br>
   `sudo borg umount /mnt/temp`
 
