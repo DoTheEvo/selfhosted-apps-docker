@@ -61,6 +61,8 @@ So if theres boot menu option choose non-uefi.
 * install grub</br>
   `grub-install /dev/sda`</br>
   `grub-mkconfig -o /boot/grub/grub.cfg`
+* set password for root</br>
+  `passwd`
 * remove the bootable media and restart the machine</br>
   `exit`</br>
   `reboot`
@@ -68,8 +70,6 @@ So if theres boot menu option choose non-uefi.
 # Basic configuration after the first boot
 
 * login as `root`</br>
-* set password for root</br>
-  `passwd`
 * set hostname</br>
   `echo docker-host > /etc/hostname`
 * add new user and set their password</br>
