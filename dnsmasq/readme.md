@@ -22,10 +22,11 @@ on your machine, adding `192.168.1.222 example.com` IP-hostname pair.
 This tells your machine to fuck asking google's DNS, the rule is right there,
 `example.com` goes directly to the local server ip `192.168.1.222`.</br>
 But if more devices should "just work" it is a no-go, since this just works
-one the machine which `hosts` file was edited.</br>
+one the machine which `hosts` file was edited.
+
 So the answer is running a DNS server that does this
-and a DHCP server that tells the devices on the network
-to use this DNS.
+paring of IPs with hostnames, and a DHCP server that tells the devices
+on the network to use this DNS.
 
 # Prerequisites
 
