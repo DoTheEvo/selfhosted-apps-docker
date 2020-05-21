@@ -25,7 +25,7 @@ to use this DNS.
 
 # Prerequisites
 
-* machine that will be running it should have set static IP
+* the machine that will be running it should have set static IP
 
 # Files and directory structure
 
@@ -119,31 +119,19 @@ nameserver ::1
 nameserver 127.0.0.1
 ```
 
-
-Bit of an issue is that this file is often managed by various system services,
-like dhcpcd, systemd, networkmanager... and they change it as they see fit.</br>
-To prevent this, `resolv.conf` will be flagged as immutable,
-which prevents all possible changes to it unless the attribute is removed.
+Bit of an issue is that `resolv.conf` belongs to glibc, a core linux library.
+But there are other network related services that like to fuck with it.
+Like dhcpcd, networkmanager, systemd-resolved,...</br>
+Ideally you know what is running on your host linux system, but just in case
+`resolv.conf` will be flagged as immutable.
+This prevents all possible changes to it unless the attribute is removed.
 
 Edit `/etc/resolv.conf` and set localhost as the DNS nameserver, as shown above.
 
-Make it immutable to prevent any changes to it.
-
-* `sudo chattr +i /etc/resolv.conf`
-
-Check if the content is what was set.
-
-* `cat /etc/resolv.conf`
-
-If it was changed by dhcpcd before the +i flag took effect, edit `/etc/dhcpcd.conf`
-and add `nohook resolv.conf` at the end.</br>
-Restart the machine, disable the immutability, edit it again,
-add immutability, and check.
-
-* `sudo chattr -i /etc/resolv.conf`
-* `sudo nano /etc/resolv.conf`
-* `sudo chattr +i /etc/resolv.conf`
-* `cat /etc/resolv.conf`
+* Make it immutable to prevent any changes to it.</br>
+  `sudo chattr +i /etc/resolv.conf`
+* Check if the content is what was set.</br>
+  `cat /etc/resolv.conf`
 
 # /etc/hosts
 
@@ -171,11 +159,11 @@ rule. So `example.com` stuff here is just for show.
 
 `sudo systemctl enable --now dnsmasq`
 
-* Check if it started without errors: `journalctl -u dnsmasq.service`
+* Check if it started without errors</br>
+  `journalctl -u dnsmasq.service`
 * If you get "port already in use" error, check which service is responsible</br>
   `sudo ss -tulwnp`</br>
-  If you are running `systemd-networkd` and `systemd-resolved`,
-  it will likely be `systemd-resolved`, so stop it and disable it.</br>
+  stop and disable that service, for example if it is `systemd-resolved`</br>
   `sudo systemctl disable --now systemd-resolved`
 * Make sure you **disable other DHCP servers** on the network,
   usually a router is running one.
@@ -197,7 +185,6 @@ part of `bind-utils` or `bind-tools` packages, again depending on the distro,
 but also available on windows.
 
 * `nslookup google.com`
-* `nslookup gateway`
 * `nslookup docker-host`
 * `nslookup example.com`
 * `nslookup whateverandom.example.com`
@@ -209,7 +196,9 @@ but also available on windows.
   windows ping does not do dns lookup when just plain hostname is used</br>
   `ping meh-pc`</br>
   it's a [quirk](https://superuser.com/questions/495759/why-is-ping-unable-to-resolve-a-name-when-nslookup-works-fine/1257512#1257512)
-  of windows ping utility, can be solved by adding dot forcing it to do it</br>
+  of windows ping utility.
+  Can be solved by adding dot, which makes it look like domain name and this
+  forces the dns lookup before pinging</br>
   `ping meh-pc.`</br>
 
 * **slow ping of a hostname, but fast nslookup on a linux machine**</br>
