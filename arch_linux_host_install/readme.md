@@ -117,7 +117,7 @@ So if theres boot menu option choose non-uefi.
 * reboot</br>
   `reboot`
 
-# SSH, ZSH, Docker, AUR
+# SSH, Docker, ZSH, AUR
 
 From now on its login as non-root user.
 
@@ -132,6 +132,17 @@ From now on its login as non-root user.
   *PasswordAuthentication yes*
 * enable sshd service</br>
   `sudo systemctl enable --now sshd`
+
+### Setup docker
+
+[Wiki](https://wiki.archlinux.org/index.php/docker)
+
+* have `docker` and `docker-compose` packages installed</br>
+  `sudo pacman -S docker docker-compose`
+* enable docker service</br>
+  `sudo systemctl enable --now docker`
+* add non-root user to the docker group</br>
+  `sudo gpasswd -a bastard docker`  
 
 ### ZSH shell
 
@@ -164,16 +175,10 @@ it's the fastest zsh framework and out of the box setup nicely
   bindkey "^f" add_sudo
   ```
 
-### Setup docker
+##### ZSH docker autocomplete
 
-[Wiki](https://wiki.archlinux.org/index.php/docker)
-
-* have `docker` and `docker-compose` packages installed</br>
-  `sudo pacman -S docker docker-compose`
-* enable docker service</br>
-  `sudo systemctl enable --now docker`
-* add non-root user to the docker group</br>
-  `sudo gpasswd -a bastard docker`
+[Here](https://docs.docker.com/compose/completion/#zsh).
+For zim it's "Without oh-my-zsh shell" section.
 
 ### Access to AUR
 
