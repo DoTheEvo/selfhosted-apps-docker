@@ -287,12 +287,15 @@ if you made changes and want them to take effect.
 
 # Caddy more info and various configurations
 
+##### Caddyfile structure:  
+
 ![caddyfile-diagram-pic](https://i.imgur.com/c0ycNal.png)
 
-Worth reading the official documentation, especially these short pages  
+Worth having a look at the official documentation, especially these short pages  
 
-* [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
+* [concept](https://caddyserver.com/docs/caddyfile/concepts)
 * [conventions](https://caddyserver.com/docs/conventions)
+* [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
 
 
 ### Routing traffic to other machines on the LAN

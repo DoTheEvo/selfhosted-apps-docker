@@ -61,7 +61,7 @@ protocol=cloudflare,        \
 zone=example.com,              \
 ttl=1,                      \
 login=bastard@gmail.com, \
-password=global-api-key-goes-here \
+password=<global-api-key-goes-here> \
 example.com,*.example.com,subdomain.example.com
 
 ##
@@ -69,7 +69,7 @@ protocol=cloudflare,        \
 zone=example.org,              \
 ttl=1,                      \
 login=bastard@gmail.com, \
-password=global-api-key-goes-here \
+password=<global-api-key-goes-here> \
 example.org,*.example.org,whatever.example.org
 ```
 
