@@ -80,7 +80,7 @@ So if theres boot menu option choose non-uefi.
   *%wheel ALL=(ALL) ALL*
 * check the network interface name</br>
   `ip link`
-* set static IP systemd-networkd</br>
+* set static IP using systemd-networkd and resolv.conf</br>
   
   `vim /etc/systemd/network/20-wired.network`
   
@@ -91,11 +91,18 @@ So if theres boot menu option choose non-uefi.
   [Network]
   Address=10.0.19.2/24
   Gateway=10.0.19.1
-  DNS=8.8.8.8
-  DNS=1.1.1.1
+  ```
+
+  `vim /etc/resolv.conf`
+
+  ```
+  nameserver 8.8.8.8
+  nameserver 1.1.1.1
   ```
 
   `systemctl enable --now systemd-networkd`</br>
+
+  No troublesome `systemd-resolved` in this setup</br>
 
 * uncomment desidred locales in locale.gen</br>
   `vim /etc/locale.gen`</br>
