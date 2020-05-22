@@ -153,7 +153,7 @@ Create a cron job that executes the script
   `su`
 * add new cron job</br>
   `crontab -e`</br>
-  `0 3 * * * /home/bastard/docker/nextcloud/nextcloud-backup-script.sh`
+  `0 3 * * * /home/bastard/borg/borg_backup.sh`
 
 
 `crontab -l` - list current cronjobs</br>
