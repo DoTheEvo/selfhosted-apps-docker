@@ -31,7 +31,7 @@ This can be bandwidth intensive, so its scheduled checks should account for this
 ```
 
 * `.env` - a file containing environment variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build the container
+* `docker-compose.yml` - a docker compose file, telling docker how to run the container
 
 Only these two files must be provided.
 

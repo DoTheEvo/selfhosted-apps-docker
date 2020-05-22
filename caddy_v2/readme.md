@@ -34,7 +34,7 @@ In this setup Caddy is used mostly as
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and dealt with based on the settings in `Caddyfile`.
 
-Caddy with its build in https and and sane config approach
+Caddy with its build-in https and and sane config approach
 allows a simple config to just work.
     
 ```
@@ -543,7 +543,7 @@ Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
 MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 
-CLOUDFLARE_API_TOKEN=asdasdasdasdasasdasdasdasdas
+CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
 ```
 
 ### - Edit docker-compose.yml

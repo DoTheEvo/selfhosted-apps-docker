@@ -32,7 +32,7 @@ In my use it is mostly information tool, rather than a management tool.
 * `portainer-data/` - a directory where portainer stores its peristent data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker
-  how to build the containers
+  how to run the containers
 
 You only need to provide the files.</br>
 The directory is created by docker compose on the first run.

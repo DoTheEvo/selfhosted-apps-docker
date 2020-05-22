@@ -45,7 +45,7 @@ and for [memory file caching](https://docs.nextcloud.com/server/latest/admin_man
 * `nextcloud-data/` - a directory where nextcloud will store users data and web app data
 * `nextcloud-db-data/` - a directory where nextcloud will store its database data
 * `.env` - a file containing environment variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build the containers
+* `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `nginx.conf` - nginx web server configuration file
 * `nextcloud-backup-script.sh` - a backup script if you want it
 
