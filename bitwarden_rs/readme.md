@@ -43,7 +43,7 @@ only the server is a different implementation.
 ```
 
 * `bitwarden-data/` - a directory where bitwarden will store its database and other data
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to build the container
 * `bitwarden-backup-script.sh` - a backup script if you want it
 
@@ -139,7 +139,7 @@ bitwarden.{$MY_DOMAIN} {
 so that all web based clients, including desktop app,
 can immediately sync when a change happens on the server.
 
-* environmental variable `WEBSOCKET_ENABLED=true` needs to be set in the `.env` file</br>
+* environment variable `WEBSOCKET_ENABLED=true` needs to be set in the `.env` file</br>
 * reverse proxy needs to route `/notifications/hub` to port 3012</br>
 * your router/firewall needs to **forward port 3012** to the docker host,
 same as port 80 and 443 are forwarded

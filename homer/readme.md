@@ -29,7 +29,7 @@ The docker image uses darkhttpd simple web server on alpine linux.
 ```
 
 * `assets/` - a directory containing icons and other directories with icons
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to build the container
 * `config.yml` - homer's configuration file bind mounted in to the container
 
