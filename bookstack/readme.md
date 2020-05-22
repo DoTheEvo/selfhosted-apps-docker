@@ -36,7 +36,7 @@ which uses nginx as a web server.
 
 * `bookstack-data/` - a directory where bookstack will store its web app data
 * `bookstack-db-data/` - a directory where bookstack will store its MySQL database data
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to build the containers
 * `bookstack-backup-script.sh` - a backup script if you want it
 

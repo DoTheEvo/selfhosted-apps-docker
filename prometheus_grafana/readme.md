@@ -78,7 +78,7 @@ and consists of several components.
 * `grafana/` - a directory containing grafanas configs and dashboards
 * `grafana-data/` - a directory where grafana stores its data
 * `prometheus-data/` - a directory where prometheus stores its database and data
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to build the containers
 * `prometheus.yml` - a configuration file for prometheus
 

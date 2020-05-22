@@ -30,7 +30,7 @@ In my use it is mostly information tool, rather than a management tool.
 ```
 
 * `portainer-data/` - a directory where portainer stores its peristent data
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker
   how to build the containers
 

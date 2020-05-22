@@ -24,9 +24,18 @@
 The core of the setup is Caddy reverse proxy.</br>
 It's described in most details.
 
-# Some docker basics and some info
+# Some extra info
 
-### Compose and environment variables
+### Caddy 
+
+When making changes to Caddyfile, the config needs to be reloaded afterwards.
+
+On the docker host:<br>
+`docker exec -w /etc/caddy caddy caddy reload`
+
+Assuming container name is kept as `caddy`.
+
+### Compose
 
 When making changes use `docker-compose down` and `docker-compose up -d`,
 not just restart or stop/start.

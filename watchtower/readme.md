@@ -30,14 +30,14 @@ This can be bandwidth intensive, so its scheduled checks should account for this
             └── docker-compose.yml
 ```
 
-* `.env` - a file containing environmental variables for docker compose
+* `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to build the container
 
 Only these two files must be provided.
 
 # docker-compose
 
-Scheduled to run every saturday at midnight using environmental variable.</br>
+Scheduled to run every saturday at midnight using environment variable.</br>
 Heads up that not a typical cron format is used,
 [seconds are the first digit](https://pkg.go.dev/github.com/robfig/cron@v1.2.0?tab=doc#hdr-CRON_Expression_Format).
 
