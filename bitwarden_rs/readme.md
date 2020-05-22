@@ -44,7 +44,7 @@ only the server is a different implementation.
 
 * `bitwarden-data/` - a directory where bitwarden will store its database and other data
 * `.env` - a file containing environment variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to build the container
+* `docker-compose.yml` - a docker compose file, telling docker how to run the container
 * `bitwarden-backup-script.sh` - a backup script if you want it
 
 You only need to provide the files.</br>
