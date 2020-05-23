@@ -56,6 +56,7 @@ or machines on the network.
 
 ### - Requirements
 
+* have some basic linux knowledge, create folders, create files, edit files, run scripts,...
 * have a docker host and some vague docker knowledge
 * have port 80 and 443 forwarded on the router/firewall to the docker host
 * have a domain, `example.com`, you can buy one for 2€ annually on namecheap
@@ -150,7 +151,7 @@ networks:
       name: $DOCKER_MY_NETWORK
 ```
 
-* port 80 and 443 are mapped for http and https
+* port 80 and 443 are pusblished for http and https
 * MY_DOMAIN variable is passed in to the container so that it can be used
   in `Caddyfile`
 * the `Caddyfile` is read-only bind-mounted from the docker host
