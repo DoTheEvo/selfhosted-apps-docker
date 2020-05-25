@@ -372,13 +372,12 @@ and `192.168.1.222:9090` gets to prometheus.
 ### Named matchers and IP filtering
 
 Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)
-which allow you to define how to deal with incoming
-[requests](https://caddyserver.com/docs/caddyfile/matchers#standard-matchers).</br>
+which allow you to define how to deal with incoming requests.</br>
 `reverse_proxy server-blue:80` is a matcher that matches all requests
 and sends them somewhere.</br>
-But if more control is desired path matchers and named matchers come to play.
+But if more control is desired, path matchers and named matchers come to play.
 
-What if you desire to block all traffic coming from the outside world,
+What if you want to block all traffic coming from the outside world,
 but local network be allowed through?</br>
 Well, the [remote_ip](https://caddyserver.com/docs/caddyfile/matchers#remote-ip)
 matcher comes to play, which enables you to filter requests by their IP.</br>
@@ -404,7 +403,7 @@ b.{$MY_DOMAIN} {
 }
 ```
 
-The `@fuck_off_world` matches all IPs except the local network IP range.</br>
+`@fuck_off_world` matches all IPs except the local network IP range.</br>
 Requests matching that rule get the response 403 - forbidden.
 
 ### Snippets
@@ -413,12 +412,13 @@ What if you need to have the same matcher in several site-blocks and
 would prefer for config to look cleaner? 
 
 Here comes the [snippets](https://caddyserver.com/docs/caddyfile/concepts#snippets).</br>
-Snippets are defined by parentheses, named whatever you like.</br>
-They are used inside side-block by simple `import <snippet name>`
+Snippets are defined under the global options block,
+using parentheses, named whatever you like.</br>
+They then can be used inside any site-block with simple `import <snippet name>`
 
-Now would be good time to look again at that concept picture above.
+Now would be a good time to look again at that concept picture above.
 
-Here is above example of IP filtering matcher done using a snippet.
+Here is above example of IP filtering named matcher done using a snippet.
 
 ```
 {
