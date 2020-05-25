@@ -298,6 +298,9 @@ Worth having a look at the official documentation, especially these short pages
 * [conventions](https://caddyserver.com/docs/conventions)
 * [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
 
+Maybe checking out
+[mozzila's - overview of HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
+would also not hurt, it is very well written.
 
 ### Routing traffic to other machines on the LAN
 
@@ -365,6 +368,79 @@ networks:
 With this setup, and assuming docker host at: `192.168.1.222`,
 writing `192.168.1.222:55414` in to browser will go to to urbackup,
 and `192.168.1.222:9090` gets to prometheus.
+
+### Named matchers and IP filtering
+
+Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)
+which allow you to define how to deal with incoming
+[requests](https://caddyserver.com/docs/caddyfile/matchers#standard-matchers).</br>
+`reverse_proxy server-blue:80` is a matcher that matches all requests
+and sends them somewhere.</br>
+But if more control is desired path matchers and named matchers come to play.
+
+What if you desire to block all traffic coming from the outside world,
+but local network be allowed through?</br>
+Well, the [remote_ip](https://caddyserver.com/docs/caddyfile/matchers#remote-ip)
+matcher comes to play, which enables you to filter requests by their IP.</br>
+
+Named matchers are defined by `@` and can be named whatever you like.
+
+```
+{
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+a.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+}
+
+b.{$MY_DOMAIN} {
+    reverse_proxy nginx:80
+
+    @fuck_off_world {
+        not remote_ip 192.168.1.0/24
+    }
+    respond @fuck_off_world 403
+}
+```
+
+The `@fuck_off_world` matches all IPs except the local network IP range.</br>
+Requests matching that rule get the response 403 - forbidden.
+
+### Snippets
+
+What if you need to have the same matcher in several site-blocks and
+would prefer for config to look cleaner? 
+
+Here comes the [snippets](https://caddyserver.com/docs/caddyfile/concepts#snippets).</br>
+Snippets are defined by parentheses, named whatever you like.</br>
+They are used inside side-block by simple `import <snippet name>`
+
+Now would be good time to look again at that concept picture above.
+
+Here is above example of IP filtering matcher done using a snippet.
+
+```
+{
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+(LAN_only) {
+    @fuck_off_world {
+        not remote_ip 192.168.1.0/24
+    }
+    respond @fuck_off_world 403
+}
+
+a.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+}
+
+b.{$MY_DOMAIN} {
+    reverse_proxy nginx:80
+    import LAN_only
+}
+```
 
 ### Backend communication
 
