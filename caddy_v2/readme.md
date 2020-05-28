@@ -13,7 +13,7 @@
 # Purpose & Overview
 
 Reverse proxy setup that allows hosting many services and access them
-based on the host name.</br>
+based on the host name.<br>
 For example `nextcloud.example.com` takes you to your nextcloud file sharing,
 and `bitwarden.example.com` takes you to your password manager,
 all hosted on your local network.
@@ -24,13 +24,13 @@ all hosted on your local network.
 * [Github](https://github.com/caddyserver/caddy)
 
 Caddy is a powerful, enterprise-ready, open source web server with automatic
-HTTPS written in Go.</br>
+HTTPS written in Go.<br>
 
 Web servers are build to deal with http traffic, so they are an obvious choice
 for the function of reverse proxy.
 
 In this setup Caddy is used mostly as
-[a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).</br> 
+[a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).<br> 
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and dealt with based on the settings in `Caddyfile`.
 
@@ -85,7 +85,7 @@ or machines on the network.
 * `Caddyfile` - the Caddy configuration file
 * `docker-compose.yml` - a docker compose file, telling docker how to run containers
 
-You only need to provide the three files.</br>
+You only need to provide the three files.<br>
 The directories are created by docker compose on the first run, 
 the content of these is visible only as root of the docker host.
 
@@ -119,7 +119,7 @@ Often variable should be available also inside the running container.
 For that it must be declared in the `environment` section of the compose file,
 as can be seen next in Caddie's `docker-compose.yml`
 
-*extra info:*</br>
+*extra info:*<br>
 `docker-compose config` shows how compose will look
 with the variables filled in.
 
@@ -177,28 +177,28 @@ b.{$MY_DOMAIN} {
 
 `a` and `b` are the subdomains, can be named whatever.
 For them to work they must have type-A DNS record
-pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.</br>
+pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.<br>
 Can also be a wild card `*.example.com -> 104.17.436.89`
 
-The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.</br>
+The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
-So every docker container you spin should have hostname definied.</br>
+So every docker container you spin should have hostname definied.<br>
 Commented out is the staging url for let's encrypt, useful for testing.
 
 ### - Setup some docker containers
 
-Something light and easy to setup to route to.</br>
+Something light and easy to setup to route to.<br>
 Assuming for this testing these compose files are in the same directory with Caddy,
 so they make use of the same `.env` file and so be on the same network.
 
 Note the lack of published/mapped ports in the compose,
-as they will be accessed only through Caddy, which has it's ports published.</br>
+as they will be accessed only through Caddy, which has it's ports published.<br>
 And since the containers and Caddy are all on the same bridge docker network,
-they can access each other on any port.</br>
+they can access each other on any port.<br>
 Exposed ports are just documentation,
 [don't confuse expose and publish](https://maximorlov.com/exposing-a-port-in-docker-what-does-it-do/).
 
-*extra info:*</br>
+*extra info:*<br>
 To know which ports containers have exposed - `docker ps`, or
 `docker port <container-name>`, or use [ctop](https://github.com/bcicen/ctop).
 
@@ -236,8 +236,8 @@ networks:
 ### - editing hosts file
 
 You are on your local network and you are likely running the docker host
-inside the same network.</br>
-If that's the case then shit will not work without editing the hosts file.</br> 
+inside the same network.<br>
+If that's the case then shit will not work without editing the hosts file.<br> 
 Reason being that when you write that `a.example.com` in to your browser,
 you are asking google's DNS for `a.example.com` IP address.
 It will give you your own public IP, and most routers/firewalls wont allow
@@ -253,10 +253,10 @@ adding whatever is the local IP of the docker host and the hostname:
 ```
 
 If it is just quick testing one can use Opera browser
-and enable the build in VPN.</br>
+and enable the build in VPN.<br>
 
 One can also run a dns/dhcp server on the network, to solve this for all
-devices.</br>
+devices.<br>
 Here's a [guide-by-example for dnsmasq](
 https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq).
 
@@ -274,7 +274,7 @@ Services
 Give it time to get certificates, checking `docker logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
 
-If something is fucky use `docker logs caddy` to see what is happening.</br>
+If something is fucky use `docker logs caddy` to see what is happening.<br>
 Restarting the container `docker container restart caddy` can help.
 Or investigate inside `docker exec -it caddy /bin/sh`.
 For example trying to ping hosts that are suppose to be reachable,
@@ -282,7 +282,7 @@ For example trying to ping hosts that are suppose to be reachable,
 
 There's also other possible issues, like bad port forwarding towards docker host.
 
-*extra info:*</br>
+*extra info:*<br>
 `docker exec -w /etc/caddy caddy caddy reload` reloads config
 if you made changes and want them to take effect.
 
@@ -304,7 +304,7 @@ would also not hurt, it is very well written.
 
 ### Routing traffic to other machines on the LAN
 
-If not targeting a docker container but a dedicated machine on the network.</br>
+If not targeting a docker container but a dedicated machine on the network.<br>
 Nothing really changes, if you can ping the machine from Caddy container
 by its hostname or its IP, it will work. 
 
@@ -332,7 +332,7 @@ localhost:55414 {
 }
 ```
 
-Prometheus entry uses short-hand notation.</br>
+Prometheus entry uses short-hand notation.<br>
 TLS is automatically disabled in localhost use.
 
 But for this to work Caddy's compose file needs to have those ports **published** too.
@@ -372,15 +372,15 @@ and `192.168.1.222:9090` gets to prometheus.
 ### Named matchers and IP filtering
 
 Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)
-which allow you to define how to deal with incoming requests.</br>
+which allow you to define how to deal with incoming requests.<br>
 `reverse_proxy server-blue:80` is a matcher that matches all requests
-and sends them somewhere.</br>
+and sends them somewhere.<br>
 But if more control is desired, path matchers and named matchers come to play.
 
 What if you want to block all traffic coming from the outside world,
-but local network be allowed through?</br>
+but local network be allowed through?<br>
 Well, the [remote_ip](https://caddyserver.com/docs/caddyfile/matchers#remote-ip)
-matcher comes to play, which enables you to filter requests by their IP.</br>
+matcher comes to play, which enables you to filter requests by their IP.<br>
 
 Named matchers are defined by `@` and can be named whatever you like.
 
@@ -403,7 +403,7 @@ b.{$MY_DOMAIN} {
 }
 ```
 
-`@fuck_off_world` matches all IPs except the local network IP range.</br>
+`@fuck_off_world` matches all IPs except the local network IP range.<br>
 Requests matching that rule get the response 403 - forbidden.
 
 ### Snippets
@@ -411,9 +411,9 @@ Requests matching that rule get the response 403 - forbidden.
 What if you need to have the same matcher in several site-blocks and
 would prefer for config to look cleaner? 
 
-Here comes the [snippets](https://caddyserver.com/docs/caddyfile/concepts#snippets).</br>
+Here comes the [snippets](https://caddyserver.com/docs/caddyfile/concepts#snippets).<br>
 Snippets are defined under the global options block,
-using parentheses, named whatever you like.</br>
+using parentheses, named whatever you like.<br>
 They then can be used inside any site-block with simple `import <snippet name>`
 
 Now would be a good time to look again at that concept picture above.
@@ -447,7 +447,7 @@ b.{$MY_DOMAIN} {
 Some containers might be set to communicate only through https 443 port.
 But since they are behind proxy, their certificates wont be singed, wont be trusted.
 
-Caddies sub-directive `transport` sets how to communicate with the backend.</br>
+Caddies sub-directive `transport` sets how to communicate with the backend.<br>
 Setting the upstream's scheme to `https://`
 or declaring the `tls` transport subdirective makes it use https.
 Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to
@@ -467,7 +467,7 @@ whatever.{$MY_DOMAIN} {
 
 Running NextCloud behind any proxy likely shows few warning on its status page.
 It requires some redirects for service discovery to work and would like 
-if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.</br> 
+if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.<br> 
 Like so:
 
 ```
@@ -484,7 +484,7 @@ nextcloud.{$MY_DOMAIN} {
 This example is with bitwarden_rs password manager, which comes with its reverse proxy
 [recommendations](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples).
 
-`encode gzip` enables compression.</br>
+`encode gzip` enables compression.<br>
 This lowers the bandwith use and speeds up loading of the sites.
 It is often set on the webserver running inside the docker container,
 but if not it can be enabled on caddy.
@@ -495,7 +495,7 @@ By default, Caddy passes through Host header and adds X-Forwarded-For
 for the client IP. This means that 90% of the time a simple config
 is all that is needed but sometimes some extra headers might be desired.
 
-Here we see bitwarden make use of some extra headers.</br>
+Here we see bitwarden make use of some extra headers.<br>
 We can also see its use of websocket protocol for notifications at port 3012.
 
 ```
@@ -523,12 +523,12 @@ bitwarden.{$MY_DOMAIN} {
 
 ### Basic authentication
 
-[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)</br>
+[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/basicauth)<br>
 Directive `basicauth` can be used when one needs to add
 a username/password check before accessing a service. 
 
 Password is [bcrypt](https://www.devglan.com/online-tools/bcrypt-hash-generator) hashed
-and then [base64](https://www.base64encode.org/) encoded.</br>
+and then [base64](https://www.base64encode.org/) encoded.<br>
 You can use the [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password)
 command to hash passwords for use in the config.
 
@@ -546,7 +546,7 @@ b.{$MY_DOMAIN} {
 
 ### Logging
 
-[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)</br>
+[Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)<br>
 If access logs for specific site are desired
 
 ```  
@@ -574,9 +574,9 @@ so your public IP is exposed.
 
 It could be also useful in security,
 as Cloudflare offers 5 firewall rules in the free tier.
-Which means one can geoblock any traffic that is not from your own country.</br>
+Which means one can geoblock any traffic that is not from your own country.<br>
 But I assume Caddy's default HTTP challenge would be also blocked,
-so no certification renewal.</br>
+so no certification renewal.<br>
 But with DNS challenge the communication is entirely between Let's Encrypt
 and Cloudflare servers.
 
@@ -585,18 +585,18 @@ and Cloudflare servers.
 On Cloudflare create a new API Token with two permsisions,
 [pic of it here](https://i.imgur.com/YWxgUiO.png)
 
-* zone/zone/read</br>
-* zone/dns/edit</br>
+* zone/zone/read<br>
+* zone/dns/edit<br>
 
 Include all zones needs to be set.
 
 ### - Create Dockerfile
 
 To add support, Caddy needs to be compiled with
-[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).</br>
+[Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).<br>
 This is done by using your own Dockerfile, using the `builder` image.
 
-Create a directory `dns-dockerfile` in the caddy directory.</br>
+Create a directory `dns-dockerfile` in the caddy directory.<br>
 Inside create a file named `Dockerfile`.
 
 `Dockerfile`
@@ -625,7 +625,7 @@ CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
 
 ### - Edit docker-compose.yml
 
-`image` replaced with `build` option pointing at the `Dockerfile` location</br>
+`image` replaced with `build` option pointing at the `Dockerfile` location<br>
 and `CLOUDFLARE_API_TOKEN` variable added.
 
 `docker-compose.yml`

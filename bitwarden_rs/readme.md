@@ -83,12 +83,12 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # BITWARDEN
+DOMAIN=https://passwd.example.com
 ADMIN_TOKEN=YdLo1TM4MYEQ948GOVZ29IF4fABSrZMpk9
 SIGNUPS_ALLOWED=false
 WEBSOCKET_ENABLED=true
 
 # USING SENDGRID FOR SENDING EMAILS
-DOMAIN=https://passwd.example.com
 SMTP_SSL=true
 SMTP_EXPLICIT_TLS=true
 SMTP_HOST=smtp.sendgrid.net
