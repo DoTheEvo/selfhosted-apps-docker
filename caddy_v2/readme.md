@@ -457,6 +457,7 @@ untrusted certificates coming from the backend.
 whatever.{$MY_DOMAIN} {
     reverse_proxy https://server-blue:443 {
         transport http {
+            tls
             tls_insecure_skip_verify
         }
     }
