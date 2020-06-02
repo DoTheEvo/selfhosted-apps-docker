@@ -38,18 +38,13 @@ Most of the stuff here is based on Arch wiki and
 
 # Installation
 
-### on linux server
-
+### on linux
 Install `wireguard-tools` or whatever is the equivalent in your distro.<br>
 The package should provide two command line utilities
  
 * `wg` -  utility for configuration and management of WireGuard tunnel interfaces
 * `wg-quick` - script for bringing up or down a WireGuard interface and provide
   some extra configuration functions
-
-### on linux clients
-
-Same as server
 
 ### on Windows or macOS clients
 
@@ -62,7 +57,6 @@ Might be of interest server setup on
 ### on Android or iOS devices
 
 Install the official app from the stores.
-
 
 # Configuration on linux server
 
@@ -126,6 +120,10 @@ This configuration when run creates a new `wg0` network interface on the machine
 
 `sudo systemctl enable --now wg-quick@wg0`
 
+### Port forwarding
+
+Forward port 51820 to the machine running the wireguard server.
+
 # Configuration on clients
 
 `TESTER-1.conf`
@@ -141,7 +139,7 @@ AllowedIPs = 10.200.200.1/32, 192.168.5.0/24
 Endpoint = 63.123.113.495:51820
 ```
 
-**[Interface]** - section defining `wg0` wireguard interface
+**[Interface]** - section defining wireguard interface
 * **PrivateKey** - private key of the peer
 * **\# PublicKey** - just a note, what is the public key of the private key
 * **Address** - IP address on the created wireguard network interface,
@@ -162,8 +160,38 @@ Endpoint = 63.123.113.495:51820
 
 # Troubleshooting
 
-* *can connct to the server, but not the LAN machines*<br>
+* *can connect to the server, but not the LAN machines*<br>
   make sure you set **your** network interface in PostUp/PostDown section on the server
+
+# Extra info
+
+* **PersistentKeepalive**<br>
+Set in clients `[Peer]` section to the number of seconds, `PersistentKeepalive = 25`<br>
+Used for specific case where clients need to communicate with other clients
+which are behind NAT.<be>
+This setting, present in a client config which is behind NAT, sends periodic traffic to the server,
+ensuring that NAT table on the router/firewall wont expire for this connection.
+
+# Vanity address generation.
+
+The generated crypto keys are used all over in configuration. 
+Would it not be nice if at a simple glance
+you would immediatly know which peer they represent?
+
+Well, what if you generate few millions of keys and pick ones that fit some rule
+of having a desired string somewhere in the first 10 letters?
+
+[https://github.com/warner/wireguard-vanity-address](https://github.com/warner/wireguard-vanity-address)
+
+* install `rust` programming language, that comes with cargo package manager
+* install wireguard-vanity-address as a non root user<br>
+  `cargo install wireguard-vanity-address`<br>
+  it will be installed in to `~/.cargo/bin`
+* run it with the desired string<br>
+  `~/.cargo/bin/wireguard-vanity-address fuck`
+
+        private OLyU1XhtCXTGzO+8ifCKR8skRL5md4n25/kiERHb3Gk=
+        public fuCK9s9wyjQ8u6eUGzthFUUP6oV9FdnNnIzDvlJboD8=
 
 # Update
 
