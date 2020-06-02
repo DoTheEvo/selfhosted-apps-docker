@@ -15,12 +15,13 @@ When you need to connect to a machine/network over the internet, securely.<br>
 * [Github](https://github.com/WireGuard)
 * [Arch wiki](https://wiki.archlinux.org/index.php/WireGuard)
 
-WireGuard is an opensource extremely simple, fast and modern VPN.
+WireGuard is an opensource simple, fast and modern VPN.<br>
 Written in C, with userspace implementation written in Go.<br>
 WireGuard is included in linux kernel version 5.6 and newer.
 
+WireGuard works at layer 3 and uses UDP protocol.<br>
 While with WireGuard there is no server-clients model, there are just peers
-connecting to each other, this setup will consider peer_A a server, 
+connecting to each other, this gudie will setup peer_A as a server listening at a port, 
 and clients will be connecting to it.
 
 This setup runs directly on the host machine, not in a container.<br>
@@ -43,9 +44,10 @@ Install `wireguard-tools` or whatever is the equivalent in your distro.<br>
 The package should provide two command line utilities
  
 * `wg` -  utility for configuration and management of WireGuard tunnel interfaces
-* `wg-quick` - script for bringing up or down a WireGuard interface
+* `wg-quick` - script for bringing up or down a WireGuard interface and provide
+  some extra configuration functions
 
-### on linux client
+### on linux clients
 
 Same as server
 
@@ -57,7 +59,7 @@ Same as server
 Might be of interest server setup on 
 [Windows](https://www.henrychang.ca/how-to-setup-wireguard-vpn-server-on-windows/)
 
-### on Android or iOS
+### on Android or iOS devices
 
 Install the official app from the stores.
 
@@ -81,8 +83,8 @@ PrivateKey = AA9q7CkUG3MuKP1eyyJFGgKzACIJ1rRIkkWYAi3p3WM=
 # PublicKey = fuCKVQU+x/jukZq3WH5yorJ4mE665dkv2HKN/0mH5hQ=
 Address = 10.200.200.1/24
 ListenPort = 51820
-PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s25 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s25 -j MASQUERADE
 
 [Peer]
 # TESTER-1
@@ -97,18 +99,28 @@ PublicKey = CAt7g42pPxgU5Lcc3uyNh5BmkITJS1K6XAoFbkhN6Qk=
 AllowedIPs = 10.200.200.3/32
 ```
 
-This configuration when run creates a new network interface on the machine.
+This configuration when run creates a new `wg0` network interface on the machine.
 
-* PrivateKey - the key that was generated, will be used to encrypt traffic
-* \# PublicKey - just a note, what is the public key of the private key
-* Address - IP address on the created wireguard interface network,
+**[Interface]** - section defining `wg0` wireguard interface
+* **PrivateKey** - the key that was generated, identifies the server,
+  will be used to encrypt packets
+* **\# PublicKey** - just a note, what is the public key of the private key
+* **Address** - IP address on the created wg0 network interface,
   `/24` defines its mask as `255.255.255.0`
-* ListenPort - port 
-* PostUp/PostDown - define what should be done after interface is turned on and off
-  in this case  firewall rules to let traffic through,
-  only ipv4 in this setup
-* [Peer] - section defining a peer, its public key
-* AllowedIPs - 
+* **ListenPort** - port on which wireguard connects to the internet, using UDP protocol 
+* **PostUp/PostDown** - section where one can define what should be done after
+  the interface is turned on or off.<br>
+  In this case forwarding traffic across the tunnel and enabling NAT for interface `enp0s25`
+  which you want to replace with your own<br>
+  This setup ipv4 only
+
+**[Peer]** - section defining a peers
+* **PublicKey** - public key of the peer
+* **AllowedIPs** - IP addresses that you want to reach at the other end of the tunnel.<br>
+  When `wg-quick` is run with these defined, a route is added in to the network stack
+  that makes sure that if something wants IP address defined here, it is send to `wg0`.<br>
+  Two peers can not have same IP set in there.<br>
+  In this case we want to define only single IP of the client as being accessible, allowed through.
 
 ### Start and enable the service
 
@@ -120,22 +132,38 @@ This configuration when run creates a new network interface on the machine.
 ```bash
 [Interface]
 PrivateKey = kGqwq/+xy8CISBLfOZVOa8Za02MRzg5bN3Ddcf5KV2M=
+# PublicKey = eVolUbiYj1kY8neKiDnA+NPB2hhCcsGs7LNIhMvUYj0=
 Address = 10.200.200.2/32
 
 [Peer]
 PublicKey = fuCKVQU+x/jukZq3WH5yorJ4mE665dkv2HKN/0mH5hQ=
-AllowedIPs = 10.200.200.0/24, 192.168.5.0/24
+AllowedIPs = 10.200.200.1/32, 192.168.5.0/24
 Endpoint = 63.123.113.495:51820
-PersistentKeepalive = 25
 ```
+
+**[Interface]** - section defining `wg0` wireguard interface
+* **PrivateKey** - private key of the peer
+* **\# PublicKey** - just a note, what is the public key of the private key
+* **Address** - IP address on the created wireguard network interface,
+  `/32` defines its mask as `255.255.255.255` - a single host
+
+**[Peer]** - section defining a peer, in this case server peer_A
+* **PublicKey** - public key of the server
+* **AllowedIPs** - IP addresses that you want to reach at the other end of the tunnel.<br>
+  When `wg-quick` is run with these defined, a route is added in to the network stack
+  that makes sure that if something wants IP address defined here, it is send to `wg0`.<br>
+  Two peers can not have same IP set in there.<br>
+  In this client case, we want to be able to communicate with the wireguard server,
+  so its IP is added, but also the entire local network at the end of the tunnel,
+  so its entire range is added.
+* **Endpoint** - public IP at which to find the WireGuard server across the internet
 
 ![windows-client](https://i.imgur.com/T5oA2No.png)
 
-
-
 # Troubleshooting
 
-
+* *can connct to the server, but not the LAN machines*<br>
+  make sure you set **your** network interface in PostUp/PostDown section on the server
 
 # Update
 
