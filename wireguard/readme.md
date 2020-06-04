@@ -1,7 +1,5 @@
 # WireGuard
 
-# Work in progress
-
 ###### guide-by-example
 
 ![logo](https://i.imgur.com/IRgkp2o.png)
@@ -39,7 +37,7 @@ Most of the stuff here is based on Arch wiki and
 # Installation
 
 ### on linux
-Install `wireguard-tools` or whatever is the equivalent in your distro.<br>
+Install `wireguard-tools` package, or whatever is the equivalent in your distro.<br>
 The package should provide two command line utilities
  
 * `wg` -  utility for configuration and management of WireGuard tunnel interfaces
@@ -165,6 +163,8 @@ Endpoint = 63.123.113.495:51820
 
 # Extra info
 
+* `sudo wg show`</br>
+shows current wireguard interface status, latest handshake, and parts of the configuration.
 * **PersistentKeepalive**<br>
 Set in clients `[Peer]` section to the number of seconds, `PersistentKeepalive = 25`<br>
 Used for specific case where clients need to communicate with other clients
