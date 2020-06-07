@@ -222,7 +222,7 @@ Monitoring and testing
 * if ssd, enable periodic trim</br>
   `sudo pacman -S util-linux`</br>
   `sudo systemctl enable --now fstrim.timer`
-* set noatime in fstab to prevent unnecessary keep of read times</br>
+* set noatime in fstab to prevent unnecessary tracking of read times</br>
   `sudo vim /etc/fstab`</br>
   *UUID=cdd..addb / ext4 rw,noatime 0 1*
 * enable use of all cpu cores for makepkg jobs and disable compression</br>
