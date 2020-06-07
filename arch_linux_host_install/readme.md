@@ -159,7 +159,7 @@ it's the fastest zsh framework and out of the box setup nicely
 
 * install zsh and curl packages</br>
   `sudo pacman -S zsh git curl`
-* install zim
+* install zim</br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 * change the default shell to zsh </br>
   `chsh -s /bin/zsh`
