@@ -8,7 +8,7 @@
 
 Linux that will run docker.
 
-This is not a hand hodling explaining guide how to install arch.</br>
+This is not a hand holding explaining guide how to install arch.</br>
 It's more of a checklist on what to do if you already done it
 and know what you are doing.</br>
 
@@ -53,7 +53,7 @@ So if theres boot menu option choose non-uefi.
   `vim /etc/pacman.d/mirrorlist` 
 * install the base system </br>
   `pacstrap /mnt base linux linux-firmware base-devel grub vim`
-* gnerate fstab</br>
+* generate fstab</br>
   `genfstab -U /mnt > /mnt/etc/fstab`
 * chroot in to the new system</br>
   `arch-chroot /mnt`
@@ -103,7 +103,7 @@ So if theres boot menu option choose non-uefi.
 
   No troublesome `systemd-resolved` in this setup.
 
-* uncomment desidred locales in locale.gen</br>
+* uncomment desired locales in locale.gen</br>
   `vim /etc/locale.gen`</br>
 * generate new locales and set one system wide</br>
   `locale-gen`</br>
@@ -155,7 +155,7 @@ From now on its login as non-root user.
 [wiki](https://wiki.archlinux.org/index.php/zsh)
 
 I like [Zim](https://github.com/zimfw/zimfw),
-it's the fastest zsh framework and out of the box setup nicely
+it's the fastest zsh framework and set up nicely out of the box
 
 * install zsh and curl packages</br>
   `sudo pacman -S zsh git curl`
@@ -232,7 +232,7 @@ Monitoring and testing
 * clean up old packages weekly, keep last 3</br>
   `sudo pacman -S pacman-contrib`</br>
   `sudo systemctl enable --now paccache.timer`
-* use reflector to get the fastes mirrors based on country `-c <country code>`</br>
+* use reflector to get the fastest mirrors based on country `-c <country code>`</br>
   `sudo pacman -S reflector`</br>
   `sudo reflector -l 200 -n 20 -c SK -c CZ -p http --sort rate --save /etc/pacman.d/mirrorlist`
 
