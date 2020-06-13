@@ -168,7 +168,8 @@ it's the fastest zsh framework and set up nicely out of the box
 
 `vim .zshrc`
 
-* `export EDITOR=vim`
+* `export EDITOR=vim`<br>
+  `export VISUAL=vim`
 
 * for ctrl+f prepending sudo
 
