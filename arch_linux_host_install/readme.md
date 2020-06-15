@@ -250,18 +250,16 @@ Monitoring and testing
 
 ### Notebook
 
-* [Source article](https://web.archive.org/web/20200615190407/https://mensfeld.pl/2018/08/ubuntu-18-04-disable-screen-on-lid-close/)
-* [Arch wiki](https://wiki.archlinux.org/index.php/Acpid)
-
 Lid closed should not make the machine go to sleep.
 
 * Set lid handle switch to ignore in systemd logind.conf<br>
   `sudo vim /etc/systemd/logind.conf`<br>
   *HandleLidSwitch=ignore*
 
-But this alone leaves the screen running.
+**But this alone leaves the screen running nonstop.**
 
-Tried to find solution, and while `vbetool dpms off` works,
-turning it back on does not `vbetool dpms on` and it timesout without error.
+Tried to find solution, and while `sudo vbetool dpms off` works,
+turning it back on does not `sudo vbetool dpms on` and it timesout without
+any message or error.
 
 Might be specific for the hardware, currently its latitude E5570
