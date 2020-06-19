@@ -115,7 +115,7 @@ So if theres boot menu option choose non-uefi.
   `hwclock --systohc --utc`<br>
   `timedatectl set-ntp true`
 * setup a swap file<br>
-  `fallocate -l 8G /swapfile`<br>
+  `dd if=/dev/zero of=/swapfile bs=1M count=8192 status=progress`
   `chmod 600 /swapfile`<br>
   `mkswap /swapfile`<br>
   `vim /etc/fstab`<br>
