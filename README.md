@@ -26,6 +26,10 @@ It's described in most details.
 
 # Some extra info
 
+You do need to have basic knowledge of docker and docker-compose,
+shit here is pretty hand holding and detailed but it still should not be
+your first time running a docker container.
+
 ### Caddy 
 
 When making changes to Caddyfile, the config needs to be reloaded afterwards.
@@ -40,10 +44,9 @@ Assuming container name is kept as `caddy`.
 When making changes use `docker-compose down` and `docker-compose up -d`,
 not just restart or stop/start.
 
-* You **do not** need to fuck with `docker-compose.yml` to get something up,
-simple copy paste should suffice.
-
-* You **do** need to fuck with `.env` file, that's where all the variables are.
+* you **do not** need to fuck with `docker-compose.yml` to get something up,
+simple copy paste should suffice
+* you **do** need to fuck with `.env` file, that's where all the variables are
   
 Often the `.env` file is used as `env_file`
 
