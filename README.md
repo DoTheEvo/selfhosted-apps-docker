@@ -24,11 +24,11 @@
 The core of the setup is Caddy reverse proxy.</br>
 It's described in most details.
 
-# Some extra info
-
-You do need to have basic knowledge of docker and docker-compose,
-shit here is pretty hand holding and detailed but it still should not be
+You do need to have **basic docker and docker-compose knowledge**,
+shit here is pretty hand holding and detailed, but it still should not be
 your first time running a docker container.
+
+# Some extra info
 
 ### Caddy 
 
