@@ -65,14 +65,19 @@ Often the `.env` file is used as `env_file`
 So a setup having `env_file: .env` in the compose mixes these two together.
 
 Benefit is that you do not need to make changes at multiple places,
-adding variable or changing its name in `.env` does not require
-to also go in to compose to add/change it there..</br>
+adding variable or changing a name in `.env` does not require
+to also go in to compose to add/change it there...</br>
 Also the compose file looks less cramped.
 
-Only issue is that **all** variables from `.env` are available in
-containers that use this `env_file: .env` method.</br>
-That can lead to potential issues if you try to use this approach elsewhere,
-universally.
+Only issue is that **all** variables from the `.env` file are available in
+all containers that use this `env_file: .env` method.</br>
+That can lead to potential issues if some containers picks up enviroment
+variable that is intented for a different container of the stack.
+
+This is tested and works in all setups here, but if you start to use this
+everywhere without understanding it, you can encounter unknown issues.
+So first troubleshooting step should be abandoning `.env` and write out 
+the variables directly in the compose file.
 
 ---
 
