@@ -62,6 +62,8 @@ Often the `.env` file is used as `env_file`
   Variables in this file will be available in the running container,
   but not during building of the container.
 
+So a setup having `env_file: .env` in the compose mixes these two together.
+
 Benefit is that you do not need to make changes at multiple places,
 adding variable or changing its name in `.env` does not require
 to also go in to compose to add/change it there..</br>
