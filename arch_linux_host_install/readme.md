@@ -110,7 +110,7 @@ So if theres boot menu option choose non-uefi.
   `localectl set-locale LANG=en_US.UTF-8`
 * select timezone and set it permanent<br>
   `tzselect`<br>
-  `timedatectl set-timezone 'Europebratislava'`
+  `timedatectl set-timezone 'Europe/Bratislava'`
 * set hardware clock and sync using ntp<br>
   `hwclock --systohc --utc`<br>
   `timedatectl set-ntp true`
