@@ -71,13 +71,13 @@ Also the compose file looks less cramped.
 
 Only issue is that **all** variables from the `.env` file are available in
 all containers that use this `env_file: .env` method.</br>
-That can lead to potential issues if some containers picks up enviroment
+That can lead to potential issues if a container picks up enviroment
 variable that is intented for a different container of the stack.
 
-This is tested and works in all setups here, but if you start to use this
-everywhere without understanding it, you can encounter unknown issues.
+In the setups here it works and is tested, but if you start to use this
+everywhere without understanding it, you can encounter issues.
 So first troubleshooting step should be abandoning `.env` and write out 
-the variables directly in the compose file.
+the variables directly in the compose file under containers that want them.
 
 ---
 
@@ -108,6 +108,8 @@ The configuration in `.env` files is almost universal, `apikey` is
 really the username, not some placeholder.
 Only the password(actual value of apikey) changes,
 which you generate in apikey section on SendGrid website.
+
+Though I heard complains lately that is not as easy as it was to register on SendGrid.
 
 ---
 
