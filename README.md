@@ -142,5 +142,4 @@ It is absofuckinglutely amazing in how simple yet effective it is.
 * quick managment, quick exec in to a container, check logs, stop it,...
 
 Written in Go, so its super fast and installation is trivial when it is a single binary,
-as likely your distro does not have in repos.
-If you use arch, like I do, its on AUR.
+as likely your distro does not have it in repos. If you use arch, like I do, its on AUR.
