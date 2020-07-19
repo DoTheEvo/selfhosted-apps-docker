@@ -18,7 +18,9 @@
 * [nextcloud](nextcloud/) - file share & sync
 * [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
+* [unifi](unifi/) - mangment utility for ubiquiti devices
 * [watchtower](watchtower/) - automatic docker images update
+* [wireguard](wireguard/) - the one and only VPN to ever consider
 * [arch_linux_host_install](arch_linux_host_install)
 
 The core of the setup is Caddy reverse proxy.</br>
@@ -32,7 +34,7 @@ your first time running a docker container.
 
 ### Caddy 
 
-When making changes to Caddyfile, the config needs to be reloaded afterwards.
+When making changes to `Caddyfile`, the config needs to be reloaded afterwards.
 
 On the docker host:<br>
 `docker exec -w /etc/caddy caddy caddy reload`
@@ -121,3 +123,23 @@ can get your public IP just from your domain name. Or 5 firewall rules that allo
 you to geoblock whole world except your country.
 
 [How to move to cloudflare.](https://support.cloudflare.com/hc/en-us/articles/205195708-Changing-your-domain-nameservers-to-Cloudflare)
+
+
+---
+
+### ctop
+
+[official site](https://github.com/bcicen/ctop)
+
+![ctop-look](https://i.imgur.com/nGAd1MQ.png)
+
+htop like utility for quick containers managment.
+
+It is absofuckinglutely amazing in how simple yet effective it is.
+
+* gives you hardware use overview, so you know which container use how much cpu, ram, bandwith, IO,...
+* gives you detailed info on container so you know IP, which ports are published, when it was created,..
+* allows quick managment - need to exec in to a container, need to see logs, need to stop it?
+
+Written in go, so its super fast and installing is easy, as likely your distro does not have in repos,
+if you use arch like I do its on AUR.
