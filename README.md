@@ -137,9 +137,10 @@ htop like utility for quick containers managment.
 
 It is absofuckinglutely amazing in how simple yet effective it is.
 
-* gives you hardware use overview, so you know which container use how much cpu, ram, bandwith, IO,...
-* gives you detailed info on container so you know IP, which ports are published, when it was created,..
-* allows quick managment - need to exec in to a container, need to see logs, need to stop it?
+* hardware use overview, so you know which container uses how much cpu, ram, bandwith, IO,...
+* detailed info on a container, it's IP, published and exposed ports, when it was created,..
+* quick managment, quick exec in to a container, check logs, stop it,...
 
-Written in go, so its super fast and installing is easy, as likely your distro does not have in repos,
-if you use arch like I do its on AUR.
+Written in Go, so its super fast and installation is trivial when it is a single binary,
+as likely your distro does not have in repos.
+If you use arch, like I do, its on AUR.
