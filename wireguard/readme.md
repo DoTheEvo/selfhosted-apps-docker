@@ -98,8 +98,7 @@ This configuration when run creates a new `wg0` network interface on the machine
   will be used to encrypt packets
 * **\# PublicKey** - just a note, what is the public key of the private key
 * **Address** - IP address on the created wg0 network interface,
-  can be whatever you want as long as it does not clash with other networks.
-  `/24` defines the mask as `255.255.255.0`
+  `/24` defines its mask as `255.255.255.0`
 * **ListenPort** - port on which wireguard connects to the internet, using UDP protocol 
 * **PostUp/PostDown** - section where one can define what should be done after
   the interface is turned on or off.<br>
@@ -107,13 +106,12 @@ This configuration when run creates a new `wg0` network interface on the machine
   which you want to replace with your own<br>
   This setup ipv4 only
 
-**[Peer]** - section defining a peers that will be able to connect
+**[Peer]** - section defining a peers
 * **PublicKey** - public key of the peer
 * **AllowedIPs** - IP addresses that you want to reach at the other end of the tunnel.<br>
-  When `wg-quick` is run with these defined, a route is added in to the machines
-  network stack that makes sure that if something wants IP address defined here,
-  it is send to `wg0`.<br>
-  Two peers can not have the same IP.<br>
+  When `wg-quick` is run with these defined, a route is added in to the network stack
+  that makes sure that if something wants IP address defined here, it is send to `wg0`.<br>
+  Two peers can not have same IP set in there.<br>
   In this case we want to define only single IP of the client as being accessible, allowed through.
 
 ### Start and enable the service
@@ -153,7 +151,7 @@ Endpoint = 63.123.113.495:51820
   Two peers can not have same IP set in there.<br>
   In this client case, we want to be able to communicate with the wireguard server,
   so its IP is added, but also the entire local network at the end of the tunnel,
-  so the entire range is added.
+  so its entire range is added.
 * **Endpoint** - public IP at which to find the WireGuard server across the internet
 
 ![windows-client](https://i.imgur.com/T5oA2No.png)
@@ -180,8 +178,8 @@ The generated crypto keys are used all over in configuration.
 Would it not be nice if at a simple glance
 you would immediatly know which peer they represent?
 
-Well, what if you generate few millions of keys and pick the ones
-that fit some rule of having a desired string somewhere in the first letters?
+Well, what if you generate few millions of keys and pick ones that fit some rule
+of having a desired string somewhere in the first 10 letters?
 
 [https://github.com/warner/wireguard-vanity-address](https://github.com/warner/wireguard-vanity-address)
 

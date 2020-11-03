@@ -12,7 +12,7 @@ Monitoring of the host and the running cointaners.
 * [Github](https://github.com/prometheus)
 * [DockerHub](https://hub.docker.com/r/prom/prometheus/)
 
-[Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
+[Good overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
 Everything here is based on the magnificent
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom),</br>
 So maybe just go get that.
@@ -21,7 +21,7 @@ So maybe just go get that.
 
 Prometheus is an open source system application used for monitoring and alerting.
 It collects metrics from configured targets at given intervals,
-exposes collected metrics for visualization, evaluates rule expressions,
+expose collected metrics for visualization, evaluates rule expressions,
 and can trigger alerts if some condition is observed to be true.
 
 Prometheus is relatively new project, it is a **pull type** monitoring
@@ -32,9 +32,9 @@ and consists of several components.
   * storing the metrics in a database and evaluating them
   * making metrics available through PromQL API
 * **Targets** - machines, services, applications that are monitored.</br>
-  These need to have an **exporter**.
+  These needs to have an **exporter**.
   *  **exporter** - a script or a service that gathers metrics on the target,
-     converts them to prometheus server format,
+     converts them for prometheus server format,
      and exposes them at an endpoint so they can be pulled
 * **AlertManager** - responsible for handling alerts from Prometheus Server,
   and sending notifications through email, slack, pushover,..

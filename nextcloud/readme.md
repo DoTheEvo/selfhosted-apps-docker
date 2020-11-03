@@ -4,13 +4,6 @@
 
 ![logo](https://i.imgur.com/VXSovC9.png)
 
-# notice
-
-current issue, [redis version 6.0](https://github.com/nextcloud/server/issues/21913)
-
-use `image: redis:5.0.9-alpine` instead of `image: redis`
-
-
 # Purpose & Overview
 
 File share & sync.
@@ -357,7 +350,7 @@ Assuming clean start.
 * start the containers: `docker-compose up -d`</br>
   let them run so they create the file structure
 * down the containers: `docker-compose down`
-* delete the directories `config`, `data`, `themes` in the freshly created
+* delete the directories `configs`, `data`, `themes` in the freshly created
   `nextcloud/nextcloud-data/`
 * from the backup of `/nextcloud/nextcloud-data/`, copy the directories
   `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud-data/`

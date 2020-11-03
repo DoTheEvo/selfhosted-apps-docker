@@ -12,9 +12,7 @@ Ubiquiti managment utility for wifi access points and other hardware.<br>
 * [Manual](https://dl.ui.com/guides/UniFi/UniFi_Controller_V5_UG.pdf)
 * [linuxserver github](https://github.com/linuxserver/docker-unifi-controller)
 
-UniFi is a web based managment software for Ubiquiti devices.</br>
-It is written in Java, utilizing the Spring Framework
-and using MongoDB as a database.
+UniFi is a web based managment software for Ubiquiti devices.<br>
 
 Docker image used here is provided by [linuxserver.io](https://www.linuxserver.io/)
 
