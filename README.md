@@ -18,17 +18,23 @@
 * [nextcloud](nextcloud/) - file share & sync
 * [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
+* [unifi](unifi/) - mangment utility for ubiquiti devices
 * [watchtower](watchtower/) - automatic docker images update
+* [wireguard](wireguard/) - the one and only VPN to ever consider
 * [arch_linux_host_install](arch_linux_host_install)
 
 The core of the setup is Caddy reverse proxy.</br>
 It's described in most details.
 
+You do need to have **basic docker and docker-compose knowledge**,
+shit here is pretty hand holding and detailed, but it still should not be
+your first time running a docker container.
+
 # Some extra info
 
 ### Caddy 
 
-When making changes to Caddyfile, the config needs to be reloaded afterwards.
+When making changes to `Caddyfile`, the config needs to be reloaded afterwards.
 
 On the docker host:<br>
 `docker exec -w /etc/caddy caddy caddy reload`
@@ -40,10 +46,9 @@ Assuming container name is kept as `caddy`.
 When making changes use `docker-compose down` and `docker-compose up -d`,
 not just restart or stop/start.
 
-* You **do not** need to fuck with `docker-compose.yml` to get something up,
-simple copy paste should suffice.
-
-* You **do** need to fuck with `.env` file, that's where all the variables are.
+* you **do not** need to fuck with `docker-compose.yml` to get something up,
+simple copy paste should suffice
+* you **do** need to fuck with `.env` file, that's where all the variables are
   
 Often the `.env` file is used as `env_file`
 
@@ -59,15 +64,22 @@ Often the `.env` file is used as `env_file`
   Variables in this file will be available in the running container,
   but not during building of the container.
 
+So a setup having `env_file: .env` in the compose mixes these two together.
+
 Benefit is that you do not need to make changes at multiple places,
-adding variable or changing its name in `.env` does not require
-to also go in to compose to add/change it there..</br>
+adding variable or changing a name in `.env` does not require
+to also go in to compose to add/change it there...</br>
 Also the compose file looks less cramped.
 
-Only issue is that **all** variables from `.env` are available in
-containers that use this `env_file: .env` method.</br>
-That can lead to potential issues if you try to use this approach elsewhere,
-universally.
+Only issue is that **all** variables from the `.env` file are available in
+all containers that use this `env_file: .env` method.</br>
+That can lead to potential issues if a container picks up enviroment
+variable that is intented for a different container of the stack.
+
+In the setups here it works and is tested, but if you start to use this
+everywhere without understanding it, you can encounter issues.
+So first troubleshooting step should be abandoning `.env` and write out 
+the variables directly in the compose file under containers that want them.
 
 ---
 
@@ -99,6 +111,8 @@ really the username, not some placeholder.
 Only the password(actual value of apikey) changes,
 which you generate in apikey section on SendGrid website.
 
+Though I heard complains lately that is not as easy as it was to register on SendGrid.
+
 ---
 
 ### Cloudflare
@@ -109,3 +123,23 @@ can get your public IP just from your domain name. Or 5 firewall rules that allo
 you to geoblock whole world except your country.
 
 [How to move to cloudflare.](https://support.cloudflare.com/hc/en-us/articles/205195708-Changing-your-domain-nameservers-to-Cloudflare)
+
+
+---
+
+### ctop
+
+[official site](https://github.com/bcicen/ctop)
+
+![ctop-look](https://i.imgur.com/nGAd1MQ.png)
+
+htop like utility for quick containers managment.
+
+It is absofuckinglutely amazing in how simple yet effective it is.
+
+* hardware use overview, so you know which container uses how much cpu, ram, bandwith, IO,...
+* detailed info on a container, it's IP, published and exposed ports, when it was created,..
+* quick managment, quick exec in to a container, check logs, stop it,...
+
+Written in Go, so its super fast and installation is trivial when it is a single binary,
+as likely your distro does not have it in repos. If you use arch, like I do, its on AUR.

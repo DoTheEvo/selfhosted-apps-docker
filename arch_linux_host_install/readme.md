@@ -8,10 +8,9 @@
 
 Linux that will run docker.
 
-This is not a hand hodling explaining guide how to install arch.</br>
+This is not a hand holding explaining guide how to install arch.<br>
 It's more of a checklist on what to do if you already done it
-and know what you are doing.</br>
-Google for plenty of tutorials and youtube videos alongside arch wiki.
+and know what you are doing.<br>
 
 * [Official site](https://www.archlinux.org/)
 * [Arch wiki install guide](https://wiki.archlinux.org/index.php/installation_guide)
@@ -39,48 +38,48 @@ The above command will fuck your machine up if you dunno what you are doing.
 # Boot from the usb
 
 This is BIOS/MBR setup as I am running on an old thinkpad with a busted screen,
-plus I like the simplicity of it.</br>
+plus I like the simplicity of it.<br>
 So if theres boot menu option choose non-uefi.
 
 # Installation 
 
-* create a single partition and mark it bootable</br>
+* create a single partition and mark it bootable<br>
   `cfdisk -z /dev/sda`
-* build ext4 filesystem on it</br>
+* build ext4 filesystem on it<br>
   `mkfs.ext4 /dev/sda1`
-* mount the new partition</br>
+* mount the new partition<br>
   `mount /dev/sda1 /mnt`
-* choose geographicly close mirror, `dd` deletes entire line in vim</br>
+* choose geographicly close mirror, `dd` deletes entire line in vim<br>
   `vim /etc/pacman.d/mirrorlist` 
-* install the base system </br>
+* install the base system <br>
   `pacstrap /mnt base linux linux-firmware base-devel grub vim`
-* gnerate fstab</br>
+* generate fstab<br>
   `genfstab -U /mnt > /mnt/etc/fstab`
-* chroot in to the new system</br>
+* chroot in to the new system<br>
   `arch-chroot /mnt`
-* install grub</br>
-  `grub-install /dev/sda`</br>
+* install grub<br>
+  `grub-install /dev/sda`<br>
   `grub-mkconfig -o /boot/grub/grub.cfg`
-* set password for root</br>
+* set password for root<br>
   `passwd`
-* remove the bootable media and restart the machine</br>
-  `exit`</br>
+* remove the bootable media and restart the machine<br>
+  `exit`<br>
   `reboot`
 
 # Basic configuration after the first boot
 
-* login as `root`</br>
-* set hostname</br>
+* login as `root`<br>
+* set hostname<br>
   `echo docker-host > /etc/hostname`
-* add new user and set their password</br>
-  `useradd -m -G wheel bastard`</br>
+* add new user and set their password<br>
+  `useradd -m -G wheel bastard`<br>
   `passwd bastard`
-* edit sudoers to allow users of the group wheel to sudo</br>
-  `EDITOR=vim visudo`</br>
+* edit sudoers to allow users of the group wheel to sudo<br>
+  `EDITOR=vim visudo`<br>
   *%wheel ALL=(ALL) ALL*
-* check the network interface name</br>
+* check the network interface name<br>
   `ip link`
-* set static IP using systemd-networkd and resolv.conf</br>
+* set static IP using systemd-networkd and resolv.conf<br>
   
   `vim /etc/systemd/network/20-wired.network`
   
@@ -104,24 +103,24 @@ So if theres boot menu option choose non-uefi.
 
   No troublesome `systemd-resolved` in this setup.
 
-* uncomment desidred locales in locale.gen</br>
-  `vim /etc/locale.gen`</br>
-* generate new locales and set one system wide</br>
-  `locale-gen`</br>
+* uncomment desired locales in locale.gen<br>
+  `vim /etc/locale.gen`<br>
+* generate new locales and set one system wide<br>
+  `locale-gen`<br>
   `localectl set-locale LANG=en_US.UTF-8`
-* select timezone and set it permanent</br>
-  `tzselect`</br>
+* select timezone and set it permanent<br>
+  `tzselect`<br>
   `timedatectl set-timezone 'Europe/Bratislava'`
-* set hardware clock and sync using ntp</br>
-  `hwclock --systohc --utc`</br>
+* set hardware clock and sync using ntp<br>
+  `hwclock --systohc --utc`<br>
   `timedatectl set-ntp true`
-* setup a swap file</br>
-  `fallocate -l 8G /swapfile`</br>
-  `chmod 600 /swapfile`</br>
-  `mkswap /swapfile`</br>
-  `vim /etc/fstab`</br>
+* setup a swap file<br>
+  `dd if=/dev/zero of=/swapfile bs=1M count=8192 status=progress`<br>
+  `chmod 600 /swapfile`<br>
+  `mkswap /swapfile`<br>
+  `vim /etc/fstab`<br>
   */swapfile none swap defaults 0 0*
-* reboot</br>
+* reboot<br>
   `reboot`
 
 # SSH, Docker, ZSH, AUR
@@ -132,23 +131,23 @@ From now on its login as non-root user.
 
 [wiki](https://wiki.archlinux.org/index.php/OpenSSH)
 
-* install openssh package</br>
+* install openssh package<br>
   `sudo pacman -S openssh`
-* edit sshd_config</br>
-  `sudo vim /etc/ssh/sshd_config`</br>
+* edit sshd_config<br>
+  `sudo vim /etc/ssh/sshd_config`<br>
   *PasswordAuthentication yes*
-* enable sshd service</br>
+* enable sshd service<br>
   `sudo systemctl enable --now sshd`
 
 ### Setup docker
 
 [Wiki](https://wiki.archlinux.org/index.php/docker)
 
-* have `docker` and `docker-compose` packages installed</br>
+* have `docker` and `docker-compose` packages installed<br>
   `sudo pacman -S docker docker-compose`
-* enable docker service</br>
+* enable docker service<br>
   `sudo systemctl enable --now docker`
-* add non-root user to the docker group</br>
+* add non-root user to the docker group<br>
   `sudo gpasswd -a bastard docker`  
 
 ### ZSH shell
@@ -156,20 +155,21 @@ From now on its login as non-root user.
 [wiki](https://wiki.archlinux.org/index.php/zsh)
 
 I like [Zim](https://github.com/zimfw/zimfw),
-it's the fastest zsh framework and out of the box setup nicely
+it's the fastest zsh framework and set up nicely out of the box
 
-* install zsh and curl packages</br>
+* install zsh and curl packages<br>
   `sudo pacman -S zsh git curl`
-* install zim, it changes users default shell to zsh</br>
+* install zim<br>
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
-* change the default shell to zsh </br>
+* change the default shell to zsh <br>
   `chsh -s /bin/zsh`
 
 ##### Adding stuff to .zshrc
 
 `vim .zshrc`
 
-* `export EDITOR=vim`
+* `export EDITOR=vim`<br>
+  `export VISUAL=vim`
 
 * for ctrl+f prepending sudo
 
@@ -191,19 +191,24 @@ For zim it's "Without oh-my-zsh shell" section.
 
 Using [Yay](https://github.com/Jguer/yay).
 
-* install git package</br>
+* install git package<br>
   `sudo pacman -S git`
-* install yay</br>
-  `git clone https://aur.archlinux.org/yay-bin.git`</br>
-  `cd yay-bin && makepkg -si`</br>
-  `cd .. && rm -rf yay-bin`</br>
+* install yay<br>
+  `git clone https://aur.archlinux.org/yay-bin.git`<br>
+  `cd yay-bin && makepkg -si`<br>
+  `cd .. && rm -rf yay-bin`<br>
 
 `ctop-bin` and `inxi` are good AUR packages.
 
 # Extra stuff
 
-[wiki - general general recommendations](https://wiki.archlinux.org/index.php/general_recommendations)</br>
-[wiki - improving performance](https://wiki.archlinux.org/index.php/Improving_performance)</br>
+[wiki - general general recommendations](https://wiki.archlinux.org/index.php/general_recommendations)<br>
+[wiki - improving performance](https://wiki.archlinux.org/index.php/Improving_performance)<br>
+
+### CPU [microcode](https://wiki.archlinux.org/index.php/Microcode)
+
+* `sudo pacman -S intel-ucode`
+* `sudo grub-mkconfig -o /boot/grub/grub.cfg`
 
 ### Some packages
 
@@ -217,35 +222,44 @@ Monitoring and testing
 
 ### Performance and maintenance
 
-* install cron and enable the service</br>
-  `sudo pacman -S cronie`</br>
+* install cron and enable the service<br>
+  `sudo pacman -S cronie`<br>
   `sudo systemctl enable --now cronie`
-* if ssd, enable periodic trim</br>
-  `sudo pacman -S util-linux`</br>
+* if ssd, enable periodic trim<br>
+  `sudo pacman -S util-linux`<br>
   `sudo systemctl enable --now fstrim.timer`
-* set noatime in fstab to prevent unnecessary keep of read times</br>
-  `sudo vim /etc/fstab`</br>
+* set noatime in fstab to prevent unnecessary tracking of read times<br>
+  `sudo vim /etc/fstab`<br>
   *UUID=cdd..addb / ext4 rw,noatime 0 1*
-* enable use of all cpu cores for makepkg jobs and disable compression</br>
-  `sudo vim /etc/makepkg.conf`</br>
-  *MAKEFLAGS="-j$(nproc)"*</br>
+* enable use of all cpu cores for makepkg jobs and disable compression<br>
+  `sudo vim /etc/makepkg.conf`<br>
+  *MAKEFLAGS="-j$(nproc)"*<br>
   *PKGEXT='.pkg.tar'*
-* clean up old packages weekly, keep last 3</br>
-  `sudo pacman -S pacman-contrib`</br>
+* clean up old packages weekly, keep last 3<br>
+  `sudo pacman -S pacman-contrib`<br>
   `sudo systemctl enable --now paccache.timer`
-* use reflector to get the fastes mirrors based on country `-c <country code>`</br>
-  `sudo pacman -S reflector`</br>
+* use reflector to get the fastest mirrors based on country `-c <country code>`<br>
+  `sudo pacman -S reflector`<br>
   `sudo reflector -l 200 -n 20 -c SK -c CZ -p http --sort rate --save /etc/pacman.d/mirrorlist`
 
 ### Comfort
 
-* enable colors in pacman.conf</br>
-  `sudo vim /etc/pacman.conf`</br>
+* enable colors in pacman.conf<br>
+  `sudo vim /etc/pacman.conf`<br>
   *Color*
 
 ### Notebook
 
-* control power events, lid close for example</br>
-  `sudo vim /etc/systemd/logind.conf`</br>
+Lid closed should not make the machine go to sleep.
+
+* Set lid handle switch to ignore in systemd logind.conf<br>
+  `sudo vim /etc/systemd/logind.conf`<br>
   *HandleLidSwitch=ignore*
 
+**But this alone leaves the screen running nonstop.**
+
+Tried to find solution, and while `sudo vbetool dpms off` works,
+turning it back on does not `sudo vbetool dpms on` and it timesout without
+any message or error.
+
+Might be specific for the hardware, currently its latitude E5570
