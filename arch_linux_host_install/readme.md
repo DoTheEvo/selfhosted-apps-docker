@@ -79,8 +79,9 @@ So if theres boot menu option choose non-uefi.
   *%wheel ALL=(ALL) ALL*
 * check the network interface name<br>
   `ip link`
-* set static IP using systemd-networkd and resolv.conf<br>
-  
+* setup networking using systemd-networkd and systemd-resolved<br>
+  create `20-wired.network` file either in static or dhcp configuration
+
   `vim /etc/systemd/network/20-wired.network`
   
   ```
@@ -90,18 +91,27 @@ So if theres boot menu option choose non-uefi.
   [Network]
   Address=10.0.19.2/24
   Gateway=10.0.19.1
+  #DNS=8.8.8.8
   ```
 
-  `vim /etc/resolv.conf`
-
   ```
-  nameserver 8.8.8.8
-  nameserver 1.1.1.1
+  [Match]
+  Name=enp0s25
+
+  [Network]
+  DHCP=yes
   ```
 
-  `systemctl enable --now systemd-networkd`
+  for DNS resolution and hostname exposure using mDNS and LLMNR<br>
+  `systemd-resolved` will be used in stub mode</br>
+  by replacing `/etc/resolv.conf` with a link to `stub-resolv.conf`
 
-  No troublesome `systemd-resolved` in this setup.
+  `ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf`
+
+  enable the services
+  
+  * `systemctl enable --now systemd-resolved`
+  * `systemctl enable --now systemd-networkd`
 
 * uncomment desired locales in locale.gen<br>
   `vim /etc/locale.gen`<br>
