@@ -23,9 +23,7 @@
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [arch_linux_host_install](arch_linux_host_install)
 
-# How to self host various services.
-
-This is a guide on how to self host various services.
+# How to self host various services
 
 You do need to have **basic linux and basic docker-compose knowledge**,
 the shit here is pretty hand holding and detailed, but it still should not be
@@ -36,9 +34,9 @@ a certain format is followed
 * **Purpose & Overview** - basic overview and intented use
 * **Files and directory structure** - lists all the files/folder involved
  and their placement
-* **docker-compose** - the recipe how to build a container, with .env file too
-* **Reverse proxy** - reverse proxy specific settings, if the container has
- some webserver providing web interface
+* **docker-compose** - the recipe file how to build a container, with .env file too
+* **Reverse proxy** - reverse proxy specific settings, if a container has
+ a webserver providing web interface
 * **Update** - how to update the container, usually just running Watchtower
 * **Backup and restore** - of the entire container using borg backup
 * **Backup of just user data** - steps to backup databases and other user data
