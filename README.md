@@ -132,7 +132,6 @@ you to geoblock whole world except your country.
 
 [How to move to cloudflare.](https://support.cloudflare.com/hc/en-us/articles/205195708-Changing-your-domain-nameservers-to-Cloudflare)
 
-
 ---
 
 ### ctop
@@ -152,6 +151,8 @@ It is absofuckinglutely amazing in how simple yet effective it is.
 Written in Go, so its super fast and installation is trivial when it is a single binary,
 as likely your distro does not have it in repos. If you use arch, like I do, its on AUR.
 
+
+---
 
 ### other guides
 
