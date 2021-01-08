@@ -91,7 +91,7 @@ the variables directly in the compose file only under containers that want them.
 
 ---
 
-### Images latest tag
+### Docker images latest tag
 
 All images are without any tag, which defaults to `latest` tag being used.</br>
 This is [frowned upon](https://vsupalov.com/docker-latest-tag/),
@@ -126,7 +126,7 @@ Though I heard complains lately that is not as easy as it was to register on Sen
 ### Cloudflare
 
 For managing DNS records. The free tier provides lot of managment options and 
-benefits. Like proxy between your domain/subdomain and your server, so no one
+benefits. Like proxy between your domain and your server, so no one
 can get your public IP just from your domain name. Or 5 firewall rules that allow
 you to geoblock whole world except your country.
 
@@ -151,3 +151,22 @@ It is absofuckinglutely amazing in how simple yet effective it is.
 
 Written in Go, so its super fast and installation is trivial when it is a single binary,
 as likely your distro does not have it in repos. If you use arch, like I do, its on AUR.
+
+
+### other guides
+
+[StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)
+    - got inspired and wrote in similar way setup for various services
+
+* Heimdall - Another Homepage Dashboard
+* FreePBX+Asterisk - VOIP & telephony server
+* Mumble - Voice Chat Before Discord Days
+* PureFTPd - FTP server
+* qBit+windscribe - Torrent Client w/ Windscribe VPN
+* Rocket.chat - Discord / Slack Clone
+* ShinobiCCTV (Not Recommended) - CCTV NVR
+* Seafile - Cloud Drive
+* Ubiquiti UniFi Controller - Management Utility for Ubiquiti Devices
+* Wordpress - CMS / Website Hosting
+* Zoneminder - CCTV NVR
+
