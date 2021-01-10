@@ -12,6 +12,7 @@
 * [bitwarden_rs](bitwarden_rs/) - password manager
 * [bookstack](bookstack/) - notes and documentation
 * [borg_backup](borg_backup/) - backup utility
+* [ofelia](ofelia/) - job scheduler
 * [ddclient](ddclient/) - automatic DNS update
 * [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [homer](homer/) - homepage
