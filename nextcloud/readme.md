@@ -89,7 +89,7 @@ services:
       - ./nextcloud-data-db:/var/lib/mysql
 
   nextcloud-redis:
-    image: redis:alpine
+    image: redis:5.0.9-alpine
     container_name: nextcloud-redis
     hostname: nextcloud-redis
     restart: unless-stopped
