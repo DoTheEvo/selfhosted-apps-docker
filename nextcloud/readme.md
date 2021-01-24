@@ -4,13 +4,6 @@
 
 ![logo](https://i.imgur.com/VXSovC9.png)
 
-# notice
-
-current issue, [redis version 6.0](https://github.com/nextcloud/server/issues/21913)
-
-use `image: redis:5.0.9-alpine` instead of `image: redis`
-
-
 # Purpose & Overview
 
 File share & sync.
@@ -187,6 +180,12 @@ upstream php-handler {
 **All containers must be on the same network**.</br>
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
+
+# notice
+
+current issue, [redis version 6.0](https://github.com/nextcloud/server/issues/21913)
+
+Therefore `image: redis:5.0.9-alpine` is used instead of `image: redis` like with the rest.
 
 # Reverse proxy
 
