@@ -49,10 +49,10 @@ So if theres boot menu option choose non-uefi.
   `mkfs.ext4 /dev/sda1`
 * mount the new partition<br>
   `mount /dev/sda1 /mnt`
-* choose geographicly close mirror, `dd` deletes entire line in vim<br>
-  `vim /etc/pacman.d/mirrorlist` 
+* choose geographicly close mirror<br>
+  `micro /etc/pacman.d/mirrorlist` 
 * install the base system <br>
-  `pacstrap /mnt base linux linux-firmware base-devel grub vim`
+  `pacstrap /mnt base linux linux-firmware base-devel grub micro`
 * generate fstab<br>
   `genfstab -U /mnt > /mnt/etc/fstab`
 * chroot in to the new system<br>
@@ -75,14 +75,14 @@ So if theres boot menu option choose non-uefi.
   `useradd -m -G wheel bastard`<br>
   `passwd bastard`
 * edit sudoers to allow users of the group wheel to sudo<br>
-  `EDITOR=vim visudo`<br>
+  `EDITOR=micro visudo`<br>
   *%wheel ALL=(ALL) ALL*
 * check the network interface name<br>
   `ip link`
 * setup networking using systemd-networkd and systemd-resolved<br>
   create `20-wired.network` file either in static or dhcp configuration
 
-  `vim /etc/systemd/network/20-wired.network`
+  `micro /etc/systemd/network/20-wired.network`
   
   ```
   [Match]
@@ -114,7 +114,7 @@ So if theres boot menu option choose non-uefi.
   * `systemctl enable --now systemd-networkd`
 
 * uncomment desired locales in locale.gen<br>
-  `vim /etc/locale.gen`<br>
+  `micro /etc/locale.gen`<br>
 * generate new locales and set one system wide<br>
   `locale-gen`<br>
   `localectl set-locale LANG=en_US.UTF-8`
@@ -128,7 +128,7 @@ So if theres boot menu option choose non-uefi.
   `dd if=/dev/zero of=/swapfile bs=1M count=8192 status=progress`<br>
   `chmod 600 /swapfile`<br>
   `mkswap /swapfile`<br>
-  `vim /etc/fstab`<br>
+  `micro /etc/fstab`<br>
   */swapfile none swap defaults 0 0*
 * reboot<br>
   `reboot`
@@ -144,7 +144,7 @@ From now on its login as non-root user.
 * install openssh package<br>
   `sudo pacman -S openssh`
 * edit sshd_config<br>
-  `sudo vim /etc/ssh/sshd_config`<br>
+  `sudo micro /etc/ssh/sshd_config`<br>
   *PasswordAuthentication yes*
 * enable sshd service<br>
   `sudo systemctl enable --now sshd`
@@ -176,10 +176,10 @@ it's the fastest zsh framework and set up nicely out of the box
 
 ##### Adding stuff to .zshrc
 
-`vim .zshrc`
+`micro .zshrc`
 
-* `export EDITOR=vim`<br>
-  `export VISUAL=vim`
+* `export EDITOR=micro`<br>
+  `export VISUAL=micro`
 
 * for ctrl+f prepending sudo
 
@@ -224,7 +224,7 @@ Using [Yay](https://github.com/Jguer/yay).
 
 Tools 
 
-* `sudo pacman -S fuse curl wget vim nnn bind-tools borg python-llfuse`
+* `sudo pacman -S fuse curl wget micro nnn bind-tools borg python-llfuse`
 
 Monitoring and testing
 
@@ -239,10 +239,10 @@ Monitoring and testing
   `sudo pacman -S util-linux`<br>
   `sudo systemctl enable --now fstrim.timer`
 * set noatime in fstab to prevent unnecessary tracking of read times<br>
-  `sudo vim /etc/fstab`<br>
+  `sudo micro /etc/fstab`<br>
   *UUID=cdd..addb / ext4 rw,noatime 0 1*
 * enable use of all cpu cores for makepkg jobs and disable compression<br>
-  `sudo vim /etc/makepkg.conf`<br>
+  `sudo micro /etc/makepkg.conf`<br>
   *MAKEFLAGS="-j$(nproc)"*<br>
   *PKGEXT='.pkg.tar'*
 * clean up old packages weekly, keep last 3<br>
@@ -255,7 +255,7 @@ Monitoring and testing
 ### Comfort
 
 * enable colors in pacman.conf<br>
-  `sudo vim /etc/pacman.conf`<br>
+  `sudo micro /etc/pacman.conf`<br>
   *Color*
 
 ### Notebook
@@ -263,7 +263,7 @@ Monitoring and testing
 Lid closed should not make the machine go to sleep.
 
 * Set lid handle switch to ignore in systemd logind.conf<br>
-  `sudo vim /etc/systemd/logind.conf`<br>
+  `sudo micro /etc/systemd/logind.conf`<br>
   *HandleLidSwitch=ignore*
 
 **But this alone leaves the screen running nonstop.**
