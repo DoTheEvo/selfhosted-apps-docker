@@ -25,7 +25,6 @@ all hosted on your local network.
 
 Caddy is a powerful, enterprise-ready, open source web server with automatic
 HTTPS written in Go.<br>
-
 Web servers are build to deal with http traffic, so they are an obvious choice
 for the function of reverse proxy.
 
@@ -34,8 +33,8 @@ In this setup Caddy is used mostly as
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and dealt with based on the settings in `Caddyfile`.
 
-Caddy with its build-in https and and sane config approach
-allows a simple config to just work.
+Caddy with its build-in https and and simple config approach
+allows even most trivial configs to just work:
     
 ```
 whatever.example.com {
