@@ -13,17 +13,20 @@
 IP address managment, LAN information and documentation tool.
 
 
+* [Official site](https://phpipam.net/)
 * [Github](https://github.com/phpipam/phpipam)
 * [DockerHub image used](https://hub.docker.com/r/phpipam/phpipam-www)
 
 IPAM is a universal term that stands for
 [IP Address Management](https://en.wikipedia.org/wiki/IP_address_management).<br>
 
-My exposure to it is very limited and at this moment 
-I only use it to keep track of used IP.
+phpIPAM is open source tool fullfilling this purpose.
+Coded in php and using mariadb for database.
+
+My exposure to it is limited and at this moment 
+So far use is just tracking of used IP.
 
 Can be used to keep inventory of IT hardware, or organization of server racks.
-
 
 # Files and directory structure
 
