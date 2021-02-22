@@ -30,7 +30,7 @@ You do need to have **basic linux and basic docker-compose knowledge**,
 the shit here is pretty hand holding and detailed, but it still should not be
 your first time running a docker container.
 
-a certain format is followed
+a certain format is followed in the services pages
 
 * **Purpose & Overview** - basic overview and intented use
 * **Files and directory structure** - lists all the files/folder involved

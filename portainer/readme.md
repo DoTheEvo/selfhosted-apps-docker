@@ -10,7 +10,7 @@ Web UI for overview and management of docker environment.
 
 * [Official site](https://www.portainer.io)
 * [Github](https://github.com/portainer/portainer)
-* [DockerHub image used](https://hub.docker.com/r/portainer/portainer/)
+* [DockerHub image used](https://hub.docker.com/r/portainer/portainer-ce/)
 
 Portainer is a lightweight management web UI, that allows to easily manage
 docker containers, networks, volumes, images,... the work.
@@ -45,7 +45,7 @@ version: '2'
 
 services:
   portainer:
-    image: portainer/portainer
+    image: portainer/portainer-ce
     container_name: portainer
     hostname: portainer
     command: -H unix:///var/run/docker.sock
