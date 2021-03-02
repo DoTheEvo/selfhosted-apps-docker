@@ -31,7 +31,7 @@ for the function of reverse proxy.
 In this setup Caddy is used mostly as
 [a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).<br> 
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
-and dealt with based on the settings in `Caddyfile`.
+and send to correct webserver based on the settings in `Caddyfile`.
 
 Caddy with its build-in https and and simple config approach
 allows even most trivial configs to just work:
