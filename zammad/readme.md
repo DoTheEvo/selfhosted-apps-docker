@@ -8,13 +8,12 @@
 
 Ticketing system.
 
-* [Official site](https://zammad.org/)
+* [Official site](https://zammad.org/screenshots)
 * [Github](https://github.com/zammad/zammad)
 * [DockerHub](https://hub.docker.com/r/zammad/zammad-docker-compose)
 
 Zammad is a modern, open source, good looking web base
-helpdesk/customer support system.
-
+helpdesk/customer support system.<br>
 Written in Ruby. This deployment uses PostgreSQL for database
 powered by elasticsearch, with nginx for web server.
 
@@ -69,10 +68,11 @@ This brings a lot of files and folders and everything is pre-prepared.<br>
 We are not touching the compose file.<br>
 Changes are done only to the `docker-compose.override.yml` and the `.env` file.
 
-In this case we override port, network and backup locations.<br>
-I prefer backups as bind mounts rather than volumes,
-which can get destroyed by simple `docker-compose down -v`
-that can popup in terminal history, if used before, and be run by accident.
+I prefer to store backups as bind mounts rather than volumes,
+as volumes can get destroyed by a simple `docker-compose down -v`
+that can popup in terminal history if used before, and be run by accident.
+
+So here we override backup locations and join it to reverse proxy network.<br>
 
 `docker-compose.override.yml`
 ```yml
@@ -132,11 +132,11 @@ ticket.{$MY_DOMAIN} {
 * Setup admin email and password.
 * Organization name and domain - System URL.
 * Email notifications, using smpt. It needs domain set,
-  wont work with just localhost
-* Setup email channel.
+  wont work with just localhost.
+* Setup email channel.<br>
   This should be an email address where any email received
   will create an unassgnied ticket in zammad and sender will be added to users.<br>
-  But even if it is not planned to use,
+  But even if it is not planned to be in use,
   it is [required](https://github.com/zammad/zammad/issues/2352) for sending
   email notifications using triggers. 
 
@@ -158,19 +158,20 @@ Basic setup and use
 # Update
 
 While [Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-might work for containers fine.
-I might prefer manual update, where it's basicly delete all, git clone new, and restore backups.
+might work for containers of the stack,
+might be prefered to just do backup and restore in a new git clone.
 
 # Backup and restore
 
 #### Backup
 
 Out of the box a container doing daily backups is running.
+Creating two files - backup of the database, and backup of the zammad files.
 By default these are saved to a docker volume, but in override it has been changed
-to bind mount in the zammad directory.
+to a bind mount in the zammad-docker-compose directory.
 
 So using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory will keep backups safe.<br>
+that makes daily snapshot of the entire \~/docker directory will keep backups safe.<br>
 
   
 #### Restore
@@ -178,43 +179,45 @@ that makes daily snapshot of the entire directory will keep backups safe.<br>
 * shutdown the stack and remove all named volumes
   `docker-compose down -v`
   Warning, by default the backups are in one of these volumes
-  be sure you cope them somewhere else before using `-v`
-* delete entire zammad directory containing the compose file and shit
+  be sure you copy them somewhere else before using `-v`
+* delete entire `zammad-docker-compose` directory containing the compose file and shit
 * git clone the repo for new installation
 * start it up,
-  `docker-compose up -d`
-  wait few minutes till everything finishes,
-  ctop, select nginx container, arrow left shows the log,
-  should be at - 'starting nginx...'
+  `docker-compose up -d` and wait few minutes till everything finishes,<br>
+  ctop, select nginx container, arrow left shows the log,<br>
+  should be at - "starting nginx..."
 * stop it all - `docker-compose down`
-* extract the database backup from `20210515183647_zammad_db.psql.gz`,
-  `gzip -dk 20210605053326_zammad_db.psql.gz`
-  rename it to something shorter like backup_db.psql
-  place it in to `/var/lib/docker/volumes/zammad-docker-compose_zammad-postgresql-data/_data/`
+* extract the database backup<br>
+  `gzip -dk 20210605053326_zammad_db.psql.gz`<br>
+  rename it to something shorter like backup_db.psql<br>
+  place it in to `/var/lib/docker/volumes/zammad-docker-compose_zammad-postgresql-data/_data/`<br>
+  I use nnn file manager as root.
 * start zammad-postgresql container
   `docker-compose up -d zammad-postgresql`
-* exec in to it `docker exec -it zammad-docker-compose_zammad-postgresql_1 bash`
-* test you can connect to the database `psql -U zammad`
-  quit `\q`
-* back in bash, drop the existing database `dropdb zammad_production -U zammad`
-* create new empty database `createdb zammad_production -U zammad`
-* restore data from backup in to it 
-  `psql zammad_production < /var/lib/postgresql/data/backup_db.psql -U zammad`
+* exec in to it `docker exec -it zammad-docker-compose_zammad-postgresql_1 bash`<br>
+  test you can connect to the database `psql -U zammad`<br>
+  quit `\q`<br>
+  back in bash, drop the existing database `dropdb zammad_production -U zammad`<br>
+  create a new empty database `createdb zammad_production -U zammad`<br>
+  restore data from backup in to it<br>
+  `psql zammad_production < /var/lib/postgresql/data/backup_db.psql -U zammad`<br>
   if you get some errors about already existing, you forgot to drop the database
 * exit and down the container
   `docker-compose down`
 * on docker host navigate to `/var/lib/docker/volumes/zammad-docker-compose_zammad-data/_data/`
   and delete everything there
-* extract 20210515183647_zammad_files.tar somewhere
-  `tar -xvpf 20210605053326_zammad_files.tar.gz`
-  copy content of opt/zammad/ containing - app, bin, config,...
-  in to /var/lib/...  where you previously deleted this stuff
-* start everything
+* extract zammad data somewhere<br>
+  `tar -xvpf 20210605053326_zammad_files.tar.gz`<br>
+  copy content of opt/zammad/ containing directories - app, bin, config,...<br>
+  in to /var/lib/...  where you previously deleted this stuff<br>
+  again, I use nnn file manager as root.
+* start everything<br>
+  `docker-compose up -d`
 * exec to rake container and run `rake searchindex:rebuild` to fix searching
 
 
-in case something is not working righ, check nginx logs,
-depending on how you copied the stuff, there could be ownership issue
-so in nginx check /opt/zammad and its content with `ls -al`
+In case something is not working right, check nginx logs.
+Depending on how you copied the stuff, there could be ownership issue
+so in nginx check /opt/zammad and its content with `ls -al`,
 if its owned by zammad user.
 if its root use `chown -R zammad:zammad /opt/zammad`
