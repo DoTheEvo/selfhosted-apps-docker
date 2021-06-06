@@ -135,7 +135,7 @@ ticket.{$MY_DOMAIN} {
   wont work with just localhost.
 * Setup email channel.<br>
   This should be an email address where any email received
-  will create an unassgnied ticket in zammad and sender will be added to users.<br>
+  will create an unassigned ticket in zammad and sender will be added to users.<br>
   But even if it is not planned to be in use,
   it is [required](https://github.com/zammad/zammad/issues/2352) for sending
   email notifications using triggers. 
@@ -147,19 +147,19 @@ ticket.{$MY_DOMAIN} {
 Basic setup and use
 
 * Zammad does not really like to show dropdown menus, whenever you are filling
-  information that should already be there,
-  you need to write first two characters for something to pop up.
+  up some text field where various entries should popup, like list of organizations,
+  you need to write first two characters for something to show up.
 * Create an organization.
 * Create a user as memember of this org. Give them email.
 * Check if there is a group in groups and if it has assigned email.
 * Test if creating a ticket will send notifications as expected.
-* Check triggers for lot of relevant options.
+* Check triggers for lot of relevant goodies.
 
 # Update
 
 While [Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
 might work for containers of the stack,
-might be prefered to just do backup and restore in a new git clone.
+might be preferable to just do backup and restore in a new git clone.
 
 # Backup and restore
 
@@ -170,7 +170,7 @@ Creating two files - backup of the database, and backup of the zammad files.
 By default these are saved to a docker volume, but in override it has been changed
 to a bind mount in the zammad-docker-compose directory.
 
-So using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+Additionaly using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
 that makes daily snapshot of the entire \~/docker directory will keep backups safe.<br>
 
   
@@ -179,10 +179,11 @@ that makes daily snapshot of the entire \~/docker directory will keep backups sa
 * shutdown the stack and remove all named volumes
   `docker-compose down -v`
   Warning, by default the backups are in one of these volumes
-  be sure you copy them somewhere else before using `-v`
+  be sure you have them somewhere safe before using `-v`
 * delete entire `zammad-docker-compose` directory containing the compose file and shit
-* git clone the repo for new installation
-* start it up,
+* git clone the repo,<br>
+  edit the override file and env file for your setup
+* start it all up
   `docker-compose up -d` and wait few minutes till everything finishes,<br>
   ctop, select nginx container, arrow left shows the log,<br>
   should be at - "starting nginx..."
@@ -213,7 +214,7 @@ that makes daily snapshot of the entire \~/docker directory will keep backups sa
   again, I use nnn file manager as root.
 * start everything<br>
   `docker-compose up -d`
-* exec to rake container and run `rake searchindex:rebuild` to fix searching
+* exec to rake container and run `rake searchindex:rebuild` to get search working again
 
 
 In case something is not working right, check nginx logs.
@@ -221,3 +222,4 @@ Depending on how you copied the stuff, there could be ownership issue
 so in nginx check /opt/zammad and its content with `ls -al`,
 if its owned by zammad user.
 if its root use `chown -R zammad:zammad /opt/zammad`
+and down and up the stack.
