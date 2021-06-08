@@ -82,6 +82,9 @@ services:
   zammad-nginx:
     ports:
       - "8080:8080"
+    environment:
+    - NGINX_SERVER_SCHEME=https
+    - RAILS_TRUSTED_PROXIES=['127.0.0.1', '::1', 'caddy']
 
   zammad-backup:
     volumes:
@@ -126,6 +129,27 @@ ticket.{$MY_DOMAIN} {
     reverse_proxy zammad-nginx:8080
 }
 ```
+
+Part of solving the situation when zammad is behind a proxy is accounting for
+a security measure where cookies are not accepted on a http connection
+by zammad's ngnix server.
+The secure TLS connection ends at caddy
+and then the communication between caddy and zammad's ngnix server is
+just plain http.<br>
+This will cause **CSRF token verification failed** when trying to log in to zammad.
+
+The way the [issue](https://github.com/zammad/zammad/issues/2829) is solved
+is adding two env variables to the compose override file, under nginx container.<br>
+These tell zammad's nginx server to use `https` scheme for X-Forwarded-Proto header,
+and to trust proxy server with hostname `caddy`.
+
+```yml
+environment:
+  - NGINX_SERVER_SCHEME=https
+  - RAILS_TRUSTED_PROXIES=['127.0.0.1', '::1', 'caddy']
+```
+
+This is just explanation, the lines are included in the override file.
 
 # First run
 
