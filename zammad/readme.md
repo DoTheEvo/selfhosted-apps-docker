@@ -72,7 +72,8 @@ I prefer to store backups as bind mounts rather than volumes,
 as volumes can get destroyed by a simple `docker-compose down -v`
 that can popup in terminal history if used before, and be run by accident.
 
-So here we override backup locations and join it to reverse proxy network.<br>
+So here we override backup location, set two env variables to fix reverse
+proxy, and join it to reverse proxy caddy network.<br>
 
 `docker-compose.override.yml`
 ```yml
