@@ -10,6 +10,7 @@ Ticketing system.
 
 * [Official site](https://zammad.org/screenshots)
 * [Github](https://github.com/zammad/zammad)
+* [Github zammad-docker-compose](https://github.com/zammad/zammad-docker-compose)
 * [DockerHub](https://hub.docker.com/r/zammad/zammad-docker-compose)
 
 Zammad is a modern, open source, good looking web base
@@ -150,7 +151,8 @@ environment:
   - RAILS_TRUSTED_PROXIES=['127.0.0.1', '::1', 'caddy']
 ```
 
-This is just explanation, the lines are included in the override file.
+This is just an explanation, no need to do anyting,
+the lines are included in the override file.
 
 # First run
 
