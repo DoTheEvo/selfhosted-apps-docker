@@ -466,7 +466,7 @@ whatever.{$MY_DOMAIN} {
 ### HSTS and redirects
 
 Here is an example of a redirect when wanting the common case of
-switching anyone that comes to A www subdomain to the naked domain.
+switching anyone that comes to a `www` subdomain to the naked domain.
 
 ```
 www.{$MY_DOMAIN} {
