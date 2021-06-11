@@ -465,7 +465,17 @@ whatever.{$MY_DOMAIN} {
 
 ### HSTS and redirects
 
-Running NextCloud behind any proxy likely shows few warning on its status page.
+Here is example of a redirect when wanting the common reddirect
+from www to naked domain.
+
+```
+www.{$MY_DOMAIN} {
+    redir https://{$MY_DOMAIN}{uri}
+}
+```
+
+Another example is running NextCloud behind any proxy,
+which likely shows few warning on its status page.
 It requires some redirects for service discovery to work and would like 
 if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.<br> 
 Like so:
