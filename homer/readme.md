@@ -23,9 +23,10 @@ The docker image uses darkhttpd simple web server on alpine linux.
         └── homer/
             ├── assets/
             │   └── tools/
+            │   └── config.yml
             ├── .env
-            ├── docker-compose.yml
-            └── config.yml
+            └── docker-compose.yml
+
 ```
 
 * `assets/` - a directory containing icons and other directories with icons
@@ -49,7 +50,7 @@ services:
     hostname: homer
     restart: unless-stopped
     volumes:
-      - ./config.yml:/www/config.yml:ro
+      - ./assets/config.yml:/www/config.yml:ro
       - ./assets/:/www/assets:ro
 
 networks:
