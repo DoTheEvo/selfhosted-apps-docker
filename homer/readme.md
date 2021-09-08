@@ -21,26 +21,26 @@ The docker image uses darkhttpd simple web server on alpine linux.
 └── ~/
     └── docker/
         └── homer/
+            ├── config.yml
             ├── assets/
             │   └── tools/
             ├── .env
-            ├── docker-compose.yml
-            └── config.yml
+            └── docker-compose.yml
 ```
 
+* `config.yml` - homer's configuration file 
 * `assets/` - a directory containing icons and other directories with icons
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the container
-* `config.yml` - homer's configuration file bind mounted in to the container
 
 All files and folders need to be provided.</br>
-`assets` direcotry is part of this repo.
+`assets` directory is part of this repo.
 
 # docker-compose
 
 `docker-compose.yml`
 ```yml
-version: "2"
+version: "3.7"
 services:
 
   homer:
@@ -49,7 +49,6 @@ services:
     hostname: homer
     restart: unless-stopped
     volumes:
-      - ./config.yml:/www/config.yml:ro
       - ./assets/:/www/assets:ro
 
 networks:
