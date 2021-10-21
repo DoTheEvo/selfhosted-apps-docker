@@ -75,7 +75,7 @@ services:
     image: mariadb
     container_name: nextcloud-db
     hostname: nextcloud-db
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --skip-innodb-read-only-compressed
     restart: unless-stopped
     env_file: .env
     volumes:
