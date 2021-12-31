@@ -19,8 +19,7 @@ IP address managment, LAN information and documentation tool.
 
 IPAM is a universal term that stands for
 [IP Address Management](https://en.wikipedia.org/wiki/IP_address_management).<br>
-
-phpIPAM is open source tool fullfilling this purpose.
+phpIPAM is an open source tool fullfilling this purpose.
 Coded in php and using mariadb for database.
 
 My exposure to it is limited and at this moment 
@@ -84,7 +83,7 @@ services:
 ```bash
 # GENERAL
 DOCKER_MY_NETWORK=caddy_net
-TZ=EuropeBratislava
+TZ=Europe/Bratislava
 
 IPAM_DATABASE_HOST=phpipam-mariadb
 IPAM_DATABASE_PASS=my_secret_phpipam_pass
