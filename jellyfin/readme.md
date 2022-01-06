@@ -1,44 +1,55 @@
-# Bookstack in docker
+# Jellyfin in docker
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/qDXwqaU.png)
+![logo](https://i.imgur.com/gSyMEvD.png)
 
 # Purpose & Overview
 
-Documentation and notes.
+WORK IN PROGRESS
+WORK IN PROGRESS
+WORK IN PROGRESS
 
-* [Official site](https://www.bookstackapp.com/)
-* [Github](https://github.com/BookStackApp/BookStack)
-* [DockerHub](https://hub.docker.com/r/linuxserver/bookstack)
+Stream movies, tv-shows, music to a browser, or a large selection of devices.
 
-BookStack is a modern, open source, good looking wiki platform
-for storing and organizing information and documentation.
+* [Official site](https://jellyfin.org/)
+* [Github](https://github.com/jellyfin/jellyfin)
+* [DockerHub](https://hub.docker.com/r/jellyfin/jellyfin/)
 
-Written in PHP, with MySQL database for the user data.</br>
-There is no official Dockerhub image so the one maintained by
-[linuxserver.io](https://www.linuxserver.io/) is used,
-which uses nginx as a web server.
+Jellyfin if a free media system, an alternative to proprietary Plex.
+
+The core server side is written in C#, web client in Javascript,
+and a number of other clients written in various languages and frameworks.
+
+Starting point for me was [this viggy96 repo](https://github.com/viggy96/container_config)
 
 # Files and directory structure
 
 ```
+/mnt/
+└── bigdisk/
+    ├── tv/
+    ├── movies/
+    └── music/
 /home/
 └── ~/
     └── docker/
-        └── bookstack/
-            ├── bookstack-data/
-            ├── bookstack-db-data/
+        └── jellyfin/
+            ├── jellyfin-cache/
+            ├── jellyfin-config/
+            ├── transcodes/
             ├── .env
             ├── docker-compose.yml
-            └── bookstack-backup-script.sh
+            └── jellyfin-backup-script.sh
 ```
 
-* `bookstack-data/` - a directory where bookstack will store its web app data
-* `bookstack-db-data/` - a directory where bookstack will store its MySQL database data
+* `/mnt/bigdisk/...` - a mounted media storage share
+* `jellyfin-cache/` - cache 
+* `jellyfin-config/` - configuration 
+* `transcodes/` - transcoded video storage
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
-* `bookstack-backup-script.sh` - a backup script if you want it
+* `jellyfin-backup-script.sh` - a backup script if you want it
 
 You only need to provide the files.</br>
 The directories are created by docker compose on the first run.
@@ -50,33 +61,31 @@ Dockerhub linuxserver/bookstack
 
 `docker-compose.yml`
 ```yml
-version: "2"
 services:
 
-  bookstack-db:
-    image: linuxserver/mariadb
-    container_name: bookstack-db
-    hostname: bookstack-db
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    hostname: jellyfin
     restart: unless-stopped
     env_file: .env
+    devices:
+      - /dev/dri
     volumes:
-      - ./bookstack-db-data:/config
-
-  bookstack:
-    image: linuxserver/bookstack
-    container_name: bookstack
-    hostname: bookstack
-    restart: unless-stopped
-    env_file: .env
-    depends_on:
-      - bookstack-db
-    volumes:
-      - ./bookstack-data:/config
+      - ./transcodes/:/transcodes
+      - ./jellyfin_config:/config
+      - ./jellyfin_cache:/cache
+      - /mnt/bigdisk/serialy:/media/video:ro
+      - /mnt/bigdisk/mp3/moje:/media/music:ro
+    expose:
+      - 8096
+    ports:
+      - 1900:1900/udp
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
@@ -85,32 +94,6 @@ networks:
 MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
-
-#LINUXSERVER.IO
-PUID=1000
-PGID=1000
-
-# BOOKSTACK-MARIADB
-MYSQL_ROOT_PASSWORD=bookstack
-MYSQL_DATABASE=bookstack
-MYSQL_USER=bookstack
-MYSQL_PASSWORD=bookstack
-
-# BOOKSTACK
-APP_URL=https://book.example.com
-DB_HOST=bookstack-db
-DB_USER=bookstack
-DB_PASS=bookstack
-DB_DATABASE=bookstack
-
-# USING SENDGRID FOR SENDING EMAILS
-MAIL_ENCRYPTION=SSL
-MAIL_DRIVER=smtp
-MAIL_HOST=smtp.sendgrid.net
-MAIL_PORT=465
-MAIL_FROM=book@example.com
-MAIL_USERNAME=apikey
-SMTP_PASSWORD=<sendgrid-api-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
@@ -124,8 +107,8 @@ Caddy v2 is used, details
 
 `Caddyfile`
 ```
-book.{$MY_DOMAIN} {
-    reverse_proxy bookstack:80
+jellyfin.{$MY_DOMAIN} {
+    reverse_proxy jellyfin:8096
 }
 ```
 
@@ -137,10 +120,46 @@ Default login: `admin@admin.com` // `password`
 
 ![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
-# Update
 
-[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically.
+# Specifics of my setup
+
+* no long term use yet
+* no gpu, so no experience with hw transcoding
+* media files are stored and shared on trunas scale VM
+ and mounted to the docker host using systemd mounts,
+ instead of fstab or autofs.
+
+  `/etc/systemd/system/mnt-bigdisk.mount`
+  ```ini
+  [Unit]
+  Description=12TB truenas mount
+
+  [Mount]
+  What=//10.0.19.19/Dataset-01
+  Where=/mnt/bigdisk
+  Type=cifs
+  Options=ro,username=ja,password=qq,file_mode=0700,dir_mode=0700,uid=1000
+  DirectoryMode=0700
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+   `/etc/systemd/system/mnt-bigdisk.automount`
+  ```ini
+  [Unit]
+  Description=myshare automount
+
+  [Automount]
+  Where=/mnt/bigdisk
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+  automount on boot - `sudo systemctl start mnt-bigdisk.automount`
+
+# Update
 
 Manual image update:
 
