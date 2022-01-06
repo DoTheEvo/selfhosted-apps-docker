@@ -6,18 +6,17 @@
 
 # Purpose & Overview
 
-WORK IN PROGRESS
-WORK IN PROGRESS
-WORK IN PROGRESS
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
 
-Stream movies, tv-shows, music to a browser, or a large selection of devices.
+Stream movies/tv-shows/music to a browser, or a [large selection of devices and services.](https://jellyfin.org/clients/) 
 
 * [Official site](https://jellyfin.org/)
 * [Github](https://github.com/jellyfin/jellyfin)
 * [DockerHub](https://hub.docker.com/r/jellyfin/jellyfin/)
 
-Jellyfin if a free media system, an alternative to proprietary Plex.
-
+Jellyfin if a free media system, an alternative to proprietary Plex.<br>
 The core server side is written in C#, web client in Javascript,
 and a number of other clients written in various languages and frameworks.
 
@@ -102,7 +101,7 @@ If one does not exist yet: `docker network create caddy_net`
 
 # Reverse proxy
 
-Caddy v2 is used, details
+Caddy is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 `Caddyfile`
