@@ -72,8 +72,8 @@ services:
       - /dev/dri
     volumes:
       - ./transcodes/:/transcodes
-      - ./jellyfin_config:/config
-      - ./jellyfin_cache:/cache
+      - ./jellyfin-config:/config
+      - ./jellyfin-cache:/cache
       - /mnt/bigdisk/serialy:/media/video:ro
       - /mnt/bigdisk/mp3/moje:/media/music:ro
     expose:
@@ -113,11 +113,8 @@ jellyfin.{$MY_DOMAIN} {
 
 # First run
 
-Default login: `admin@admin.com` // `password`
 
----
-
-![interface-pic](https://i.imgur.com/cN1GUZw.png)
+![interface-pic](https://i.imgur.com/pZMi6bb.png)
 
 
 # Specifics of my setup
@@ -125,7 +122,7 @@ Default login: `admin@admin.com` // `password`
 * no long term use yet
 * no gpu, so no experience with hw transcoding
 * media files are stored and shared on trunas scale VM
- and mounted to the docker host using systemd mounts,
+ and mounted directly on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
  instead of fstab or autofs.
 
   `/etc/systemd/system/mnt-bigdisk.mount`
@@ -156,7 +153,7 @@ Default login: `admin@admin.com` // `password`
   WantedBy=multi-user.target
   ```
 
-  automount on boot - `sudo systemctl start mnt-bigdisk.automount`
+  to automount on boot - `sudo systemctl start mnt-bigdisk.automount`
 
 # Update
 
@@ -182,60 +179,4 @@ that makes daily snapshot of the entire directory.
 
 # Backup of just user data
 
-Users data daily export using the
-[official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
-For bookstack it means database dump and backing up several directories
-containing user uploaded files.
-
-Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
-takes care of backing up the directories.
-So only database dump is needed.</br>
-The created backup sqlite3 file is overwritten on every run of the script,
-but that's ok since borg is making daily snapshots.
-
-#### Create a backup script
-
-Placed inside `bookstack` directory on the host
-
-`bookstack-backup-script.sh`
-```bash
-#!/bin/bash
-
-# CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
-docker container exec bookstack-db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
-```
-
-the script must be **executable** - `chmod +x bookstack-backup-script.sh`
-
-#### Cronjob
-
-Running on the host, so that the script will be periodically run.
-
-* `su` - switch to root
-* `crontab -e` - add new cron job</br>
-* `0 22 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh`</br>
-  runs it every day [at 22:00](https://crontab.guru/#0_22_*_*_*) 
-* `crontab -l` - list cronjobs to check
-
-# Restore the user data
-
-Assuming clean start, first restore the database before running the app container.
-
-* start only the database container: `docker-compose up -d bookstack-db`
-* copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack-db-data/`
-* restore the database inside the container</br>
-  `docker container exec --workdir /config bookstack-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql'`
-* now start the app container: `docker-compose up -d`
-* let it run so it creates its file structure
-* down the containers `docker-compose down`
-* in `bookstack/bookstack-data/www/`</br>
-  replace directories `files`,`images`,`uploads` and the file `.env`</br>
-  with the ones from the BorgBackup repository 
-* start the containers: `docker-compose up -d`
-* if there was a major version jump, exec in to the app container and run `php artisan migrate`</br>
-  `docker container exec -it bookstack /bin/bash`</br>
-  `cd /var/www/html/`</br>
-  `php artisan migrate`
-
-Again, the above steps are based on the 
-[official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)
+dont care
