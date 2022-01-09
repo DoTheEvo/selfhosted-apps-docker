@@ -144,7 +144,7 @@ jellyfin.{$MY_DOMAIN} {
    `/etc/systemd/system/mnt-bigdisk.automount`
   ```ini
   [Unit]
-  Description=myshare automount
+  Description=12TB truenas mount
 
   [Automount]
   Where=/mnt/bigdisk
