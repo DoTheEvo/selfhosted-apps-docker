@@ -55,8 +55,7 @@ The directories are created by docker compose on the first run.
 
 # docker-compose
 
-Dockerhub linuxserver/bookstack 
-[example compose.](https://hub.docker.com/r/linuxserver/bookstack)
+The media are mounted in read only mode.
 
 `docker-compose.yml`
 ```yml
@@ -141,7 +140,7 @@ jellyfin.{$MY_DOMAIN} {
   WantedBy=multi-user.target
   ```
 
-   `/etc/systemd/system/mnt-bigdisk.automount`
+  `/etc/systemd/system/mnt-bigdisk.automount`
   ```ini
   [Unit]
   Description=12TB truenas mount
