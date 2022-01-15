@@ -116,13 +116,30 @@ This configuration when run creates a new `wg0` network interface on the machine
   Two peers can not have the same IP.<br>
   In this case we want to define only single IP of the client as being accessible, allowed through.
 
+
+### ipv4 packet forwarding
+
+Without this you will be be able to connect,
+but your access will be only to the wireguard host.
+To have access to the entire network you need to enable packet forwarding.
+
+You can check current value `cat /proc/sys/net/ipv4/ip_forward`
+
+To permanently enable it create a file
+
+`/etc/sysctl.d/99-sysctl.conf`
+```bash
+net.ipv4.ip_forward=1
+```
+
+### NAT forwarding on the router
+
+Forward port 51820 to the machine running the wireguard server.
+
+
 ### Start and enable the service
 
 `sudo systemctl enable --now wg-quick@wg0`
-
-### Port forwarding
-
-Forward port 51820 to the machine running the wireguard server.
 
 # Configuration on clients
 
