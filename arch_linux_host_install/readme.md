@@ -274,7 +274,6 @@ Monitoring and testing
   `sudo micro /etc/pacman.conf`<br>
   *Color*
 
-
 ### Notebook
 
 Lid closed should not make the machine go to sleep.
