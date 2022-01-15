@@ -248,15 +248,33 @@ Monitoring and testing
 * clean up old packages weekly, keep last 3<br>
   `sudo pacman -S pacman-contrib`<br>
   `sudo systemctl enable --now paccache.timer`
+
 * use reflector to get the fastest mirrors based on country `-c <country code>`<br>
   `sudo pacman -S reflector`<br>
-  `sudo reflector -l 200 -n 20 -c SK -c CZ -p http --sort rate --save /etc/pacman.d/mirrorlist`
+  `sudo reflector -c SK,CZ,UA -p http --score 20 --sort rate --save /etc/pacman.d/mirrorlist`
+
+  automatic mirror update with reflector
+
+  `/etc/xdg/reflector/reflector.conf`
+  ```
+  --save /etc/pacman.d/mirrorlist
+  --protocol http
+  --country SK,CZ,UA
+  --score 20
+  --sort rate
+  ```
+
+  enable it, it will run weekly
+
+  `sudo systemctl enable --now reflector`
 
 ### Comfort
 
 * enable colors in pacman.conf<br>
   `sudo micro /etc/pacman.conf`<br>
   *Color*
+
+
 
 ### Notebook
 
