@@ -275,7 +275,6 @@ Monitoring and testing
   *Color*
 
 
-
 ### Notebook
 
 Lid closed should not make the machine go to sleep.
