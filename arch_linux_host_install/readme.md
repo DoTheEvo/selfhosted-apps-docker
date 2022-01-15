@@ -171,6 +171,8 @@ it's the fastest zsh framework and set up nicely out of the box
   `curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh`
 * change the default shell to zsh <br>
   `chsh -s /bin/zsh`
+* I prefer [steeef](https://github.com/zimfw/steeef) theme
+  `echo 'zmodule steeef' >> ~/.zimrc && zimfw install`
 
 ##### Adding stuff to .zshrc
 
