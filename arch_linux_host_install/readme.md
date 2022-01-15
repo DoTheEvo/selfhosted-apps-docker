@@ -266,7 +266,7 @@ Monitoring and testing
 
   enable it, it will run weekly
 
-  `sudo systemctl enable --now reflector`
+  `sudo systemctl enable --now reflector.timer`
 
 ### Comfort
 
