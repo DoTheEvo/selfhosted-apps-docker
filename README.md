@@ -157,18 +157,8 @@ as likely your distro does not have it in repos. If you use arch, like I do, its
 
 ### other guides
 
-[StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)
+* [StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)
     - got inspired and wrote in similar way setup for various services
-
-* Heimdall - Another Homepage Dashboard
-* FreePBX+Asterisk - VOIP & telephony server
-* Mumble - Voice Chat Before Discord Days
-* PureFTPd - FTP server
-* qBit+windscribe - Torrent Client w/ Windscribe VPN
-* Rocket.chat - Discord / Slack Clone
-* ShinobiCCTV (Not Recommended) - CCTV NVR
-* Seafile - Cloud Drive
-* Ubiquiti UniFi Controller - Management Utility for Ubiquiti Devices
-* Wordpress - CMS / Website Hosting
-* Zoneminder - CCTV NVR
+* [BaptisteBdn/docker-selfhosted-apps](https://github.com/BaptisteBdn/docker-selfhosted-apps)
+   - many services using traefik for reverse proxy
 
