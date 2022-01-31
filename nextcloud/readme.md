@@ -131,7 +131,7 @@ networks:
 # GENERAL
 MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
-TZ=Europe/Bratislava
+TZ=UTC
 
 # NEXTCLOUD-MARIADB
 MYSQL_ROOT_PASSWORD=nextcloud
