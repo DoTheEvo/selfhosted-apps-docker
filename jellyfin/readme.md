@@ -154,6 +154,19 @@ jellyfin.{$MY_DOMAIN} {
 
   to automount on boot - `sudo systemctl start mnt-bigdisk.automount`
 
+# Troubleshooting
+
+
+![error-pic](https://i.imgur.com/KQhmZTQ.png)
+
+*We're unable to connect to the selected server right now. Please ensure it is running and try again.*
+
+If you encounter this, 
+try open the url in browsers private window.
+
+If it works then clear the cookies in your browser.
+
+
 # Update
 
 Manual image update:
