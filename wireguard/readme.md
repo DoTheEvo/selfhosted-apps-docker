@@ -112,7 +112,7 @@ This configuration when run creates a new `wg0` network interface on the machine
 * **AllowedIPs** - IP addresses that you want to reach at the other end of the tunnel.<br>
   When `wg-quick` is run with these defined, a route is added in to the machines
   network stack that makes sure that if something wants IP address defined here,
-  it is send to `wg0`.<br>
+  it is send through the wireguard tunnel and not the default gateway.<br>
   Two peers can not have the same IP.<br>
   In this case we want to define only single IP of the client as being accessible, allowed through.
 
@@ -166,10 +166,10 @@ Endpoint = 63.123.113.495:51820
 * **PublicKey** - public key of the server
 * **AllowedIPs** - IP addresses that you want to reach at the other end of the tunnel.<br>
   When `wg-quick` is run with these defined, a route is added in to the network stack
-  that makes sure that if something wants IP address defined here, it is send to `wg0`.<br>
+  that makes sure that if something wants IP address defined here,
+  it is send through the wireguard tunnel and not the default gateway.<br>
   Two peers can not have same IP set in there.<br>
-  In this client case, we want to be able to communicate with the wireguard server,
-  so its IP is added, but also the entire local network at the end of the tunnel,
+  In this client case, we want to be able to communicate with the entire local network at the end of the tunnel,
   so the entire range is added.
 * **Endpoint** - public IP at which to find the WireGuard server across the internet
 
