@@ -152,7 +152,7 @@ Address = 10.200.200.2/32
 
 [Peer]
 PublicKey = fuCKVQU+x/jukZq3WH5yorJ4mE665dkv2HKN/0mH5hQ=
-AllowedIPs = 10.200.200.1/32, 192.168.5.0/24
+AllowedIPs = 192.168.5.0/24
 Endpoint = 63.123.113.495:51820
 ```
 
