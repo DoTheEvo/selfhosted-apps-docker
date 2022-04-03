@@ -161,9 +161,7 @@ jellyfin.{$MY_DOMAIN} {
 
 *We're unable to connect to the selected server right now. Please ensure it is running and try again.*
 
-If you encounter this, 
-try open the url in browsers private window.
-
+If you encounter this, try opening the url in browsers private window.<br>
 If it works then clear the cookies in your browser.
 
 

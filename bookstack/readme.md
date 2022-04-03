@@ -137,6 +137,10 @@ Default login: `admin@admin.com` // `password`
 
 ![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
+# Trouble shooting
+
+If after update you cant see edit tools. Clear cookies.
+
 # Update
 
 [Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)

@@ -64,7 +64,8 @@ Borg is likely in your linux repositories.
 `mkdir ~/borg`</br>
 `borg init --encryption=none ~/borg/docker_backup`
 
-Note the sudo. Borg commands should be run as root, so it can access everything.
+Note the lack of sudo for initialization, this allows regular user to browse it.
+But the script should be run as root to have full access.
 
 #### The backup script
 
@@ -141,23 +142,13 @@ but then non root user would not be able to enter the repo directory.
 
 ### Automatic execution
 
-Using [cron](https://wiki.archlinux.org/index.php/cron).
+Previously cron has been used, but decided to try systemd timers.
 
-**Make sure cron is installed and the service is running**</br> 
-`sudo systemctl status cronie`
-
-Create a cron job that executes the script
-[at 03:00](https://crontab.guru/#0_03_*_*_*) 
-
-* switch to root</br>
-  `su`
-* add new cron job</br>
-  `crontab -e`</br>
-  `0 3 * * * /home/bastard/borg/borg_backup.sh`
+[This](https://blog.andrewkeech.com/posts/170719_borg.html) is the source.
 
 
-`crontab -l` - list current cronjobs</br>
-`journalctl -u cronie` - cron history
+
+
 
 
 # Accessing the backup files
