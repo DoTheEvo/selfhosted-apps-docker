@@ -477,7 +477,8 @@ www.{$MY_DOMAIN} {
 Another example is running NextCloud behind proxy,
 which likely shows few warning on its status page.
 It requires some redirects for service discovery to work and would like 
-if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw) would be set.<br> 
+if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw)
+[2](https://www.youtube.com/watch?v=-MWqSD2_37E) would be set.<br> 
 Like so:
 
 ```

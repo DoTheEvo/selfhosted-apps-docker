@@ -106,12 +106,11 @@ Just want pretty graphs.
 
 `docker-compose.yml`
 ```yml
-version: '3'
 services:
 
   # MONITORING SYSTEM AND THE METRICS DATABASE
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.35.0
     container_name: prometheus
     hostname: prometheus
     restart: unless-stopped
@@ -121,19 +120,21 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=200h'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus_data:/prometheus
+    expose:
+      - 9090
     labels:
       org.label-schema.group: "monitoring"
 
   # WEB BASED UI VISUALISATION OF THE METRICS
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:8.4.5
     container_name: grafana
     hostname: grafana
     restart: unless-stopped
@@ -144,13 +145,16 @@ services:
       - GF_USERS_ALLOW_SIGN_UP
     volumes:
       - ./grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    expose:
+      - 3000
     labels:
       org.label-schema.group: "monitoring"
 
   # HOSTS METRICS COLLECTOR
   nodeexporter:
-    image: prom/node-exporter
+    image: prom/node-exporter:v1.3.1
     container_name: nodeexporter
     hostname: nodeexporter
     restart: unless-stopped
@@ -163,28 +167,35 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+    expose:
+      - 9100
     labels:
       org.label-schema.group: "monitoring"
 
   # DOCKER CONTAINERS METRICS COLLECTOR
   cadvisor:
-    image: google/cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.44.0
     container_name: cadvisor
     hostname: cadvisor
     restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro
+      - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+    expose:
+      - 3000
     labels:
       org.label-schema.group: "monitoring"
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
