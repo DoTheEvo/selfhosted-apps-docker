@@ -17,6 +17,7 @@
 * [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [homer](homer/) - homepage
 * [nextcloud](nextcloud/) - file share & sync
+* [jellyfin](jellyfin/) - video and music streaming
 * [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
 * [unifi](unifi/) - mangment utility for ubiquiti devices
