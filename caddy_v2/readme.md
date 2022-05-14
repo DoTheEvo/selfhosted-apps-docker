@@ -126,7 +126,6 @@ with the variables filled in.
 
 `docker-compose.yml`
 ```yml
-version: "3.7"
 services:
 
   caddy:
@@ -146,8 +145,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 * port 80 and 443 are pusblished for http and https
@@ -213,8 +212,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `nginx-compose.yml`
@@ -229,8 +228,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 ### - editing hosts file
 
@@ -338,7 +337,6 @@ But for this to work Caddy's compose file needs to have those ports **published*
 
 `docker-compose.yml`
 ```yml
-version: "3.7"
 services:
 
   caddy:
@@ -360,8 +358,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 With this setup, and assuming docker host at: `192.168.1.222`,
@@ -641,7 +639,6 @@ and `CLOUDFLARE_API_TOKEN` variable added.
 
 `docker-compose.yml`
 ```yml
-version: "3.7"
 services:
 
   caddy:
@@ -662,8 +659,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 
