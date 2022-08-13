@@ -87,9 +87,10 @@ The controller might see your APs during initial setup,
 but it can not adopt them before you set your docker host IP
 as `Override Inform Host`.
 
-* *Settings > System > Other Configuration section*<br>
+* *Settings > System > Other Configuration*<br>
   `Override Inform Host` check the Enable checbox<br>
-* Enter docker-host IP
+* enter docker-host IP
+* adopt devices
 
 # Reverse proxy
 
