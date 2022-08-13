@@ -139,7 +139,7 @@ services:
     environment:
       - MY_DOMAIN
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - ./data:/data
       - ./config:/config
 
@@ -283,6 +283,12 @@ There's also other possible issues, like bad port forwarding towards docker host
 *extra info:*<br>
 `docker exec -w /etc/caddy caddy caddy reload` reloads config
 if you made changes and want them to take effect.
+
+*extra info2:*<br>
+caddy can complain about formatting of the `Caddyfile`<br>
+this executed on the host will let caddy overwrite the Caddyfile with 
+correct formatting
+`docker exec -w /etc/caddy caddy caddy fmt -overwrite`  
 
 # Caddy more info and various configurations
 
