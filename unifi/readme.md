@@ -6,7 +6,7 @@
 
 # Purpose & Overview
 
-Ubiquiti managment utility for wifi access points and other hardware.<br>
+Ubiquiti managment software for wifi access points and other ubiquiti hardware.<br>
 
 * [Official site](https://www.ui.com/software/)
 * [Manual](https://dl.ui.com/guides/UniFi/UniFi_Controller_V5_UG.pdf)
@@ -42,46 +42,72 @@ The directory is created by docker compose on the first run.
 
 `docker-compose.yml`
 ```yml
-version: "2.1"
 services:
-  unifi-controller:
-    image: linuxserver/unifi-controller:LTS
+  unifi:
+    image: linuxserver/unifi-controller
     container_name: unifi
     hostname: unifi
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - ./config:/config
     ports:
+      - 8443:8443
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
-      - 8081:8081
-      - 8443:8443
-      - 8843:8843
-      - 8880:8880
-      - 6789:6789
-    volumes:
-      - ./config:/config
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+
+ networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
 ```bash
 # GENERAL
+DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 #LINUXSERVER.IO
 PUID=1000
 PGID=1000
-MEM_LIMIT=1024M #optional
+MEM_LIMIT=1024
+MEM_STARTUP=1024
 ```
 
-# Configuration
+# Adoption
 
-For adoption of APs when the controller runs on docker network:
+The controller might see your APs during initial setup,
+but it can not adopt them before you set your docker host IP
+as `Override Inform Host`.
 
-* *Settings > Controller > Controller Settings*<br>
-  `Controller Hostname/IP` **set to the IP of the docker host**,<br>
-  assuming it is on the same network as the APs
-*  **check** `Override inform host with controller hostname/IP`
+* *Settings > System > Other Configuration section*<br>
+  `Override Inform Host` check the Enable checbox<br>
+* Enter docker-host IP
+
+# Reverse proxy
+
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+
+`Caddyfile`
+```
+unifi.{$MY_DOMAIN} {
+        encode gzip
+        reverse_proxy unifi:8443 {
+                transport http {
+                        tls
+                        tls_insecure_skip_verify
+                }
+        }
+}
+```
 
 # Update
 
