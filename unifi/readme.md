@@ -62,7 +62,7 @@ services:
       - 6789:6789 #optional
       - 5514:5514/udp #optional
 
- networks:
+networks:
   default:
     name: $DOCKER_MY_NETWORK
     external: true
