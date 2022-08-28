@@ -98,7 +98,7 @@ This setup is written in august 2022<br>
 * [EssentialsX Spawn](https://essentialsx.net/downloads.html)
 
 Why the mods?<br>
-You want one server but you want people to be able to play creative or surival>
+You want one server but you want people to be able to play creative or surival?<br>
 Well you need `multiverse core`.<br>
 How do the people move between these worlds?<br>
 Well you need `multiverse portals` to be able to create a *lobby* world.<br>
@@ -109,8 +109,14 @@ but also remember the position in the worlds when entering portals?<br>
 Well you need the rest of that shit, EssentialsX and EssentialsX Spawn.<br>
 
 **Plugins installation** - place the downloaded jar files in to 
-  `~/docker/minecraft/minecraft-data/plugins`
+  `~/docker/minecraft/minecraft-data/plugins`<br>
 restart the server
+
+check if the plugins are loaded using command `plugins`
+
+How to setup the worlds 
+
+* 
 
 
 
