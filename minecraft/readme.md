@@ -80,10 +80,9 @@ ICON=https://i.imgur.com/cjwKzqi.png
 
 # Reverse proxy
 
-No need. There is no website managment.
-There is no accessing it through port 80 or 443.
-Just clients connecting through port 25565
-and that does not go through reverse proxy.
+No need.<br>
+There is no website managment. There is no accessing it through port 80 or 443.<br>
+Just clients connecting through port 25565 and that does not go through reverse proxy.<br>
 But you **must forwarded 25565** on your firewall to your docker host.
 
 # Plugins
