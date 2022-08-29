@@ -11,8 +11,7 @@ Open world building and surviving game.
 * [Official site](https://www.minecraft.net/en-us)
 * [Github](https://github.com/itzg/docker-minecraft-server)
 
-Minecraft is written in Java.
-
+Minecraft is written in Java.<br>
 [Purpur](https://purpurmc.org/docs/) version of the server
 is used in this setup along with few plugings,
 which allow to host multiple worlds on the same server.
@@ -83,7 +82,17 @@ ICON=https://i.imgur.com/cjwKzqi.png
 No need.<br>
 There is no website managment. There is no accessing it through port 80 or 443.<br>
 Just clients connecting through port 25565 and that does not go through reverse proxy.<br>
-But you **must forward port 25565** on your firewall to your docker host.
+But you **must forward port 25565** on your firewall to your docker host
+if you want it world accessible.
+
+# Domain 
+
+Setup a DNS record for you subdomain - `minecraft.example.com`
+Will work fine if using default port `25565`<br>
+If you would want to use different port, but also would prefer your users
+to not need to enter `minecraft.example.com:30108` then google 
+"minecraft srv record" and you should find some guides.<br>
+Setting like [this](https://i.imgur.com/hDhZQ.png) are mentioned.
 
 # Plugins
 
