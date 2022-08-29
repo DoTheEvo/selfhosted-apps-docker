@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/GYq1N1l.png)
+![logo](https://i.imgur.com/nTCa9ao.png)
 
 # Purpose & Overview
 
