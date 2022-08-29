@@ -182,6 +182,7 @@ if you have seed `mv create snow_world normal -s -5343926151482505487`
 * [luckperms](https://luckperms.net/download) - manage permissions of players
 * [holomobhealth](https://www.spigotmc.org/resources/holomobhealth-display-mob-health-damage-indicator-client-side-javascript-formatting.75975/) -
   see mobs health
+* [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) - dependancy of holomobhealth
 
 # Update
 
