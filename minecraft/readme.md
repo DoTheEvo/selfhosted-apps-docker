@@ -83,7 +83,7 @@ ICON=https://i.imgur.com/cjwKzqi.png
 No need.<br>
 There is no website managment. There is no accessing it through port 80 or 443.<br>
 Just clients connecting through port 25565 and that does not go through reverse proxy.<br>
-But you **must forwarded 25565** on your firewall to your docker host.
+But you **must forward port 25565** on your firewall to your docker host.
 
 # Plugins
 
@@ -100,24 +100,82 @@ Why the mods?<br>
 You want one server but you want people to be able to play creative or surival?<br>
 Well you need `multiverse core`.<br>
 How do the people move between these worlds?<br>
-Well you need `multiverse portals` to be able to create a *lobby* world.<br>
+Well you need `multiverse portals`.<br>
 Should they be able to bring stuff from one world to another? No?<br>
 Well you need `multiverse inventory`.<br>
 Should they spawn in lobby on connecting,
 but also remember the position in the worlds when entering portals?<br>
-Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.<br>
+Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.
 
 **Plugins installation** - place the downloaded jar files in to 
   `~/docker/minecraft/minecraft-data/plugins`<br>
 restart the server
 
+# The setup
+
 check if the plugins are loaded using command `plugins`
 
-How to setup the worlds 
+### creation of the worlds
 
-* 
+* check the worlds present - `mv list`<br>
+  these 3 existing worlds [world, nether, end] are grouped and interconnected
+  and will be used as the survival world
+* create a new world called **"creative_world"** - `mv create creative_world normal`
+* teleport to it - `mv tp creative_world`
+* switch mode to creative - `mvm set mode creative creative_world`
+* create a new world called **"lobby"** - `mv create lobby normal -t flat`
+* teleport to lobby world - `mv tp lobby`
+* remove monsters - `mvm set difficulty peaceful`
+* remove animals - `mv modify set animals false`
+* set adventure - `mvm set mode adventure`
+* **build 2 portals**, for survival and creative worlds
+* get worldedit axe using command - `mvp wand`
+* use left click and right click to select portal area<br>
+  after selecting it create a portal named portal1 with destination creative_world - 
+  `mvp create portal1 creative_world`
+* same thing with the axe for survival, with destination to "world" - 
+  `mvp create portal2 world`
+* you can check your portals configuration on server in `> plugins > multiverse-portals > config.yml`
+* if **non OP players** cant use portals execute - 
+  `mvp conf enforceportalaccess false` or `mv conf enforceaccess false`
+
+*bonus info*<br>
+if you have seed `mv create snow_world normal -s -5343926151482505487`
 
 
+### spawning in the worlds 
+* pick a spawn point in the lobby and set it with multiple commands
+* `setspawn`
+* `setworldspawn`
+* `mv setspawn`
+* edit the file in `> plugins > Essentials > config.yml`<br>
+  `setspawn-on-join: true`
+* you would think we are done with spawns, but nope, fuck you,
+  this all lets the game start in spawn location in the lobby world,
+  but when entering creative world you would be starting from its spawn,
+  instead of last position on exit. So... heres how to fix that.
+* this command for the inventory plugin makes the world remember last location
+  `mvinv toggle last_location`<br>
+  but with just that change the lobby world position is also remembered
+  and users end up spawning inside of portals instead of specific spawn
+* to fix that we set in `> plugins > multiverse-inventories > config.yml`
+  `optionals_for_ungrouped_worlds: false`<br>
+* but our lobby world is ungrouped, so we need to add it to a group
+  using command `mvinv group` and then following the instructions.
+  Writing the answers in to the console without slash, when it asks
+  about shares, giving `last_location` and ending with `@`<br>
+  [This](https://i.imgur.com/8yBh2Bz.png) could be helpful too,
+  but it feels like doing unnecessary steps
+* now you should have spawn point in lobby that is always the same,
+  while after entering portals you end up at your last location
+
+# Extra Plugins 
+
+* [AntiPopup](https://github.com/KaspianDev/AntiPopup) - 
+  if you dont want that stupid chat popup so thats AntiPopup.<br>
+* [luckperms](https://luckperms.net/download) - manage permissions of players
+* [holomobhealth](https://www.spigotmc.org/resources/holomobhealth-display-mob-health-damage-indicator-client-side-javascript-formatting.75975/) -
+  see mobs health
 
 # Update
 
