@@ -77,22 +77,21 @@ ICON=https://i.imgur.com/cjwKzqi.png
 
 ```
 
-# Reverse proxy
+# Port forwarding
 
-No need.<br>
-There is no website managment. There is no accessing it through port 80 or 443.<br>
-Just clients connecting through port 25565 and that does not go through reverse proxy.<br>
-But you **must forward port 25565** on your firewall to your docker host
-if you want it world accessible.
+You **must forward port 25565** on your firewall to your docker host
+if you want it world accessible.<br>
+Usually here is reverse proxy settings but there is no need here,
+nothing is trying to get in over port 80 or 443.
 
 # Domain 
 
-Setup a DNS record for you subdomain - `minecraft.example.com`
+Setup a DNS A-record for you subdomain - `minecraft.example.com`
 Will work fine if using default port `25565`<br>
 If you would want to use different port, but also would prefer your users
 to not need to enter `minecraft.example.com:30108` then google 
-"minecraft srv record" and you should find some guides.<br>
-Setting like [this](https://i.imgur.com/hDhZQ.png) are mentioned.
+"minecraft srv record" and you should find the correct settings.<br>
+Like [this one](https://i.imgur.com/hDhZQ.png).
 
 # Plugins
 
