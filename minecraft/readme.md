@@ -14,7 +14,8 @@ Open world building and surviving game.
 Minecraft is written in Java.<br>
 [Purpur](https://purpurmc.org/docs/) version of the server
 is used in this setup along with few plugings,
-which allow to host multiple worlds on the same server.
+which allow to host multiple worlds on the same server.<br>
+This setup is written in august 2022 with 1.19.2 being the latest build.
 
 # Files and directory structure
 
@@ -88,15 +89,12 @@ nothing is trying to get in over port 80 or 443.
 
 Setup a DNS A-record for you subdomain - `minecraft.example.com`
 Will work fine if using default port `25565`<br>
-If you would want to use different port, but also would prefer your users
+If you would want to use a different port, but also would prefer your users
 to not need to enter `minecraft.example.com:30108` then google 
-"minecraft srv record" and you should find the correct settings.<br>
+"minecraft srv record" and you should find correct settings.<br>
 Like [this one](https://i.imgur.com/hDhZQ.png).
 
 # Plugins
-
-This setup is written in august 2022<br>
-1.19.2 is the latest build
 
 * [multiverse core](https://dev.bukkit.org/projects/multiverse-core)
 * [multiverse portals](https://dev.bukkit.org/projects/multiverse-portals)
