@@ -15,6 +15,7 @@
 * [ddclient](ddclient/) - automatic DNS update
 * [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [homer](homer/) - homepage
+* [minecraft](minecraft/) - game server
 * [nextcloud](nextcloud/) - file share & sync
 * [jellyfin](jellyfin/) - video and music streaming
 * [portainer](portainer/) - docker management

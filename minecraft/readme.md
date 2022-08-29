@@ -181,7 +181,7 @@ if you have seed `mv create snow_world normal -s -5343926151482505487`
   if you dont want that stupid chat popup so thats AntiPopup.<br>
 * [luckperms](https://luckperms.net/download) - manage permissions of players
 * [holomobhealth](https://www.spigotmc.org/resources/holomobhealth-display-mob-health-damage-indicator-client-side-javascript-formatting.75975/) -
-  see mobs health
+  see mobs health, configured to see it for 30sec after hitting a mob
 * [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) - dependancy of holomobhealth
 
 # Update
