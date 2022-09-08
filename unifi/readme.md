@@ -81,17 +81,6 @@ MEM_LIMIT=1024
 MEM_STARTUP=1024
 ```
 
-# Adoption
-
-The controller might see your APs during initial setup,
-but it can not adopt them before you set your docker host IP
-as `Override Inform Host`.
-
-* *Settings > System > Other Configuration*<br>
-  `Override Inform Host` check the Enable checbox<br>
-* enter docker-host IP
-* adopt devices
-
 # Reverse proxy
 
 Caddy v2 is used, details
@@ -109,6 +98,24 @@ unifi.{$MY_DOMAIN} {
         }
 }
 ```
+
+# Adoption
+
+The controller might see your APs during initial setup,
+but it can not adopt them before you set your docker host IP
+as `Override Inform Host`.
+
+* *Settings > System > Other Configuration*<br>
+  `Override Inform Host` check the Enable checbox<br>
+* enter docker-host IP
+* adopt devices
+
+# Some Settings
+
+* Old interface > Wifi > advanced settings > disable "High Performance Devices"<br>
+  When enabled it forces devices to ignore 2ghz band which obviously causes problems at range. 
+  Fucking monstrous stupidity.
+
 
 # Update
 
