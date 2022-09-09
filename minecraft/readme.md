@@ -6,16 +6,21 @@
 
 # Purpose & Overview
 
-Open world building and surviving game.
+A game - open world, building, survival.
 
 * [Official site](https://www.minecraft.net/en-us)
-* [Github](https://github.com/itzg/docker-minecraft-server)
+* [itzg github](https://github.com/itzg/docker-minecraft-server)
 
 Minecraft is written in Java.<br>
-[Purpur](https://purpurmc.org/docs/) version of the server
-is used in this setup along with few plugings,
-which allow to host multiple worlds on the same server.<br>
-This setup is written in august 2022 with 1.19.2 being the latest build.
+This setup is using [itzg](https://github.com/itzg/docker-minecraft-server)
+maintend docker image. Specificly [Purpur](https://purpurmc.org/docs/)
+version which is fork of 
+[paper](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
+Few plugings are used which allow to host multiple worlds on the same server.<br>
+Also [docker-rcon-web-admin](https://github.com/itzg/docker-rcon-web-admin) 
+container is runnig to be able to do basic console tasks from web interface.
+
+This setup is written in september 2022 with 1.19.2 being the latest build.
 
 # Files and directory structure
 
@@ -29,9 +34,9 @@ This setup is written in august 2022 with 1.19.2 being the latest build.
             └── docker-compose.yml
 ```
 
-* `minecraft-data/` - a directory where bookstack will store its web app data
+* `minecraft-data/` - a directory where minecraft stores its data
 * `.env` - a file containing environment variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to run the containers
+* `docker-compose.yml` - a compose file, telling docker how to build containers
 
 You only need to provide the files.</br>
 The directory is created by docker compose on the first run.
@@ -51,8 +56,24 @@ services:
     stdin_open: true
     ports:
       - 25565:25565
+      - 8123:8123
     volumes:
       - ./minecraft-data:/data
+
+  rcon-web:
+    image: itzg/rcon
+    container_name: rcon-web
+    hostname: rcon-web
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - 4326:4326
+      - 4327:4327
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
@@ -62,7 +83,7 @@ MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
-# itzg specific
+# ITZG MINECRAFT SPECIFIC
 TYPE=PURPUR
 EULA=TRUE
 ONLINE_MODE=FALSE
@@ -76,14 +97,41 @@ ALLOW_NETHER=TRUE
 OVERRIDE_ICON=TRUE
 ICON=https://i.imgur.com/cjwKzqi.png
 
+# ITZG RCON WEB ADMIN SPECIFIC
+RWA_USERNAME: admin
+RWA_PASSWORD: admin
+RWA_ADMIN: "TRUE"
+RWA_RCON_HOST: minecraft
+# needs to match the password configured for the container, which is 'minecraft' by default
+RWA_RCON_PASSWORD: minecraft
+
 ```
 
 # Port forwarding
 
 You **must forward port 25565** on your firewall to your docker host
 if you want it world accessible.<br>
-Usually here is reverse proxy settings but there is no need here,
-nothing is trying to get in over port 80 or 443.
+
+# Reverse proxy
+
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+
+The minecraft server itself does not need this, but plugins do.
+
+First one is dynmap, to see real time map of the world.<br>
+Second one is for rcon web admin, to be able to quickly manage server from anywhere.
+
+`Caddyfile`
+```
+map.{$MY_DOMAIN} {
+    reverse_proxy minecraft:8123
+}
+
+rcon.{$MY_DOMAIN} {
+    reverse_proxy rcon-web:4326
+}
+```
 
 # Domain 
 
@@ -99,16 +147,19 @@ Like [this one](https://i.imgur.com/hDhZQ.png).
 * [multiverse core](https://dev.bukkit.org/projects/multiverse-core)
 * [multiverse portals](https://dev.bukkit.org/projects/multiverse-portals)
 * [multiverse inventory](https://dev.bukkit.org/projects/multiverse-inventories)
-* [EssentialsX](https://essentialsx.net/downloads.html)
+* [multiverse netherportals](https://dev.bukkit.org/projects/multiverse-netherportals/)
+* [EssentialsX](https://essentialsx.net/downloads.html) *(switch to stable tab)*
 * [EssentialsX Spawn](https://essentialsx.net/downloads.html)
 
-Why the mods?<br>
+Why the plugins?<br>
 You want one server but you want people to be able to play creative or surival?<br>
 Well you need `multiverse core`.<br>
 How do the people move between these worlds?<br>
 Well you need `multiverse portals`.<br>
 Should they be able to bring stuff from one world to another? No?<br>
 Well you need `multiverse inventory`.<br>
+Should the connecting of worlds with their nether be easy?<br>
+Well you need `multiverse netherportals`.<br>
 Should they spawn in lobby on connecting,
 but also remember the position in the worlds when entering portals?<br>
 Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.
@@ -180,9 +231,18 @@ if you have seed `mv create snow_world normal -s -5343926151482505487`
 * [AntiPopup](https://github.com/KaspianDev/AntiPopup) - 
   if you dont want that stupid chat popup so thats AntiPopup.<br>
 * [luckperms](https://luckperms.net/download) - manage permissions of players
-* [holomobhealth](https://www.spigotmc.org/resources/holomobhealth-display-mob-health-damage-indicator-client-side-javascript-formatting.75975/) -
-  see mobs health, configured to see it for 30sec after hitting a mob
-* [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) - dependancy of holomobhealth
+* [Action Bar Health](https://www.spigotmc.org/resources/action-bar-health.2661/)
+  - see mobs health when you fight them, `show on look` i set to false<br>
+  prefered the look of holomobhealth, but its dependancy ProtocolLib is only 
+  in beta now, and might be causing issues on my server, did not investigate thoroughly
+* [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/) - map 
+  of the world in web gui, real time. Default port 8123
+* [Chunky](https://www.spigotmc.org/resources/chunky.81534/) - pre-generates chunks
+  useful for dynmap to fill black patches
+* https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/
+
+
+
 
 # Update
 
