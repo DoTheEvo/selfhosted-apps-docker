@@ -12,9 +12,9 @@ IT inventory managment tool.
 * [Github](https://github.com/snipe/snipe-it)
 * [DockerHub](https://hub.docker.com/r/snipe/snipe-it/)
 
-Snipe-IT is a modern, open source, go-to asset managment tool.</br>
+Snipe-IT is a modern, open source, go-to asset managment tool with LDAP integration.</br>
 Written in PHP, using Laravel framework.
-This setup is using mariadb database for the data.</br>
+This setup is using mariadb database for storing the data.</br>
 Dockerhub image maintained by
 [linuxserver.io](https://docs.linuxserver.io/images/docker-snipe-it)
 is used.
