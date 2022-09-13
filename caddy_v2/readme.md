@@ -152,7 +152,7 @@ networks:
 * port 80 and 443 are pusblished for http and https
 * MY_DOMAIN variable is passed in to the container so that it can be used
   in `Caddyfile`
-* the `Caddyfile` is read-only bind-mounted from the docker host
+* the `Caddyfile` is bind-mounted from the docker host
 * directories `data` and `config` are bind mounted so that their content persists
 * the same network is joined as for all other containers
 
@@ -181,7 +181,7 @@ Can also be a wild card `*.example.com -> 104.17.436.89`
 The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
 So every docker container you spin should have hostname definied.<br>
-Commented out is the staging url for let's encrypt, useful for testing.
+Commented out is the staging url for let's encrypt.
 
 ### - Setup some docker containers
 

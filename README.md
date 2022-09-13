@@ -18,6 +18,7 @@
 * [minecraft](minecraft/) - game server
 * [nextcloud](nextcloud/) - file share & sync
 * [jellyfin](jellyfin/) - video and music streaming
+* [qbittorrent](qbittorrent/) - video and music streaming
 * [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
 * [unifi](unifi/) - mangment utility for ubiquiti devices

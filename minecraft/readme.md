@@ -119,7 +119,7 @@ Caddy v2 is used, details
 
 The minecraft server itself does not need this, but plugins do.
 
-First one is dynmap, to see real time map of the world.<br>
+First one is bluemap/dynmap, to see real time map of the world.<br>
 Second one is for rcon web admin, to be able to quickly manage server from anywhere.
 
 `Caddyfile`
