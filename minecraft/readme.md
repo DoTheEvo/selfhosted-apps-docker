@@ -230,18 +230,30 @@ if you have seed `mv create snow_world normal -s -5343926151482505487`
 
 * [AntiPopup](https://github.com/KaspianDev/AntiPopup) - 
   if you dont want that stupid chat popup so thats AntiPopup.<br>
-* [luckperms](https://luckperms.net/download) - manage permissions of players
 * [Action Bar Health](https://www.spigotmc.org/resources/action-bar-health.2661/)
-  - see mobs health when you fight them, `show on look` i set to false<br>
-  prefered the look of holomobhealth, but its dependancy ProtocolLib is only 
-  in beta now, and might be causing issues on my server, did not investigate thoroughly
+  - see mobs health when you fight them,
+  in config I set `show on look` to false<br>
+  I prefered the look of holomobhealth, but its dependancy ProtocolLib is only 
+  in beta at the moment, and might be causing issues on my server, did not investigate thoroughly
+* [Bluemap](https://www.spigotmc.org/resources/bluemap.83557/) - map 
+  of the world in web gui, real time.Default port 8100
+
+----------
+
+Something of this is causing server to ocasionally go to super high disk use
+and needs restart. Not just container, but entire VM. Will maybe investigate.
+
 * [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/) - map 
   of the world in web gui, real time. Default port 8123
 * [Chunky](https://www.spigotmc.org/resources/chunky.81534/) - pre-generates chunks
   useful for dynmap to fill black patches
-* https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/
+* [OpeNLogin](https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/)
+* [luckperms](https://luckperms.net/download) - manage permissions of players,
+  planned to use, not in use yet
 
+# Comamnds & settings
 
+* `/gamerule playersSleepingPercentage 1` - use bed whenever, sleep not dependant on other players
 
 
 # Update
