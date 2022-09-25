@@ -14,7 +14,7 @@ A game - open world, building, survival.
 Minecraft is written in Java.<br>
 This setup is using [itzg](https://github.com/itzg/docker-minecraft-server)
 maintend docker image. Specificly [Purpur](https://purpurmc.org/docs/)
-version which is fork of 
+version which is a fork of 
 [paper](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
 Few plugings are used which allow to host multiple worlds on the same server.<br>
 Also [docker-rcon-web-admin](https://github.com/itzg/docker-rcon-web-admin) 
@@ -55,17 +55,21 @@ services:
     tty: true
     stdin_open: true
     ports:
-      - 25565:25565
-      - 8123:8123
+      - 25565:25565     # minecraft server players connect
+      - 25575:25575     # rcon connection
+      - 8100:8100       # bluemap
+      - 8123:8123       # dynmap
     volumes:
       - ./minecraft-data:/data
 
-  rcon-web:
+  minecraft-rcon:
     image: itzg/rcon
-    container_name: rcon-web
-    hostname: rcon-web
+    container_name: minecraft-rcon
+    hostname: minecraft-rcon
     restart: unless-stopped
     env_file: .env
+    depends_on:
+      - minecraft
     ports:
       - 4326:4326
       - 4327:4327
@@ -94,16 +98,16 @@ MAX_MEMORY=3G
 MAX_PLAYERS=50
 ENABLE_COMMAND_BLOCK=TRUE
 ALLOW_NETHER=TRUE
-OVERRIDE_ICON=TRUE
 
 # ITZG RCON WEB ADMIN SPECIFIC
-RWA_USERNAME: admin
-RWA_PASSWORD: admin
-RWA_ADMIN: "TRUE"
-RWA_RCON_HOST: minecraft
-# needs to match the password configured for the container, which is 'minecraft' by default
-RWA_RCON_PASSWORD: minecraft
-
+RWA_ENV=TRUE
+RWA_USERNAME=admin
+RWA_PASSWORD=admin
+RWA_ADMIN=TRUE
+RWA_RCON_HOST=minecraft
+RWA_RCON_PASSWORD=minecraft
+RWA_WEBSOCKET_URL: "ws://rcon.example.com/ws"
+RWA_WEBSOCKET_URL_SSL: "wss://rcon.example.com/ws"
 ```
 
 # Port forwarding
