@@ -132,7 +132,8 @@ map.{$MY_DOMAIN} {
 }
 
 rcon.{$MY_DOMAIN} {
-    reverse_proxy rcon-web:4326
+  reverse_proxy /ws minecraft-rcon:4327
+  reverse_proxy minecraft-rcon:4326
 }
 ```
 
