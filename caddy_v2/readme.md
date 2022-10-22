@@ -46,8 +46,8 @@ And **just works** means fully works. No additional configuration needed
 for https redirect, or special services if target is not a container,
 or need to deal with load balancer, or need to add boilerplate headers
 for x-forward, or other extra work.<br>
-In short, it has sane out of box defaults fitting majority of uses and only
-some special casess with some extra desired functionality need extra work.
+In short, it has great out of the box defaults, fitting majority of uses
+and only some special casess with extra functionality need extra work.
 
 ![url](https://i.imgur.com/iTjzPc0.png)
 
