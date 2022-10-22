@@ -586,9 +586,7 @@ Benefit of using DNS challenge is that there is no need for your server
 to be reachable by the letsencrypt servers. Cant open ports or want to exclude
 entire world except your own country from being able to reach your server?
 DNS challange is what you want to use for https then.<br>
-It also allows for issuance of wildcard certificates.
-Though with the free Cloudflare tier, wildcard record is not proxied,
-so your public IP is exposed.<br>
+It also allows for issuance of wildcard certificates.<br>
 The drawback is a potential security issue, since you are creating a token
 that allows full control over your domain's DNS. You store this token somewhere,
 you are giving it to some application from dockerhub...
@@ -606,6 +604,18 @@ create a new API Token with two permsisions,
 * zone/dns/edit<br>
 
 Include all zones needs to be set.
+
+### - Edit .env file
+
+Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
+
+`.env`
+```
+MY_DOMAIN={$MY_DOMAIN}
+DOCKER_MY_NETWORK=caddy_net
+
+CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
+```
 
 ### - Create Dockerfile
 
@@ -626,18 +636,6 @@ RUN xcaddy build \
 FROM caddy:2.6.2
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-```
-
-### - Edit .env file
-
-Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
-
-`.env`
-```
-MY_DOMAIN={$MY_DOMAIN}
-DOCKER_MY_NETWORK=caddy_net
-
-CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
 ```
 
 ### - Edit docker-compose.yml
@@ -674,7 +672,7 @@ networks:
 
 ### - Edit Caddyfile
 
-Add global option acme_dns<br>
+Add global option `acme_dns`<br>
 or add `tls` directive to the site-blocks.
 
 `Caddyfile`
@@ -682,7 +680,6 @@ or add `tls` directive to the site-blocks.
 {
   acme_dns cloudflare {$CLOUDFLARE_API_TOKEN}
 }
-
 
 a.{$MY_DOMAIN} {
     reverse_proxy whoami:80
@@ -698,11 +695,10 @@ b.{$MY_DOMAIN} {
 
 ### - Wildcard certificate
 
-If theres preference for certificate to rule all subdomains.<br>
-But not apex/naked domain, thats separate.
-
+A one certificate to rule all subdomains. But not apex/naked domain, thats separate.<br>
 As shown in [the documentation](https://caddyserver.com/docs/caddyfile/patterns#wildcard-certificates),
-the subdomains must be moved under the wildcard site block.
+the subdomains must be moved under the wildcard site block and make use
+of host matching and handles.
 
 
 `Caddyfile`
