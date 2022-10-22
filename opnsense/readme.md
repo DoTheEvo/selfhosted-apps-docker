@@ -70,9 +70,7 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * 
 
 <details>
-    <summary><h3>https and subdomain</h3></summary>
-
-# https and subdomain
+    <summary><h1>https and subdomain</h1></summary>
 
 ### on cloudflare
 
