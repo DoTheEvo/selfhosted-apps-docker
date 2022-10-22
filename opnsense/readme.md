@@ -84,14 +84,14 @@ System > Firmware > Plugins
 
 Not really needed. More like an exercise.
 But hey, its extra protection from someone snooping
-whoes already on the LAN side I guess.
+who is already on the LAN side I guess.
 
 ### on cloudflare
 
 * create dns record `fw.example.com`
 * get user ID - its in the url when you are on cloudflare dashboard, looks like 0122db3h3824893914169c9c4f919747f
 * in My Profile >  Api Tokens > get Global API Key
-* in My Profile >  Api Tokens > create token that looks [like this](https://i.imgur.com/YWxgUiO.png)
+* in My Profile >  Api Tokens > create token that looks [like this](https://i.imgur.com/pRelkUu.png)
     * zone/zone/read
     * zone/dns/edit
     * include all zones
