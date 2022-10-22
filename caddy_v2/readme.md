@@ -42,12 +42,12 @@ jellyfin.{$MY_DOMAIN} {
 }
 ```
 
-And **just works** means fully work, no additional configuration needed 
+And **just works** means fully works. No additional configuration needed 
 for https redirect, or special services if target is not a container,
 or need to deal with load balancer, or need to add boilerplate headers
 for x-forward, or other extra work.<br>
 In short, it has sane out of box defaults fitting majority of uses and only
-some special casess with some extra desired functionality need extra configuration.
+some special casess with some extra desired functionality need extra work.
 
 ![url](https://i.imgur.com/iTjzPc0.png)
 
@@ -99,11 +99,11 @@ All the containers and Caddy must be on the same network.
 
 ### - Create .env file
 
-You want to change `{$MY_DOMAIN}` to your domain.
+You want to change `example.com` to your domain.
 
 `.env`
 ```bash
-MY_DOMAIN={$MY_DOMAIN}
+MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 ```
     
