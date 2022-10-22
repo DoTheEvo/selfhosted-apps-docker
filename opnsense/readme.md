@@ -121,7 +121,7 @@ who is already on the LAN side I guess.
 * Alternate Hostnames - add your fw.example.com
 * SSL Certificate -  pick from dropdown menu your certificate
 * apply changes
-* switch radio buttons at the top from http to https if its not already.
+* switch radio buttons at the top from http to https if its not already.<br>
   The previous steps should be done as opnsense will want to reload gui
 
 now from local LAN side one can access web gui with https://fw.example.com
@@ -132,6 +132,37 @@ and its an encrypted communication between the browser and the firewall
 <details>
 <summary><h1>Geoblock</h1></summary>
 
+Lock out the entire world from your network, except for your own country.
+Great security benefits, but if you dont use dns challange you might have issues
+with https certificates renewal and other stuff thats initiated connection
+from the outside.
 
+Following [the official documentation](https://docs.opnsense.org/manual/how-tos/maxmind_geo_ip.html)
 
+### on maxmind.com
+
+* register account on [maxmind.com](https://www.maxmind.com/en/geolite2/signup),
+  this will give access to info which IP ranges belong to which country
+* in the freshly created maxmind account generate new license
+* in this url replace `My_License_key` with your actual license key<br>
+  `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=My_License_key&suffix=zip`
+* paste it in browser, if its working it should download zip file with the IP info 
+
+### in opnsense
+
+* Firewall: Aliases: GeoIP tab - paste the url, click apply
+* switch to Aliases tab, create new geoip alias and select your own country<br>
+  [something like this](https://i.imgur.com/vu2slRd.png)
+* Firewall: Rules: WAN - create new rule<br>
+  block; source invert; source geoip alias we created;
+  enable log packets that are handled by this rule; add description<br>
+  [something like this](https://i.imgur.com/qi7sL9J.png)
+
+Observe it in action in Firewall: Log Files: Live View   
+
+If you host anything with a website you can test if its working by using
+opera build in vpn, or by using some
+[online web site testers](https://www.webpagetest.org/).
+Assuming you are not in the country from which these run their test.
+ 
 </details>
