@@ -21,7 +21,7 @@ and custom services built in Python.
 Can be installed on a physical server or in a virtual machine.
 
 <details>
-    <summary><h1>VMware ESXi</h1></summary>
+<summary><h1>VMware ESXi</h1></summary>
 
 This setup is running on the free version of ESXi 7.0 U3<br>
 
@@ -64,11 +64,13 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * click through installation leaving stuff at default except for password
 * done
 
+Afte the initial setup, install plugin `os-vmware`<br>
+System > Firmware > Plugins
+
 </details>
 
-
 <details>
-    <summary><h1>first login and basic setup</h1></summary>
+<summary><h1>First login and basic setup</h1></summary>
 
 * at the LAN ip login
 * click through wizzard, use 8.8.8.8 and 1.1.1.1 for DNS
@@ -78,47 +80,58 @@ Disconnect your current router and plug stuff in to the ESXi host.
 
 
 <details>
-    <summary><h1>https and subdomain</h1></summary>
+<summary><h1>Switch to https</h1></summary>
+
+Not really needed. More like an exercise.
+But hey, its extra protection from someone snooping
+whoes already on the LAN side I guess.
 
 ### on cloudflare
 
-* create dns record fw.<yourdomain>
-* get user ID - its in the url when you are on dashboard in cloudflare > workers, looks like 0122db3h4824893916169c9c4f919747f
+* create dns record `fw.example.com`
+* get user ID - its in the url when you are on cloudflare dashboard, looks like 0122db3h3824893914169c9c4f919747f
 * in My Profile >  Api Tokens > get Global API Key
 * in My Profile >  Api Tokens > create token that looks [like this](https://i.imgur.com/YWxgUiO.png)
+    * zone/zone/read
+    * zone/dns/edit
+    * include all zones
 
 ### in opnsense acme plugin
 
 * download acme plugin
-* Services: ACME Client: Accounts - create account with your email where notifications about certs can go
-* Services: ACME Client: Challenge Types - create new dns challange with info you gathered from cloudflare, looks something [like this](https://i.imgur.com/JryFSq4.png)
-* Services: ACME Client: Certificates - create new certificate, stuff is just picked from the drop down menus, [looks like this](https://i.imgur.com/uytzQ9F.png)
-* now check logs if request went through on its own, or just click small icon to force renew the certificate, in logs in matter of a minute there should be some either success or fail
+* Services: ACME Client: Accounts - create account with your email
+  where notifications about certs can go
+* Services: ACME Client: Challenge Types - create new dns challange with info
+  you gathered from cloudflare,
+  looks something [like this](https://i.imgur.com/bYZ6pTj.png)
+* Services: ACME Client: Certificates - create new certificate,
+  stuff is just picked from the drop down menus,
+  [looks like this](https://i.imgur.com/MC1kBCV.png)
+* now check logs if request went through on its own, or just click small icon
+  to force renew the certificate, in logs in matter of a minute
+  there should be some either success or fail
 
 ### in opnsense Services: Unbound DNS: General
 
-* add an override - so that the fw.whatever.org points to your local ip instead of going out, [looks like this](https://i.imgur.com/ZqIa0HN.png)
+* add an override - so that the fw.example.com points to your local ip
+  instead of going out, [looks like this](https://i.imgur.com/vqT9t3Y.png)
 
 ### in opnsense System: Settings: Administration
 
-*  Alternate Hostnames - add your fw.whatever.org
+* Alternate Hostnames - add your fw.example.com
 * SSL Certificate -  pick from dropdown menu your certificate
 * apply changes
-* switch radio buttons at the top from http to https if its not already. The previous steps should be done as opnsense will want to reload gui
+* switch radio buttons at the top from http to https if its not already.
+  The previous steps should be done as opnsense will want to reload gui
 
-now from local LAN side one can access web gui with https://fw.whatever.org and its an encrypted communication between the firewall and browser
+now from local LAN side one can access web gui with https://fw.example.com
+and its an encrypted communication between the browser and the firewall
 
 </details>
 
-# Update
+<details>
+<summary><h1>Geoblock</h1></summary>
 
 
-# Backup and restore
 
-#### Backup
-
-
-  
-#### Restore
-
-
+</details>
