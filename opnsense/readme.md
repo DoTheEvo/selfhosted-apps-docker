@@ -65,7 +65,7 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * click through installation leaving stuff at default except for password
 * done
 
-Afte the initial setup, install plugin `os-vmware`<br>
+After the initial setup, install plugin `os-vmware`<br>
 System > Firmware > Plugins
 
 </details>
