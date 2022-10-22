@@ -14,8 +14,8 @@
 
 Reverse proxy setup that allows hosting many services and access them
 based on the host name.<br>
-For example `nextcloud.example.com` takes you to your nextcloud file sharing,
-and `bitwarden.example.com` takes you to your password manager,
+For example `nextcloud.{$MY_DOMAIN}` takes you to your nextcloud file sharing,
+and `bitwarden.{$MY_DOMAIN}` takes you to your password manager,
 all hosted on your local network.
 
 * [Official site](https://caddyserver.com/v2)
@@ -37,11 +37,11 @@ Caddy with its build-in https and and simple config approach
 allows even most trivial configs to just work:
     
 ```
-whatever.example.com {
+whatever.{$MY_DOMAIN} {
   reverse_proxy server-blue:80
 }
 
-blabla.example.com {
+blabla.{$MY_DOMAIN} {
   reverse_proxy 192.168.1.20:80
 }
 ```
@@ -58,7 +58,7 @@ or machines on the network.
 * have some basic linux knowledge, create folders, create files, edit files, run scripts,...
 * have a docker host and some vague docker knowledge
 * have port 80 and 443 forwarded on the router/firewall to the docker host
-* have a domain, `example.com`, you can buy one for 2€ annually on namecheap
+* have a domain, `{$MY_DOMAIN}`, you can buy one for 2€ annually on namecheap
 * have corectly set type-A DNS records pointing at your public IP address,
   preferably using Cloudflare
 
@@ -96,11 +96,11 @@ All the containers and Caddy must be on the same network.
 
 ### - Create .env file
 
-You want to change `example.com` to your domain.
+You want to change `{$MY_DOMAIN}` to your domain.
 
 `.env`
 ```bash
-MY_DOMAIN=example.com
+MY_DOMAIN={$MY_DOMAIN}
 DOCKER_MY_NETWORK=caddy_net
 ```
     
@@ -176,7 +176,7 @@ b.{$MY_DOMAIN} {
 `a` and `b` are the subdomains, can be named whatever.
 For them to work they must have type-A DNS record
 pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.<br>
-Can also be a wild card `*.example.com -> 104.17.436.89`
+Can also be a wild card `*.{$MY_DOMAIN} -> 104.17.436.89`
 
 The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
@@ -236,8 +236,8 @@ networks:
 You are on your local network and you are likely running the docker host
 inside the same network.<br>
 If that's the case then shit will not work without editing the hosts file.<br> 
-Reason being that when you write that `a.example.com` in to your browser,
-you are asking google's DNS for `a.example.com` IP address.
+Reason being that when you write that `a.{$MY_DOMAIN}` in to your browser,
+you are asking google's DNS for `a.{$MY_DOMAIN}` IP address.
 It will give you your own public IP, and most routers/firewalls wont allow
 this loopback, where your requests should go out and then right back.
 
@@ -246,8 +246,8 @@ So just [edit](https://support.rackspace.com/how-to/modify-your-hosts-file/)
 adding whatever is the local IP of the docker host and the hostname:
 
 ```
-192.168.1.222     a.example.com
-192.168.1.222     b.example.com
+192.168.1.222     a.{$MY_DOMAIN}
+192.168.1.222     b.{$MY_DOMAIN}
 ```
 
 If it is just quick testing one can use Opera browser
@@ -580,24 +580,26 @@ bookstack.{$MY_DOMAIN} {
 
 This setup only works for Cloudflare.
 
-Benefit of using DNS challenge is being able to to use Let's Encrypt for HTTPS
-even with port 80/443 inaccessible from outside networks.
-
-Also allows for issuance of wildcard certificates.
+DNS challenge authenticates ownership of the domain by requesting that the owner
+puts a specific TXT record in to the domains DNS zone.<br>
+Benefit of using DNS challenge is that there is no need for your server
+to be reachable by the letsencrypt servers. Cant open ports or want to exclude
+entire world except your own country from being able to reach your server?
+DNS challange is what you want to use for https then.<br>
+It also allows for issuance of wildcard certificates.
 Though with the free Cloudflare tier, wildcard record is not proxied,
-so your public IP is exposed.
+so your public IP is exposed.<br>
+The drawback is a potential security issue, since you are creating a token
+that allows full control over your domain's DNS. You store this token somewhere,
+you are giving it to some application from dockerhub...
 
-It could be also useful in security,
-as Cloudflare offers 5 firewall rules in the free tier.
-Which means one can geoblock any traffic that is not from your own country.<br>
-But I assume Caddy's default HTTP challenge would be also blocked,
-so no certification renewal.<br>
-But with DNS challenge the communication is entirely between Let's Encrypt
-and Cloudflare servers.
+*note*: caddy uses a new [libdns](https://github.com/libdns/libdns/)
+golang library with [cloudflare package](https://github.com/libdns/cloudflare)
 
 ### - Create API token on Cloudflare
 
-On Cloudflare create a new API Token with two permsisions,
+[On Cloudflare](https://dash.cloudflare.com/profile/api-tokens)
+create a new API Token with two permsisions,
 [pic of it here](https://i.imgur.com/YWxgUiO.png)
 
 * zone/zone/read<br>
@@ -611,17 +613,17 @@ To add support, Caddy needs to be compiled with
 [Cloudflare DNS plugin](https://github.com/caddy-dns/cloudflare).<br>
 This is done by using your own Dockerfile, using the `builder` image.
 
-Create a directory `dns-dockerfile` in the caddy directory.<br>
+Create a directory `dockerfile-caddy` in the caddy directory.<br>
 Inside create a file named `Dockerfile`.
 
 `Dockerfile`
 ```Dockerfile
-FROM caddy:2.0.0-builder AS builder
+FROM caddy:2.6.2-builder AS builder
 
-RUN caddy-builder \
-    github.com/caddy-dns/cloudflare
+RUN xcaddy build \
+    --with github.com/caddy-dns/cloudflare
 
-FROM caddy:2.0.0
+FROM caddy:2.6.2
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ```
@@ -632,7 +634,7 @@ Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
 
 `.env`
 ```
-MY_DOMAIN=example.com
+MY_DOMAIN={$MY_DOMAIN}
 DOCKER_MY_NETWORK=caddy_net
 
 CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
@@ -648,7 +650,7 @@ and `CLOUDFLARE_API_TOKEN` variable added.
 services:
 
   caddy:
-    build: ./dns-dockerfile
+    build: ./dockerfile-caddy
     container_name: caddy
     hostname: caddy
     restart: unless-stopped
@@ -672,26 +674,65 @@ networks:
 
 ### - Edit Caddyfile
 
-Add `tls` directive to the site-blocks, forcing the use of tls dns challange.
+Add global option acme_dns<br>
+or add `tls` directive to the site-blocks.
 
 `Caddyfile`
 ```
 {
-    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+  acme_dns cloudflare {$CLOUDFLARE_API_TOKEN}
 }
+
 
 a.{$MY_DOMAIN} {
     reverse_proxy whoami:80
-    tls {
-        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    }
 }
 
 b.{$MY_DOMAIN} {
     reverse_proxy nginx:80
     tls {
-        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+        dns cloudflare {$CLOUDFLARE_API_TOKEN}
     }
 }
 ```
 
+### - Wildcard certificate
+
+If theres preference for certificate to rule all subdomains.<br>
+But not apex/naked domain, thats separate.
+
+As shown in [the documentation](https://caddyserver.com/docs/caddyfile/patterns#wildcard-certificates),
+the subdomains must be moved under the wildcard site block.
+
+
+`Caddyfile`
+```
+{
+  acme_dns cloudflare {$CLOUDFLARE_API_TOKEN}
+}
+
+{$MY_DOMAIN} {
+    reverse_proxy homer:8080
+}
+
+*.{$MY_DOMAIN} {
+    @a host a.{$MY_DOMAIN}
+    handle @a {
+        reverse_proxy whoami:80
+    }
+
+    @b host b.{$MY_DOMAIN}
+    handle @b {
+        reverse_proxy nginx:80
+    }
+
+    handle {
+        abort
+    }
+}
+```
+
+[Here's](https://github.com/caddyserver/caddy/issues/3200) some discussion
+on this and a simple, elegant way we could have had it without the need to
+dick with the Caddyfile this much. Just one global line declaration.<br>
+But the effort went sideways.
