@@ -29,6 +29,8 @@ This setup is running on the free version of ESXi 7.0 U3<br>
 
 Two physical network cards - NICs
 
+![esxi-network](https://i.imgur.com/xvjyF3a.gif)
+
 * the default `vSwitch0` will be used for LAN side
 * create new virtual switch - `vSwitch1-WAN`
 * create new port group - `WAN Network`, assign to it `vSwitch1-WAN`
@@ -47,7 +49,6 @@ Afterwards, edit the VM, add network adapter connected to `WAN Network`
 [Download](https://opnsense.org/download/) the latest opnsense - amd64, dvd,
 extract iso, upload to ESXi datastore,
 mount it in to the VMs dvd, check connect on boot
-
 
 #### OPNsense installation in VM
 
