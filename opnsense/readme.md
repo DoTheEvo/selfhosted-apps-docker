@@ -20,7 +20,8 @@ and custom services built in Python.
 
 Can be installed on a physical server or in a virtual machine.
 
-# VMware ESXi 
+<details>
+    <summary><h1>VMware ESXi</h1></summary>
 
 This setup is running on the free version of ESXi 7.0 U3<br>
 
@@ -63,11 +64,18 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * click through installation leaving stuff at default except for password
 * done
 
-# First login and basic setup
+</details>
+
+
+<details>
+    <summary><h1>first login and basic setup</h1></summary>
 
 * at the LAN ip login
 * click through wizzard, use 8.8.8.8 and 1.1.1.1 for DNS
 * 
+
+</details>
+
 
 <details>
     <summary><h1>https and subdomain</h1></summary>
