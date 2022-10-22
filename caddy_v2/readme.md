@@ -12,24 +12,20 @@
 
 # Purpose & Overview
 
-Reverse proxy setup that allows hosting many services and access them
-based on the host name.<br>
-For example `nextcloud.{$MY_DOMAIN}` takes you to your nextcloud file sharing,
-and `bitwarden.{$MY_DOMAIN}` takes you to your password manager,
-all hosted on your local network.
+Reverse proxy is needed if one wants access to services based on the hostname.<br>
+For example `nextcloud.example.com` points traffic to nextcloud docker container,
+while `jellyfin.example.com` points to the media server on the network.
 
 * [Official site](https://caddyserver.com/v2)
 * [Official documentation](https://caddyserver.com/docs/)
 * [Forum](https://caddy.community/)
 * [Github](https://github.com/caddyserver/caddy)
 
-Caddy is a powerful, enterprise-ready, open source web server with automatic
-HTTPS written in Go.<br>
+Caddy is a pretty damn good web server with automatic HTTPS. Written in Go.<br>
 Web servers are build to deal with http traffic, so they are an obvious choice
-for the function of reverse proxy.
-
+for the function of reverse proxy.<br>
 In this setup Caddy is used mostly as
-[a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no).<br> 
+[a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no). 
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and send to a correct webserver based on the settings in `Caddyfile`.
 
@@ -37,16 +33,23 @@ Caddy with its build-in https and and simple config approach
 allows even most trivial configs to just work:
     
 ```
-whatever.{$MY_DOMAIN} {
-  reverse_proxy server-blue:80
+nextcloud.{$MY_DOMAIN} {
+  reverse_proxy nextcloud-web:80
 }
 
-blabla.{$MY_DOMAIN} {
+jellyfin.{$MY_DOMAIN} {
   reverse_proxy 192.168.1.20:80
 }
 ```
 
-![url](https://i.imgur.com/rzhNJ23.png)
+And **just works** means fully work, no additional configuration needed 
+for https redirect, or special services if target is not a container,
+or need to deal with load balancer, or need to add boilerplate headers
+for x-forward, or other extra work.<br>
+In short, it has sane out of box defaults fitting majority of uses and only
+some special casess with some extra desired functionality need extra configuration.
+
+![url](https://i.imgur.com/iTjzPc0.png)
 
 # Caddy as a reverse proxy in docker
 
@@ -58,9 +61,9 @@ or machines on the network.
 * have some basic linux knowledge, create folders, create files, edit files, run scripts,...
 * have a docker host and some vague docker knowledge
 * have port 80 and 443 forwarded on the router/firewall to the docker host
-* have a domain, `{$MY_DOMAIN}`, you can buy one for 2€ annually on namecheap
-* have corectly set type-A DNS records pointing at your public IP address,
-  preferably using Cloudflare
+* have a domain, `example.com`, you can buy one for 2€ annually on namecheap
+* have correctly set type-A DNS records pointing at your public IP address,
+  [switching to Cloudflare](https://youtu.be/XQKkb84EjNQ) for DNS managment is recommended
 
 
 ### - Files and directory structure
@@ -173,10 +176,10 @@ b.{$MY_DOMAIN} {
 }
 ```
 
-`a` and `b` are the subdomains, can be named whatever.
+`a` and `b` are the subdomains `a.example.com` and `b.example.com`,
+can be named whatever.
 For them to work they must have type-A DNS record
 pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.<br>
-Can also be a wild card `*.{$MY_DOMAIN} -> 104.17.436.89`
 
 The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
