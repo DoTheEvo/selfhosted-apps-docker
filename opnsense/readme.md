@@ -69,6 +69,40 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * click through wizzard, use 8.8.8.8 and 1.1.1.1 for DNS
 * 
 
+<details>
+    <summary><h3>https and subdomain</h3></summary>
+
+# https and subdomain
+
+### on cloudflare
+
+* create dns record fw.<yourdomain>
+* get user ID - its in the url when you are on dashboard in cloudflare > workers, looks like 0122db3h4824893916169c9c4f919747f
+* in My Profile >  Api Tokens > get Global API Key
+* in My Profile >  Api Tokens > create token that looks [like this](https://i.imgur.com/YWxgUiO.png)
+
+### in opnsense acme plugin
+
+* download acme plugin
+* Services: ACME Client: Accounts - create account with your email where notifications about certs can go
+* Services: ACME Client: Challenge Types - create new dns challange with info you gathered from cloudflare, looks something [like this](https://i.imgur.com/JryFSq4.png)
+* Services: ACME Client: Certificates - create new certificate, stuff is just picked from the drop down menus, [looks like this](https://i.imgur.com/uytzQ9F.png)
+* now check logs if request went through on its own, or just click small icon to force renew the certificate, in logs in matter of a minute there should be some either success or fail
+
+### in opnsense Services: Unbound DNS: General
+
+* add an override - so that the fw.whatever.org points to your local ip instead of going out, [looks like this](https://i.imgur.com/ZqIa0HN.png)
+
+### in opnsense System: Settings: Administration
+
+*  Alternate Hostnames - add your fw.whatever.org
+* SSL Certificate -  pick from dropdown menu your certificate
+* apply changes
+* switch radio buttons at the top from http to https if its not already. The previous steps should be done as opnsense will want to reload gui
+
+now from local LAN side one can access web gui with https://fw.whatever.org and its an encrypted communication between the firewall and browser
+
+</details>
 
 # Update
 
