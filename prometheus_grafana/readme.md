@@ -127,8 +127,8 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus_data:/prometheus
-    expose:
-      - 9090
+    ports:
+      - 9090:9090
     labels:
       org.label-schema.group: "monitoring"
 
@@ -335,22 +335,8 @@ Caddy v2 is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 The setup is accessed through grafana.
-But occasionally there might be need to check with prometheus,
-which will be available on \<docker-host-ip>:9090.</br>
-For that to work, Caddy will also need port 9090 published.
-
-`Caddyfile`
-```
-grafana.{$MY_DOMAIN} {
-    reverse_proxy grafana:3000
-}
-
-:9090 {
-    reverse_proxy prometheus:9090
-}
-```
-
-*Extra info:* `:9090` is short notation for `localhost:9090`
+But occasionally there might be need to check with prometheus or pushgateway
+which are available on \<docker-host-ip>:9090.</br>
 
 ---
 

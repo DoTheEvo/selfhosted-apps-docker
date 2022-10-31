@@ -46,7 +46,7 @@ And **just works** means fully works. No additional configuration needed
 for https redirect, or special services if target is not a container,
 or need to deal with load balancer, or need to add boilerplate headers
 for x-forward, or other extra work.<br>
-In short, it has great out of the box defaults, fitting majority of uses
+It has great out of the box defaults, fitting majority of uses
 and only some special casess with extra functionality need extra work.
 
 ![url](https://i.imgur.com/iTjzPc0.png)
@@ -239,8 +239,8 @@ networks:
 You are on your local network and you are likely running the docker host
 inside the same network.<br>
 If that's the case then shit will not work without editing the hosts file.<br> 
-Reason being that when you write that `a.{$MY_DOMAIN}` in to your browser,
-you are asking google's DNS for `a.{$MY_DOMAIN}` IP address.
+Reason being that when you write that `a.example.com` in to your browser,
+you are asking google's DNS for `a.example.com` IP address.
 It will give you your own public IP, and most routers/firewalls wont allow
 this loopback, where your requests should go out and then right back.
 

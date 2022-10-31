@@ -15,7 +15,8 @@ Minecraft is written in Java.<br>
 This setup is using [itzg](https://github.com/itzg/docker-minecraft-server)
 maintend docker image. Specificly [Purpur](https://purpurmc.org/docs/)
 version which is a fork of 
-[paper](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
+[Paper](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/)
+ which is a fork of [Spigot](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
 Few plugings are used which allow to host multiple worlds on the same server.<br>
 Also [docker-rcon-web-admin](https://github.com/itzg/docker-rcon-web-admin) 
 container is runnig to be able to do basic console tasks from web interface.
@@ -164,7 +165,7 @@ Should they be able to bring stuff from one world to another? No?<br>
 Well you need `multiverse inventory`.<br>
 Should the connecting of worlds with their nether be easy?<br>
 Well you need `multiverse netherportals`.<br>
-Should they spawn in lobby on connecting,
+Should they spawn in lobby on start,
 but also remember the position in the worlds when entering portals?<br>
 Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.
 

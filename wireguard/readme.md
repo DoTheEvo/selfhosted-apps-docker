@@ -26,6 +26,8 @@ This setup runs directly on the host machine, not in a container.<br>
 Most of the stuff here is based on Arch wiki and 
 [this tutorial](https://securityespresso.org/tutorials/2019/03/22/vpn-server-using-wireguard-on-ubuntu/).
 
+[This](https://github.com/mikeroyal/WireGuard-Guide) also seems rich in content.
+
 # Files and directory structure
 
 ```
