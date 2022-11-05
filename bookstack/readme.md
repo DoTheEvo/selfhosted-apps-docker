@@ -13,7 +13,7 @@ Documentation and notes.
 * [DockerHub](https://hub.docker.com/r/linuxserver/bookstack)
 
 BookStack is a modern, open source, good looking wiki platform
-for storing and organizing information and documentation.
+for storing and organizing information.
 
 Written in PHP, with MySQL database for the user data.</br>
 There is no official Dockerhub image so the one maintained by
@@ -142,9 +142,6 @@ Default login: `admin@admin.com` // `password`
 If after update you cant see edit tools. Clear cookies.
 
 # Update
-
-[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically.
 
 Manual image update:
 
