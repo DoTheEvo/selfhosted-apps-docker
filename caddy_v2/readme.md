@@ -733,7 +733,7 @@ of host matching and handles.
 
 [Here's](https://github.com/caddyserver/caddy/issues/3200) some discussion
 on this and a simple, elegant way we could have had, without the need to
-dick with the Caddyfile this much. Just one global line declaration.<br>
+dick with the Caddyfile this much. Just one global line declaration.
 But the effort went sideways.<br>
 So I myself do not even bother with wildcard when the config ends up looking
 like nginx full on boilerplate lines.
