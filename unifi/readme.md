@@ -115,6 +115,7 @@ as `Override Inform Host`.
 * Old interface > Wifi > advanced settings > disable "High Performance Devices"<br>
   When enabled it forces devices to ignore 2ghz band which obviously causes problems at range. 
   Fucking monstrous stupidity.
+* DTIM sets to 3 for [apple devices](https://www.sniffwifi.com/2016/05/go-to-sleep-go-to-sleep-go-to-sleep.html)
 
 
 # Update
