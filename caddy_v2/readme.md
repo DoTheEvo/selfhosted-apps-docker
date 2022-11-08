@@ -614,7 +614,7 @@ Add `CLOUDFLARE_API_TOKEN` variable with the value of the newly created token.
 
 `.env`
 ```
-MY_DOMAIN={$MY_DOMAIN}
+MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 
 CLOUDFLARE_API_TOKEN=<cloudflare api token goes here>
