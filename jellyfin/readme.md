@@ -38,8 +38,7 @@ Starting point for me was [this viggy96 repo](https://github.com/viggy96/contain
             ├── jellyfin-config/
             ├── transcodes/
             ├── .env
-            ├── docker-compose.yml
-            └── jellyfin-backup-script.sh
+            └── docker-compose.yml
 ```
 
 * `/mnt/bigdisk/...` - a mounted media storage share
@@ -48,9 +47,8 @@ Starting point for me was [this viggy96 repo](https://github.com/viggy96/contain
 * `transcodes/` - transcoded video storage
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
-* `jellyfin-backup-script.sh` - a backup script if you want it
 
-You only need to provide the files.</br>
+You only need to provide the two files.</br>
 The directories are created by docker compose on the first run.
 
 # docker-compose
