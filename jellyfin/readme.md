@@ -117,7 +117,7 @@ jellyfin.{$MY_DOMAIN} {
 # Specifics of my setup
 
 * no long term use yet
-* no gpu, so no experience with hw transcoding
+* amd cpu and no gpu, so no experience with hw transcoding
 * media files are stored and shared on trunas scale VM
  and mounted directly on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
  instead of fstab or autofs.
@@ -184,7 +184,3 @@ that makes daily snapshot of the entire directory.
 * delete the entire bookstack directory</br>
 * from the backup copy back the bookstack directory</br>
 * start the containers `docker-compose up -d`
-
-# Backup of just user data
-
-dont care
