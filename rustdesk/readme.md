@@ -87,13 +87,18 @@ ENCRYPTED_ONLY=0
 ports 21115 - 21119 needs to be open for tcp<br>
 the port 21116 also udp
 
-# Usage
+# The Usage
 
-* download client apps from [the official site](https://rustdesk.com/)
+* download and install the client apps from [the official site](https://rustdesk.com/)
 * three dots near ID > ID/Relay Server > ID Server: rust.example.com > OK
 * the green dot at the bottom should stay green saying "ready"
 * done
 * in the docker server logs you should see machines public IP and ID code it was given
+
+To delete rustdesk data from a windows machine, delete:
+
+* `C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\RustDesk`
+* `%AppData%\RustDesk`
 
 # Encrypted use
 
