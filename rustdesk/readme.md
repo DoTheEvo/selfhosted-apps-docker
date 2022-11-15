@@ -18,6 +18,9 @@ and lets you host all the infrastructure for it to function.
 
 Written in rust(gasp), with Dart and Flutter framework for client side.</br>
 
+---
+
+
 ![interface-pic](https://i.imgur.com/ekA7Hms.png)
 
 # Files and directory structure
@@ -87,9 +90,12 @@ ENCRYPTED_ONLY=0
 ports 21115 - 21119 needs to be open for tcp<br>
 the port 21116 also udp
 
-# The Usage
+---
 
 ![interface-pic](https://i.imgur.com/CK6pRyq.png)
+
+# The Usage
+
 
 * download and install the client apps from [the official site](https://rustdesk.com/)
 * three dots near ID > ID/Relay Server > ID Server: rust.example.com > OK
