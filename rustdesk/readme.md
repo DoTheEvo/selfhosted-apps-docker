@@ -89,6 +89,8 @@ the port 21116 also udp
 
 # The Usage
 
+![interface-pic](https://i.imgur.com/CK6pRyq.png)
+
 * download and install the client apps from [the official site](https://rustdesk.com/)
 * three dots near ID > ID/Relay Server > ID Server: rust.example.com > OK
 * the green dot at the bottom should stay green saying "ready"
