@@ -18,6 +18,8 @@ and lets you host all the infrastructure for it to function.
 
 Written in rust(gasp), with Dart and Flutter framework for client side.</br>
 
+![interface-pic](https://i.imgur.com/ekA7Hms.png)
+
 # Files and directory structure
 
 ```
@@ -34,12 +36,14 @@ Written in rust(gasp), with Dart and Flutter framework for client side.</br>
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
-You only need to provide the files.</br>
-The directories are created by docker compose on the first run.
+You only need to provide the two files.</br>
+The directory is created by docker compose on the first run.
 
 # docker-compose
 
-Using edited version of [S6-overlay based images.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)
+Using edited version of [S6-overlay based images.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
+It's a simpler, single container approach, without the noise of hbbs/hbbr.
+
 
 `docker-compose.yml`
 ```yml
@@ -75,32 +79,48 @@ TZ=Europe/Bratislava
 
 # RUSTDESK
 RELAY=rust.example.com:21117
-ENCRYPTED_ONLY=1"
+ENCRYPTED_ONLY=0
 ```
-
-**All containers must be on the same network**.</br>
-Which is named in the `.env` file.</br>
-If one does not exist yet: `docker network create caddy_net`
 
 # Port forwarding
 
-ports 21115 - 21119 needs to be open
-port 21116 open as tcp and udp
+ports 21115 - 21119 needs to be open for tcp<br>
+the port 21116 also udp
 
-# First run
-.....
-....
-...
-..
-.
+# Usage
 
+* download client apps from [the official site](https://rustdesk.com/)
+* three dots near ID > ID/Relay Server > ID Server: rust.example.com > OK
+* the green dot at the bottom should stay green saying "ready"
+* done
+* in the docker server logs you should see machines public IP and ID code it was given
+
+# Encrypted use
+
+![settings-pic](https://i.imgur.com/6mKkSuh.png)
+
+For encrypted communication and to prevent undesirables access to the server
+
+* they encryption public key is on the docker host:<br>
+  `~/docker/rustdesk/data/id_ed25519.pub`
+* you can manually add it to any client application<br>
+  three dots near ID > ID/Relay Server > Key: 3AVva64bn1ea2vsDuOuQH3i8+2M=
+* to only allow clients with the key on server:<br>
+  in the env_file set `ENCRYPTED_ONLY=1`
+
+[On windows](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
+one can deploy client with these settings by renaming
+the installation file to: `rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
+
+example: `rustdesk-host=rust.example.com,key=3AVva64bn1ea2vsDuOuQH3i8+2M=.exe`
+
+If by chance the key contains symbols not usable in windows filenames,
+down the container, delete the files `id_ed25519` and `id_ed25519.pub`, up the container
 ---
-
-![interface-pic](https://i.imgur.com/cN1GUZw.png)
 
 # Trouble shooting
 
-If after update you cant see edit tools. Clear cookies.
+
 
 # Update
 
@@ -124,62 +144,3 @@ that makes daily snapshot of the entire directory.
 * from the backup copy back the bookstack directory</br>
 * start the containers `docker-compose up -d`
 
-# Backup of just user data
-
-Users data daily export using the
-[official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)</br>
-For bookstack it means database dump and backing up several directories
-containing user uploaded files.
-
-Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
-takes care of backing up the directories.
-So only database dump is needed.</br>
-The created backup sqlite3 file is overwritten on every run of the script,
-but that's ok since borg is making daily snapshots.
-
-#### Create a backup script
-
-Placed inside `bookstack` directory on the host
-
-`bookstack-backup-script.sh`
-```bash
-#!/bin/bash
-
-# CREATE DATABASE DUMP, bash -c '...' IS USED OTHERWISE OUTPUT > WOULD TRY TO GO TO THE HOST
-docker container exec bookstack-db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > $MYSQL_DIR/BACKUP.bookstack.database.sql'
-```
-
-the script must be **executable** - `chmod +x bookstack-backup-script.sh`
-
-#### Cronjob
-
-Running on the host, so that the script will be periodically run.
-
-* `su` - switch to root
-* `crontab -e` - add new cron job</br>
-* `0 22 * * * /home/bastard/docker/bookstack/bookstack-backup-script.sh`</br>
-  runs it every day [at 22:00](https://crontab.guru/#0_22_*_*_*) 
-* `crontab -l` - list cronjobs to check
-
-# Restore the user data
-
-Assuming clean start, first restore the database before running the app container.
-
-* start only the database container: `docker-compose up -d bookstack-db`
-* copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack-db-data/`
-* restore the database inside the container</br>
-  `docker container exec --workdir /config bookstack-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql'`
-* now start the app container: `docker-compose up -d`
-* let it run so it creates its file structure
-* down the containers `docker-compose down`
-* in `bookstack/bookstack-data/www/`</br>
-  replace directories `files`,`images`,`uploads` and the file `.env`</br>
-  with the ones from the BorgBackup repository 
-* start the containers: `docker-compose up -d`
-* if there was a major version jump, exec in to the app container and run `php artisan migrate`</br>
-  `docker container exec -it bookstack /bin/bash`</br>
-  `cd /var/www/html/`</br>
-  `php artisan migrate`
-
-Again, the above steps are based on the 
-[official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)
