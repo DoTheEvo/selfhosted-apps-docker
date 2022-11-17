@@ -35,7 +35,7 @@ Written in rust(gasp), with Dart and Flutter framework for client side.</br>
             └── docker-compose.yml
 ```
 
-* `data/` - relay server
+* `data/` - servers persistent data, contains sqlite database and the api key
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -44,9 +44,11 @@ The directory is created by docker compose on the first run.
 
 # docker-compose
 
-Using edited version of [S6-overlay based images.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
-It's a simpler, single container approach, without the noise of hbbs/hbbr.
+Using an edited version of [S6-overlay based compose.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
+It's a simpler, single container approach, without the noise of hbbs/hbbr,
+it also has health check implemented.
 
+There is also no network section since its fine to run this completely isolated.
 
 `docker-compose.yml`
 ```yml
@@ -66,11 +68,6 @@ services:
       - 21119:21119
     volumes:
       - ./data:/data
-
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
 ```
 
 `.env`
@@ -87,14 +84,14 @@ ENCRYPTED_ONLY=0
 
 # Port forwarding
 
-ports 21115 - 21119 needs to be open for tcp<br>
-the port 21116 also udp
+the ports 21115 - 21119 needs to be open for tcp<br>
+the port 21116 is tcp and udp
 
 ---
 
 ![interface-pic](https://i.imgur.com/CK6pRyq.png)
 
-# The Usage
+# The usage on clients
 
 
 * download and install the client apps from [the official site](https://rustdesk.com/)
@@ -103,23 +100,18 @@ the port 21116 also udp
 * done
 * in the docker server logs you should see machines public IP and ID code it was given
 
-To delete rustdesk data from a windows machine, delete:
-
-* `C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\RustDesk`
-* `%AppData%\RustDesk`
-
 # Encrypted use
 
 ![settings-pic](https://i.imgur.com/6mKkSuh.png)
 
 For encrypted communication and to prevent undesirables access to the server
 
-* they encryption public key is on the docker host:<br>
+* the encryption public key is on the docker host:<br>
   `~/docker/rustdesk/data/id_ed25519.pub`
 * you can manually add it to any client application<br>
   three dots near ID > ID/Relay Server > Key: 3AVva64bn1ea2vsDuOuQH3i8+2M=
 * to only allow clients with the key on server:<br>
-  in the env_file set `ENCRYPTED_ONLY=1`
+  in the env_file set `ENCRYPTED_ONLY=1` and down and up the copose.
 
 [On windows](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
 one can deploy client with these settings by renaming
@@ -133,7 +125,15 @@ down the container, delete the files `id_ed25519` and `id_ed25519.pub`, up the c
 
 # Trouble shooting
 
+From what I read, most client side issues are with two differently set rustdesk
+clients running on the same machine.<br>
 
+Uninstall/remove all all, plus:
+
+* `C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\RustDesk`
+* `%AppData%\RustDesk`
+
+restart and do fresh client install
 
 # Update
 
