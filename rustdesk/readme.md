@@ -45,8 +45,8 @@ The directory is created by docker compose on the first run.
 # docker-compose
 
 Using an edited version of [S6-overlay based compose.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
-It's a simpler, single container approach, without the noise of hbbs/hbbr,
-it also has health check implemented.
+It's a simpler, single container approach, without the noise of hbbs/hbbr.
+It also has health check implemented.
 
 There is no network section since its fine to run this completely isolated.
 
