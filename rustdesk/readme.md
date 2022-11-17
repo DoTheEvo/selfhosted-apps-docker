@@ -12,8 +12,8 @@ Remote desktop application.
 * [Github](https://github.com/rustdesk/rustdesk)
 * [DockerHub](https://hub.docker.com/r/rustdesk/rustdesk-server)
 
-Rustdesk is a young opensource replacement for TeamViewer or Anydesk.
-The major thing is that it does NAT punching, 
+Rustdesk is a young opensource replacement for TeamViewer or Anydesk.<br>
+The major aspects is that it does NAT punching, 
 and lets you host all the infrastructure for it to function.
 
 Written in rust(gasp), with Dart and Flutter framework for client side.</br>
@@ -35,7 +35,7 @@ Written in rust(gasp), with Dart and Flutter framework for client side.</br>
             └── docker-compose.yml
 ```
 
-* `data/` - servers persistent data, contains sqlite database and the api key
+* `data/` - persistent data, contains sqlite database and the api key
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -48,7 +48,7 @@ Using an edited version of [S6-overlay based compose.](https://github.com/rustde
 It's a simpler, single container approach, without the noise of hbbs/hbbr,
 it also has health check implemented.
 
-There is also no network section since its fine to run this completely isolated.
+There is no network section since its fine to run this completely isolated.
 
 `docker-compose.yml`
 ```yml
@@ -84,8 +84,18 @@ ENCRYPTED_ONLY=0
 
 # Port forwarding
 
-the ports 21115 - 21119 needs to be open for tcp<br>
-the port 21116 is tcp and udp
+as can be seen in the compose
+
+* **21115 - 21119** TCP need to be forwarded to docker host<br>
+* **21116** is TCP and UDP 
+
+21115 is used for the NAT type test,
+21116/UDP is used for the ID registration and heartbeat service,
+21116/TCP is used for TCP hole punching and connection service,
+21117 is used for the Relay services,
+and 21118 and 21119 are used to support web clients. 
+
+[source](https://rustdesk.com/docs/en/self-host/install/)
 
 ---
 
@@ -111,24 +121,24 @@ For encrypted communication and to prevent undesirables access to the server
 * you can manually add it to any client application<br>
   three dots near ID > ID/Relay Server > Key: 3AVva64bn1ea2vsDuOuQH3i8+2M=
 * to only allow clients with the key on server:<br>
-  in the env_file set `ENCRYPTED_ONLY=1` and down and up the copose.
+  in the env_file set `ENCRYPTED_ONLY=1` and down/up the compose.
 
 [On windows](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
-one can deploy client with these settings by renaming
+one can deploy client with these settings pre-set by renaming
 the installation file to: `rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
 
 example: `rustdesk-host=rust.example.com,key=3AVva64bn1ea2vsDuOuQH3i8+2M=.exe`
 
-If by chance the key contains symbols not usable in windows filenames,
-down the container, delete the files `id_ed25519` and `id_ed25519.pub`, up the container
----
+If by chance the public key contains symbols not usable in windows filenames,
+down the container, delete the files `id_ed25519` and `id_ed25519.pub`,
+up the container
 
 # Trouble shooting
 
-From what I read, most client side issues are with two differently set rustdesk
-clients running on the same machine.<br>
+From what I read, most client side issues come from two differently set rustdesk
+client applications running on the same machine.<br>
 
-Uninstall/remove all all, plus:
+Uninstall/remove all, plus delete:
 
 * `C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\RustDesk`
 * `%AppData%\RustDesk`
