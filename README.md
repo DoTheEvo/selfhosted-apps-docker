@@ -26,6 +26,9 @@
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [arch_linux_host_install](arch_linux_host_install)
 
+Check also [StarWhiz / docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)<br>
+Who documents self hosted apps in similar format and also uses caddy for reverse proxy
+
 # How to self host various services
 
 You do need to have **basic linux and basic docker-compose knowledge**,
@@ -159,7 +162,7 @@ as likely your distro does not have it in repos. If you use arch, like I do, its
 
 ### other guides
 
-* [StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)
+* [StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes)
     - got inspired and wrote in similar way setup for various services
 * [BaptisteBdn/docker-selfhosted-apps](https://github.com/BaptisteBdn/docker-selfhosted-apps)
    - many services using traefik for reverse proxy

@@ -150,7 +150,7 @@ jellyfin.{$MY_DOMAIN} {
   WantedBy=multi-user.target
   ```
 
-  to automount on boot - `sudo systemctl start mnt-bigdisk.automount`
+  to automount on boot - `sudo systemctl enable mnt-bigdisk.automount`
 
 # Troubleshooting
 

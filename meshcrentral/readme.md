@@ -1,37 +1,35 @@
-# Rustdesk in docker
+# Meshcentral in docker
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/ImsIffW.png)
+![logo](https://i.imgur.com/aqBSYbu.png)
 
 # Purpose & Overview
 
-Remote desktop application. 
+Powerful remote desktop toolset. 
 
-* [Official site](https://rustdesk.com/)
-* [Github](https://github.com/rustdesk/rustdesk)
-* [DockerHub](https://hub.docker.com/r/rustdesk/rustdesk-server)
+* [Official site](https://www.meshcommander.com/meshcentral2)
+* [Github](https://github.com/Ylianst/MeshCentral)
+* [unofficial DockerHub](https://hub.docker.com/r/typhonragewind/meshcentral)
 
-Rustdesk is a young opensource replacement for TeamViewer or Anydesk.<br>
-The major aspects is that it does NAT punching, 
-and lets you host all the infrastructure for it to function.
-
-Written in rust(gasp), with Dart and Flutter framework for client side.</br>
+Web based, can be a replacement for TeamViewer or Anydesk.<br>
+The server is written in javascript, running in node.js runtime.
+The client application is written mostly in C runnig Duktape javascript engine.
 
 The architecture is relatively simple.<br>
 
-* run server reachable online
-* install clients on PCs you want to connect from/to
+* a server is running online, with ports 80/443 open
+* clients can visit the servers web and from it install Mesh Agent
+  which allows full control of the device straight from servers webpage
 
-Server sits online and clients register with it when installed/run.
-Thanks to keeping communication with the server open, they are able to punch
-a hole in NAT and so a connection can be initialized from the outside
-without the need for opening of ports.
+For database the server uses a build in neDB, which should be enough for
+less than 100 clients deployments. Or MongoDB can be deployed for better
+performance and robustness but added complexity.
 
 ---
 
 
-![interface-pic](https://i.imgur.com/ekA7Hms.png)
+![interface-pic](https://i.imgur.com/0egkM4J.png)
 
 # Files and directory structure
 
@@ -39,45 +37,56 @@ without the need for opening of ports.
 /home/
 └── ~/
     └── docker/
-        └── rustdesk/
+        └── meshcentral/
             ├── data/
+            ├── meshcentral/
             ├── .env
             └── docker-compose.yml
 ```
 
-* `data/` - persistent data, contains sqlite database and the api key
+* `data/` - persistent data for the MongoDB database
+* `meshcentral/` - web app persistent data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
 You only need to provide the two files.</br>
-The directory is created by docker compose on the first run.
+The directories are created by docker compose on the first run.
 
 # docker-compose
 
-Using an edited version of [S6-overlay based compose.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
-It's a simpler, single container approach, without the noise of hbbs/hbbr.
-It also has health check implemented.
+There is no official docker image.
+So [This one is used.](https://github.com/Typhonragewind/meshcentral-docker)
 
-There is no network section since its fine to run this completely isolated.
+Going with the more robust MongoDB version.
 
 `docker-compose.yml`
 ```yml
 services:
-  rustdesk:
-    image: rustdesk/rustdesk-server-s6:latest
-    container_name: rustdesk
-    hostname: rustdesk
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      - 21115:21115
-      - 21116:21116
-      - 21116:21116/udp
-      - 21117:21117
-      - 21118:21118
-      - 21119:21119
-    volumes:
-      - ./data:/data
+    meshcentral_db:
+        image: mongo:latest
+        container_name: meshcentral_db
+        hostname: meshcentral_db
+        restart: unless-stopped
+        expose:
+            - 27017
+        volumes:
+            - ./meshcentral_db:/data/db
+    meshcentral:
+        image: typhonragewind/meshcentral:mongodb
+        container_name: meshcentral
+        hostname: meshcentral
+        restart: unless-stopped
+        env_file: .env
+        depends_on:
+            - meshcentral_db
+        volumes:
+            - ./meshcentral/data:/opt/meshcentral/meshcentral-data
+            - ./meshcentral/user_files:/opt/meshcentral/meshcentral-files
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
@@ -88,8 +97,13 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # RUSTDESK
-RELAY=rust.example.com:21117
-ENCRYPTED_ONLY=0
+HOSTNAME=mesh.example.com
+REVERSE_PROXY=10     #set to your reverse proxy IP
+REVERSE_PROXY_TLS_PORT=443
+IFRAME=false #set to true if you wish to enable iframe support
+ALLOW_NEW_ACCOUNTS=false    
+WEBRTC=false  #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
+NODE_ENV=production
 ```
 
 # Port forwarding
