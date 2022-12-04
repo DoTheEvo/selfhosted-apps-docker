@@ -254,7 +254,7 @@ and needs restart. Not just container, but entire VM. Will maybe investigate.
   useful for dynmap to fill black patches
 * [OpeNLogin](https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/)
 * [luckperms](https://luckperms.net/download) - manage permissions of players,
-  planned to use, not in use yet
+  planned to use, not in use yet. [Here](https://www.youtube.com/watch?v=AwbVqSOn2SI) is a good video on it.
 
 # Comamnds & settings
 
