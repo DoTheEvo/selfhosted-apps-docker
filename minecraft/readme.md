@@ -248,6 +248,9 @@ if you have seed `mv create snow_world normal -s -5343926151482505487`
 Something of this is causing server to ocasionally go to super high disk use
 and needs restart. Not just container, but entire VM. Will maybe investigate.
 
+/update, it was likely caused by using m.2 ssd for storing esxi VMs,
+switch to sata ssd seems to prevent any more occurancies of this high disk usage
+
 * [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/) - map 
   of the world in web gui, real time. Default port 8123
 * [Chunky](https://www.spigotmc.org/resources/chunky.81534/) - pre-generates chunks
@@ -255,6 +258,7 @@ and needs restart. Not just container, but entire VM. Will maybe investigate.
 * [OpeNLogin](https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/)
 * [luckperms](https://luckperms.net/download) - manage permissions of players,
   planned to use, not in use yet. [Here](https://www.youtube.com/watch?v=AwbVqSOn2SI) is a good video on it.
+* wordguard with word edit, followed [this video](https://youtu.be/pYAk38Hekqg)
 
 # Comamnds & settings
 
