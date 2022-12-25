@@ -4,6 +4,12 @@
 
 ![logo](https://i.imgur.com/SkENpGn.png)
 
+# Notice
+
+**Since 2022 I am using the [archinstall script](https://github.com/archlinux/archinstall)
+that comes with arch iso**<br>
+**After the install [I use my ansible playbooks](https://github.com/DoTheEvo/ansible-arch) to setup the arch the way I like it**
+
 # Purpose
 
 Linux that will run docker.
