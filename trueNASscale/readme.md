@@ -27,13 +27,35 @@ So I make zero use of zfs raid features and use it just as nice web GUI
 for samba and nfs sharing.
 
 Good alterntive I could have go for is [openmediavault](https://www.openmediavault.org/),
-but truenas seems a bigger player.
+but truenas seems a bigger player. And if I did not luck out with the HBA card,
+I would be buying Fujitsu 9211-8i from ebay.
 
 
-# Installation 
+# Installation
 
+![logo](https://i.imgur.com/hqatTKG.png)
+
+[official documentation](https://www.truenas.com/docs/scale/gettingstarted/install/installingscale/)
+
+* [download ISO](https://www.truenas.com/download-truenas-scale/)
+* upload it to esxi datastore
+* create new VM
+    * Guest OS family - linux
+    * Guest OS version - Debian <latest> 64-bit 
+    * give it 2 cpu cores
+    * give it 4GB RAM
+    * give it 50GB disk space
+    * mount ISO in to the dvd drive
+    * SCSI Controller was left at default - vmware paravirtual
+    * switch tab and change boot from bios to uefi
+* click through the Installation
+* login, shutdown
+* Esxi - edit VM, add other device, PCI device, <should be listed HBA card> 
 
 # Basic Setup
+
+### First login
+
 
 ### Static IP address
 
