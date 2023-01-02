@@ -32,7 +32,8 @@ Good alterntive is [openmediavault](https://www.openmediavault.org/),
 but truenas seems a bigger player. And if I would have not lucked out
 with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 
-# Installation
+<details>
+<summary><h1>Installation in as VM in VMware ESXi</h1></summary>
 
 ![esxi-vm](https://i.imgur.com/hqatTKG.png)
 
@@ -53,6 +54,11 @@ with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 * pick admin user and set password
 * login, shutdown
 * ESXi - edit VM, add other device, PCI device, <should be listed HBA card> 
+
+</details>
+
+---
+---
 
 # Basic Setup
 
@@ -97,7 +103,7 @@ Then set the UTC time in bios using `hwclock --systohc --utc`
 
 ![zfs-layout](https://i.imgur.com/uQXaw3h.png)
 
-##### Pool
+### Pool
 
 [The official documentation.](https://www.truenas.com/docs/core/coretutorials/storage/pools/poolcreate/)
 
@@ -115,7 +121,7 @@ But it is at the creation of pool where "raid" is set.
 
 For destruction of a pool - Storage > Export/Disconnect button
 
-##### Dataset
+### Dataset
 
 [The official documentation.](https://www.truenas.com/docs/core/coretutorials/storage/pools/datasets/)
 
