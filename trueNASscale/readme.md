@@ -75,41 +75,47 @@ with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 If there are issues with the time... enable ssh service, ssh in to the truenas 
 check few things
 
-* `timedatectl` 
-* `ntpq -p`
-* `sudo ntpq -c sysinfo`
-* `systemctl status ntp.service`
-* `sudo journalctl -u ntp.service`
-* `cat /etc/ntp.conf`
-* `sudo hwclock --systohc --utc`
+* `timedatectl` - general time info
+* `sudo ntpq -p` - lists configured ntp servers, the symbols in the first column
+ `+, -, *` [note the use](https://web.archive.org/web/20230102105411/https://detailed.wordpress.com/2017/10/22/understanding-ntpq-output/)
+* `sudo ntpq -c sysinfo` - operational summary
+* `sudo sntp -t 1 pool.ntp.org` - force sync to a pool, timeout after 1 sec
+* `systemctl status ntp.service` - check service status
+* `sudo journalctl -u ntp.service` - check journal info of the service
+* `systemctl restart ntp.service` - restart the service
+* `cat /etc/ntp.conf` - check the config 
+* `sudo hwclock --systohc --utc` - set utc time to rtc clock, hardware clock runnin in bios
 
 ![timedatectl](https://i.imgur.com/aIMm7WT.png)
 
-For the issue I faced, I think what did the trick was sync time through dashboard
-when I had notice of wrong time for like 4th time.
-Then I set the UTC time in bios using `hwclock --systohc --utc`
-and then I started `sudo systemctl start ntp` which previously was failing,
-after that `ntpq -p` worked.
+I faced an issue of time being out of sync after restarts and ntpq command
+failing to connect. What I think did the trick was force sync time through dashboard,
+or through use of `sntp` command, then restart the ntp service.
+Then set the UTC time in bios using `hwclock --systohc --utc`
 
 ### Pools and Datasets
 
 ![zfs-layout](https://i.imgur.com/uQXaw3h.png)
 
-
-##### First a Pool
+##### Pool
 
 [The official documentation.](https://www.truenas.com/docs/core/coretutorials/storage/pools/poolcreate/)
 
-I think of a pool as of a virtual unformated hard rive. You cant mount it,
-you cant use it without partitioning it first.
+Pool is like a virtual unformated hard drive. Can't be mounted,
+cant be used without *"partitioning"* it first.
+But it is at the creation of pool where "raid" is set.
 
-* create a pool in the Storage section, name it, I prefer to not encrypt,
-  that comes later with Datasets
-* assign disks to the pool's default VDev, if needed more VDevs can be added
-* in vdev select "raid" type stripe, mirror,
-* finish
+* start creating a pool<br>
+  Storage > Create Pool button<br>
+  name it; I prefer to not encrypt, that comes with datasets
+* assign physical disks to the pool's default VDev,
+  if needed, more VDevs can be added<br>
+  select "raid" type for the VDev - stripe, mirror
+* Create
 
-##### Second comes Dataset
+For destruction of a pool - Storage > Export/Disconnect button
+
+##### Dataset
 
 [The official documentation.](https://www.truenas.com/docs/core/coretutorials/storage/pools/datasets/)
 
@@ -117,8 +123,9 @@ you cant use it without partitioning it first.
 actually comes to play, with all the good stuff like mount, access, quotas,
 compression, snapshots,...
 
-* create a dataset in Datasets > Add Dataset, name it,
-  I prefer to turn off compression
+* start creating a dataset<br>
+  Datasets > Add Dataset button<br>
+  name it; I prefer to turn off compression
 * set encryption to passphrase if desired<br>
   this encryption prevents access to the data after shutdown,
   nothing to do with sharing
@@ -126,14 +133,15 @@ compression, snapshots,...
 * set Share Type to `SMB` if planning to share with SMB, which is the most used
   way to share, especially for windows or mixed access
 
-Theres also a direct alterantive to dataset - `Zvol` when one desires
-iScsi and the mounting of a network storage as a block device.
-Which provides great speeds with small files, but at the cost of space.
+##### Zvol
 
-For destruction of datasets - Datasets > select one > delete button right side<br>
-For destruction of pools - Storage > Export/Disconnect button
+`Zvol` is a direct alternative to dataset.<br>
+When planning to use iScsi with its approach of mounting network storage
+as a block device.
+This provides great speeds with small files, but at the cost of space.
 
-### SMB share
+<details>
+<summary><h1>SMB share</h1></summary>
 
 Should be go-to for most cases, as all systems(win, linux, mac, 
 android, ios) have mature reliable smb clients.
@@ -168,7 +176,7 @@ should allow full access to the share.
 Worth noting that it's the UID number that identifies users,
 not the username.
 
-#### SMB share for everyone
+### SMB share for everyone
 
 One might think that just allowing group `everyone@` access is enough.
 But when someone connects to a share, there must be a username used.
@@ -178,7 +186,7 @@ which under the hood is named `nobody`
 * in Shares > Windows (SMB) Shares > edit the share
 * Advanced Options > Allow Guest Access
 
-#### Mounting network share at boot
+### Mounting network share at boot
 
 Using systemd. And the instructions from [arch wiki.](https://wiki.archlinux.org/title/samba#As_systemd_unit)
 
@@ -209,9 +217,13 @@ Where=/mnt/bigdisk
 [Install]
 WantedBy=multi-user.target
 ```
+</details>
 
+---
+---
 
-### NFS share
+<details>
+<summary><h1>NFS share</h1></summary>
 
 Linux to linux file sharing. Simple.
 
@@ -252,7 +264,7 @@ Test mounting on client machine, in my case arch linux machine,
 * mount the share `sudo mount 10.0.19.11:/mnt/Pool-02/sun/ ~/temp`
 * should work can check version using `nfsstat -m` or `rpcinfo -p 10.0.19.11`
 
-#### Mounting network share at boot
+### Mounting network share at boot
 
 Using systemd. And the instructions from [arch wiki.](https://wiki.archlinux.org/title/NFS#As_systemd_unit)
 
@@ -284,11 +296,12 @@ Where=/mnt/truenas
 WantedBy=multi-user.target
 ```
 
-handy commands
+</details>
 
-* `lsof ~/temp` - find what uses files when trying to unmount
+---
+---
 
-### iSCSI share
+# iSCSI share
 
 ### Data protection settings
 
