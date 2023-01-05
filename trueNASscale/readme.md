@@ -14,6 +14,9 @@ Network storage operating system managed through web GUI.<br>
 Based on debian linux with ZFS file system is at the core.
 Running nginx and using python and django for the web interface.
 
+**note** - There are links to the official documentation in subsections,
+its of decent quality, with pictures and videos and it should be up-to-date.
+
 [ZFS for Dummies](https://blog.victormendonca.com/2020/11/03/zfs-for-dummies/)
 
 # My specific use case
@@ -33,7 +36,7 @@ but truenas seems a bigger player. And if I would have not lucked out
 with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 
 <details>
-<summary><h1>Installation in as VM in VMware ESXi</h1></summary>
+<summary><h1>Installation as a VM in VMware ESXi</h1></summary>
 
 ![esxi-vm](https://i.imgur.com/hqatTKG.png)
 
@@ -139,7 +142,7 @@ compression, snapshots,...
 * set Share Type to `SMB` if planning to share with SMB, which is the most used
   way to share, especially for windows or mixed access
 
-##### Zvol
+### Zvol
 
 `Zvol` is a direct alternative to dataset.<br>
 When planning to use iScsi with its approach of mounting network storage
@@ -307,7 +310,134 @@ WantedBy=multi-user.target
 ---
 ---
 
-# iSCSI share
+<details>
+<summary><h1>iSCSI share</h1></summary>
+
+[The official documentation.](https://www.truenas.com/docs/scale/scaletutorials/shares/iscsi/addingiscsishares/)
+
+Sharing disk space as a block device over network. 
+Great perfromance, especially if lot of I/O small files stuff.
+Only single client can work with the block device at once.
+
+* **target** - a storage we want to make available over network
+* **initiator** - a device connecting to a target
+* **portal** - they say IP and port pair, but part of it is also authentication
+* 
+
+both target and initiator must be assigned IQN - iSCSI Qualified Name<br>
+name format: iqn.yyyy-mm.naming-authority:unique name<br>
+examples:<br>
+`iqn.2016-04.com.open-iscsi:4ab2905b66ca`<br>
+`iqn.2005-10.org.freenas.ctl:garbage`<br>
+`iqn.1991-05.com.microsoft:tester-81`<br>
+
+
+assuming all sections (portals, Initators groups, Authgorized access, targets, extents,..) are empty and doing it first time
+
+* create a new Zvol<br>
+  Datasets > Add Zvol button<br>
+  set Name; set Size, they recommend less than 80% of the pool but can be forced higher;
+
+* click through iSCSI share wizzard or do the manual setup<br>
+  Shares > Block (iSCSI) Shares Targets > ...<br>
+
+Manual setup
+
+* Target Global Configuration<br>
+  nothing really worth changing
+* Portals<br>
+  add some description and set IP of the truenas<br>
+* Initiator<br>
+  add some description and for now check Allow All Initiators
+* Authorized Access<br>
+  skip
+* Targets<br>
+  set name; set portal group; set initiator group; authentication kept none
+* Extents<br>
+  set name; device=some zvol; Logical Block Size=4096
+* Associated Targets <br>
+  set target; LUN ID=0; set extent
+
+Enable iSCSI service. 
+
+To test if it works.<br>
+On windows just launching `iscsicpl.exe` and refreshing, connect, should work.
+
+On arch linux there is a good and detailed [instructions on the wiki.](https://wiki.archlinux.org/title/Open-iSCSI)
+
+* install `open-iscsi`
+* start service `sudo systemctl start iscsid.service`<br>
+  do not `enable` it just start it to test,
+  to have it present after boot
+  - `sudo systemctl enable iscsi.service`
+  - edit `/etc/iscsi/nodes/../default` and set `node.startup = automatic`
+  - apply systemd mount files 
+* discover targets at the ip<br>
+  `sudo iscsiadm --mode discovery --portal 10.0.19.11 --type sendtargets`<br>
+  after this command a new directory is created `/etc/iscsi/nodes/`
+* login to all available targets
+  `sudo iscsiadm -m node -L all`
+* see availabl block devices<br>
+  `lsblks`
+
+### Encryption setup using fs
+
+[very well written arch wiki page](https://wiki.archlinux.org/title/Fscrypt)
+
+* format the iscsi disk<br> 
+  `sudo mkfs.ext4 -O encrypt /dev/sdb1`<br>
+  or enable it with `sudo tune2fs -O encrypt /dev/device`
+* mount it lets say `/mnt/target1`
+* install fscrypt<br>
+  `sudo pacman -S fscrypt`
+* enable it on the system `fscrypt setup`
+* enable it on the mounted partition `sudo fscrypt setup /mnt/target1`
+* create a directory there as you cant encrypt root of a partition
+* encrypt the directory `fscrypt encrypt /mnt/target1/homework` 
+* lock `fscrypt lock /mnt/target1/homework`
+* lock `fscrypt unlock /mnt/target1/homework`
+
+systemd mount files
+
+`/etc/systemd/system/mnt-target1.mount`
+```ini
+[Unit]
+Before=remote-fs.target
+After=iscsi.service 
+Requires=iscsi.service
+Description=iscasi test share
+
+[Mount]
+What=/dev/disk/by-uuid/58b83770-2c68-463e-9ea4-6f62ef8c001d
+Where=/mnt/target1
+Type=ext4
+Options=_netdev,noatime
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`/etc/systemd/system/mnt-bigdisk.automount`
+```ini
+[Unit]
+Description=iscasi test share
+
+[Automount]
+Where=/mnt/target1
+
+[Install]
+WantedBy=multi-user.target
+```
+
+* `/etc/iscsi/nodes` - where targets are added
+* `/etc/iscsi/initiatorname.iscsi` - machines id
+* `/etc/iscsi/iscsid.conf` - general config
+
+
+</details>
+
+---
+---
 
 ### Data protection settings
 
