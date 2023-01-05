@@ -62,6 +62,11 @@ services:
       - 8123:8123       # dynmap
     volumes:
       - ./minecraft-data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   minecraft-rcon:
     image: itzg/rcon
@@ -258,6 +263,14 @@ switch to sata ssd seems to prevent any more occurancies of this high disk usage
 * [OpeNLogin](https://www.spigotmc.org/resources/openlogin-1-7x-1-19x.57272/)
 * [luckperms](https://luckperms.net/download) - manage permissions of players,
   planned to use, not in use yet. [Here](https://www.youtube.com/watch?v=AwbVqSOn2SI) is a good video on it.
+
+  luckpers commands 
+
+  * `lp editor` - open browser editor, afterwards it should be confirmed
+  * set everything in browser
+  * in game `lp user Dunco parent set hráč`
+
+
 * wordguard with word edit, followed [this video](https://youtu.be/pYAk38Hekqg)
 
 # Comamnds & settings
