@@ -56,7 +56,9 @@ with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 * click through the Installation
 * pick admin user and set password
 * login, shutdown
-* ESXi - edit VM, add other device, PCI device, <should be listed HBA card> 
+* ESXi - edit VM, add other device, PCI device,
+  should be listed HBA card thats passthrough
+  so that truenas has direct disks access
 
 </details>
 
@@ -88,10 +90,11 @@ check few things
 * `sudo ntpq -p` - lists configured ntp servers, the symbols in the first column
  `+, -, *` [note the use](https://web.archive.org/web/20230102105411/https://detailed.wordpress.com/2017/10/22/understanding-ntpq-output/)
 * `sudo ntpq -c sysinfo` - operational summary
-* `sudo sntp -t 1 pool.ntp.org` - force sync to a pool, timeout after 1 sec
+* `sudo ntpd -g -x -q pool.ntp.org` - force sync to a pool
+* `sudo sntp pool.ntp.org` - force sync to a pool
 * `systemctl status ntp.service` - check service status
 * `sudo journalctl -u ntp.service` - check journal info of the service
-* `systemctl restart ntp.service` - restart the service
+* `sudo systemctl restart ntp.service` - restart the service
 * `cat /etc/ntp.conf` - check the config 
 * `sudo hwclock --systohc --utc` - set utc time to rtc clock, hardware clock runnin in bios
 
@@ -99,7 +102,7 @@ check few things
 
 I faced an issue of time being out of sync after restarts and ntpq command
 failing to connect. What I think did the trick was force sync time through dashboard,
-or through use of `sntp` command, then restart the ntp service.
+or through cli commands, then restart the ntp service.
 Then set the UTC time in bios using `hwclock --systohc --utc`
 
 ### Pools and Datasets
@@ -367,8 +370,8 @@ On arch linux there is a good and detailed [instructions on the wiki.](https://w
 
 * install `open-iscsi`
 * start service `sudo systemctl start iscsid.service`<br>
-  do not `enable` it just start it to test,
-  to have it present after boot
+  do not `enable` it just start it to test<br>
+  to have it present after boot:
   - `sudo systemctl enable iscsi.service`
   - edit `/etc/iscsi/nodes/../default` and set `node.startup = automatic`
   - apply systemd mount files 
