@@ -70,6 +70,10 @@ System > Firmware > Plugins
 
 </details>
 
+---
+---
+
+
 <details>
 <summary><h1>First login and basic setup</h1></summary>
 
@@ -79,6 +83,8 @@ System > Firmware > Plugins
 
 </details>
 
+---
+---
 
 <details>
 <summary><h1>Switch to https</h1></summary>
@@ -130,12 +136,15 @@ and its an encrypted communication between the browser and the firewall
 
 </details>
 
+---
+---
+
 <details>
 <summary><h1>Geoblock</h1></summary>
 
 Lock out the entire world from your network, except for your own country.
-Great security benefits, but if you dont use dns challange you might have issues
-with https certificates renewal and other stuff thats initiated connection
+Great security benefits, but if you dont use dns challenge you might have issues
+with https certificates renewal and other stuff that initiates connection
 from the outside.
 
 Following [the official documentation](https://docs.opnsense.org/manual/how-tos/maxmind_geo_ip.html)
@@ -167,3 +176,34 @@ opera build in vpn, or by using some
 Assuming you are not in the country from which these run their test.
  
 </details>
+
+---
+---
+
+<details>
+<summary><h1>Monitoring</h1></summary>
+
+### current live view of connections
+
+Firewall: Log Files: Live View<br>
+The filter and autorefresh on/off allow to investigate traffic
+
+* targeting specific ip on the LAN, for example docker host<br>
+  `dst` `is` `192.168.19.200`<br> 
+  or ip address of a reverse proxy in docker, for me it was `10.36.44.8`
+* or specific port, like for minecraft
+  port is 25565
+* controlling for direction and understanding the concept
+  - 🡪 IN means in to a firewall, 🡨 OUT means out of a firewall
+  - the interfaces WAN/LAN, give the meaning to these IN/OUT directions
+  - IN on LAN interface means traffic is leaving LAN and heading out through firewall
+  - IN on WAN interface means traffic is coming in to 
+  - OUT on LAN means its leaving firewall and heading to LAN 
+  - OUT on WAN means its leaving firewall and heading to the WAN side
+* 
+
+
+</details>
+
+---
+---
