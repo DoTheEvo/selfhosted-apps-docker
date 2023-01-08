@@ -202,6 +202,10 @@ which under the hood is named `nobody`
 
 Using systemd. And the instructions from [arch wiki.](https://wiki.archlinux.org/title/samba#As_systemd_unit)
 
+I prefer setting permissions in the unit
+
+check your user `id $whoami` for uid and gid
+
 `/etc/systemd/system/mnt-bigdisk.mount`
 ```ini
 [Unit]
@@ -210,7 +214,7 @@ Description=12TB truenas mount
 [Mount]
 What=//10.0.19.11/Dataset-01
 Where=/mnt/bigdisk
-Options=rw,username=ja,password=qq,file_mode=0644,dir_mode=0755,uid=1000
+Options=rw,username=bastard,password=lalala,file_mode=0644,dir_mode=0755,uid=1000,gid=1000
 Type=cifs
 TimeoutSec=10
 
