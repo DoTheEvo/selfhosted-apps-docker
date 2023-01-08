@@ -28,7 +28,7 @@ its of decent quality, with pictures and videos and it should be up-to-date.
 My home server runs ESXi.<br>
 TrueNAS is one of the virtual machines,
 with Fujitsu D3307 [flashed in to IT Mode](https://forums.servethehome.com/index.php?threads/the-versatile-sas3008-chipset-my-vendor-crossflashing-adventures.28297/page-4#post-319106)
-and pass-through in to the VM so that truenas has direct access to the disk,
+and pass-through in to the VM so that truenas has direct access to the disks,
 without any in between layer.
 
 I hold strong opinion on backups > raid.<br>
@@ -69,7 +69,8 @@ with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 ---
 ---
 
-# Basic Setup
+<details>
+<summary><h1>Basic Setup</h1></summary>
 
 ### Static IP address
 
@@ -155,6 +156,11 @@ compression, snapshots,...
 When planning to use iScsi with its approach of mounting network storage
 as a block device.
 This provides great speeds with small files, but at the cost of space.
+
+</details>
+
+---
+---
 
 <details>
 <summary><h1>SMB share</h1></summary>
