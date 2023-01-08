@@ -4,6 +4,10 @@
 
 ![logo](https://i.imgur.com/9ocPlzl.png)
 
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+
 # Purpose & Overview
 
 Network storage operating system managed through web GUI.<br>
