@@ -131,6 +131,14 @@ who is already on the LAN side I guess.
 * switch radio buttons at the top from http to https if its not already.<br>
   The previous steps should be done as opnsense will want to reload gui
 
+### automatic renewal
+
+* `Services: ACME Client: Settings` - click tab - `Update Schedule`<br>
+  opens `System: Settings: Cron` where renewal schedule in cron format is set<br>
+* everything is left default, only changing hours=`3` and months=`*/2`<br>
+  this sets schedule to every other month at 3 after midnight.
+* cant tell yet if its working or not, got to wait few months and check
+
 now from local LAN side one can access web gui with https://fw.example.com
 and its an encrypted communication between the browser and the firewall
 
