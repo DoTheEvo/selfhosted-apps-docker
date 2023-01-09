@@ -215,3 +215,9 @@ The filter and autorefresh on/off allow to investigate traffic
 
 ---
 ---
+
+### Extra info and encountered issues
+
+* Health check - `System: Firmware` Run an audit button, Health
+* zenarmor that was disabled caused<br>
+  opnsense and PHP Startup: Unable to load dynamic library 'mongodb.so' 
