@@ -87,6 +87,48 @@ System > Firmware > Plugins
 ---
 
 <details>
+<summary><h1>Port fowarding and NAT reflection(hairpin)</h1></summary>
+
+[source](https://forum.opnsense.org/index.php?topic=8783.0)
+
+### Firewall settings
+
+`Firewall: Settings: Advanced`
+- Reflection for port forwards: `Enabled`
+- Reflection for 1:1: `Disabled`
+- Automatic outbound NAT for Reflection: `Enabled`
+
+### Port Forwarding:
+
+a host with IP 192.168.1.200, with port 3100 open TCP<br>
+want to port forward from the outside 3200 to 3100
+
+- set up Aliases in `Firewall: Aliases`<br>
+  - name: A short friendly name for the IP address you're aliasing. I'll call it "media-server"
+  - type: Host(s)
+  - Aliases: Input 192.168.1.200
+
+- register the portforwarding in `Firewall: NAT: Port Forward`<br>
+  - Interface: WAN
+  - TCP/IP Version: IPv4
+  - Protocol: TCP
+  - Under Source > Advanced:<br>
+    - Source / Invert: Unchecked
+    - Source: Any
+    - Source Port Range: any to any
+  - Destination / Invert: Unchecked
+  - Destination: WAN address
+  - Destination Port range: (other) 3200 to (other) 3200
+  - Redirect target IP: Alias "media-server"
+  - Redirect target Port: (other) 3100
+
+</details>
+
+---
+---
+
+
+<details>
 <summary><h1>Switch to https</h1></summary>
 
 Not really needed. More like an exercise.
