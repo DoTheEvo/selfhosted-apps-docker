@@ -107,14 +107,13 @@ checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
 - Automatic outbound NAT for Reflection: `Enabled`
 
 *extra info:*<br>
-Many consider NAT reflection a hack that should not be used or even allowed.<br>
-That the correct way is split DNS, where you maintain DNS records so that
-`a.example.com` points directly to some local 192.168.0.12 IP address.<br>
-Reason being that since DNS records are cached, this way machines on LAN,
-that use hostname to access each other, are not hitting the firewall with
-every traffic that goes between two machines on LAN side.
-But IMO in small scale selfhosted setup its perfectly fine and it requires
-far less management.
+Many consider NAT reflection to be a hack that should not be used.<br>
+That the correct way is split DNS, where you maintain separate DNS records for
+LAN side so that `a.example.com` points directly to some local ip.
+Reason being machines on LAN that use FQDN to access other machine on LAN
+are not hitting the firewall with every traffic that goes between them.
+But IMO in small scale selfhosted setup its perfectly fine
+and it requires far less management.
 
 ### Port Forwarding:
 
