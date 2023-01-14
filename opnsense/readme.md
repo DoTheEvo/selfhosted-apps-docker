@@ -109,18 +109,18 @@ want to port forward from the outside 3200 to 3100
   - Aliases: Input 192.168.1.200
 
 - register the portforwarding in `Firewall: NAT: Port Forward`<br>
-  - Interface: WAN
-  - TCP/IP Version: IPv4
-  - Protocol: TCP
-  - Under Source > Advanced:<br>
-    - Source / Invert: Unchecked
-    - Source: Any
-    - Source Port Range: any to any
-  - Destination / Invert: Unchecked
-  - Destination: WAN address
-  - Destination Port range: (other) 3200 to (other) 3200
-  - Redirect target IP: Alias "media-server"
-  - Redirect target Port: (other) 3100
+  - Interface: `WAN`
+  - TCP/IP Version: `IPv4`
+  - Protocol: `TCP`
+  - Under `Source > Advanced`:<br>
+    - Source / Invert: `Unchecked`
+    - Source: `Any`
+    - Source Port Range: `any to any`
+  - Destination / Invert: `Unchecked`
+  - Destination: `WAN address`
+  - Destination Port range: `(other) 3200 to (other) 3200`
+  - Redirect target IP: `Alias "media-server"`
+  - Redirect target Port: `(other) 3100`
 
 </details>
 
