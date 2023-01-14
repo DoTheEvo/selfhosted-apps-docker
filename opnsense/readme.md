@@ -15,7 +15,7 @@ Firewall, router, dhcp server, recursive DNS, VPN, traffic monitoring.
 Opensource.<br>
 Backend is FreeBSD with its packet filter `pf` and `configd`
 for managing daemons, services and templates.<br>
-For web gui frontend it uses lighttpd web server, PHP/Phalcon framework
+For web gui it uses lighttpd web server, PHP/Phalcon framework
 and custom services built in Python.
 
 Can be installed on a physical server or in a virtual machine.
@@ -106,6 +106,7 @@ checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
 - Reflection for 1:1: `Disabled`
 - Automatic outbound NAT for Reflection: `Enabled`
 
+*extra info:*<br>
 Many consider NAT reflection a hack that should not be used or even allowed.<br>
 That the correct way is split DNS, where you maintain DNS records so that
 `a.example.com` points directly to some local 192.168.0.12 IP address.<br>
