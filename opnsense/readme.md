@@ -87,16 +87,33 @@ System > Firmware > Plugins
 ---
 
 <details>
-<summary><h1>Port fowarding and NAT reflection(hairpin)</h1></summary>
+<summary><h1>Port fowarding and NAT reflection(hairpin/loopback)</h1></summary>
 
 [source](https://forum.opnsense.org/index.php?topic=8783.0)
 
-### Firewall settings
+### NAT reflection
+
+When you write `a.example.com` in to your browser,
+you are asking a DNS server for an IP address.
+When selfhosting that `a.example.com` it will give you your own public IP,
+and most consumer routers don't allow this loopback, where your requests
+should go out and then right back.<br>
+So a solution for above-consumer-level routers/firewalls is to just have 
+checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
 
 `Firewall: Settings: Advanced`
 - Reflection for port forwards: `Enabled`
 - Reflection for 1:1: `Disabled`
 - Automatic outbound NAT for Reflection: `Enabled`
+
+Many consider NAT reflection a hack that should not be used or even allowed.<br>
+That the correct way is split DNS, where you maintain DNS records so that
+`a.example.com` points directly to some local 192.168.0.12 IP address.<br>
+Reason being that since DNS records are cached, this way machines on LAN,
+that use hostname to access each other, are not hitting the firewall with
+every traffic that goes between two machines on LAN side.
+But IMO in small scale selfhosted setup its perfectly fine and it requires
+far less management.
 
 ### Port Forwarding:
 
