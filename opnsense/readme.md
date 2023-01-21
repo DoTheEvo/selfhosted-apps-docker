@@ -73,6 +73,69 @@ System > Firmware > Plugins
 ---
 ---
 
+<details>
+<summary><h1>Hyper-V</h1></summary>
+
+Tested in windows 11 pro, v10.0.22621<br>
+
+#### Network setup
+
+Two physical network cards - NICs
+
+![esxi-network](https://i.imgur.com/WnVQiZC.gif)
+
+* the Default Switch will not be used.
+* create new virtual switch - `vWAN`<br>
+  `external`, unchecked - *Allow management operating system to share this network adapter*<br>
+  set correct physical NIC
+* create new virtual switch - `vLAN`<br>
+  `external`, set correct physical NIC<br>
+
+A cable with a live device at the end must be connected to LAN NIC 
+for that LAN part of setup to start working.
+
+#### Virtual machine creation
+
+[Download](https://opnsense.org/download/) the latest opnsense - amd64, dvd,
+extract 
+
+* generation 2
+* firmware > security > turn off secure boot
+* SCSI Controller add DVD and mount opnsense iso
+* 2 cores, 2GB ram, for basic functionality, later can assign more 
+* add two virtual NICs, assign WAN and LAN virtual switches
+* firmware boot order change
+* turn off automatic checkpoints
+* automatic stop action - shutdown
+
+Start the VM
+
+
+#### OPNsense installation in VM
+
+Disconnect your current router and plug stuff in to the ESXi host.
+
+* let it boot up
+* login `installer/opnsense`
+* click through the install process
+  * UFS
+  * disk
+  * 8GB for swap
+  * keep default password for now
+  * set the interfaces, in hyperv you can check mac addresses
+* set IPs, wan is usually left alone with dhcp,<br>
+  static ip for LAN and enable dhcp server running and give it range
+* afterwards you should be able to access web gui
+* log out
+* done
+
+No need to install some hyperv plugin after the installation,
+its on by default
+
+</details>
+
+---
+---
 
 <details>
 <summary><h1>First login and basic setup</h1></summary>
@@ -110,7 +173,7 @@ checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
 Many consider NAT reflection to be a hack that should not be used.<br>
 That the correct way is split DNS, where you maintain separate DNS records for
 LAN side so that `a.example.com` points directly to some local ip.
-Reason being machines on LAN that use FQDN to access other machine on LAN
+Reason being that machines on LAN that use FQDN to access other machine on LAN
 are not hitting the firewall with every traffic that goes between them.
 But IMO in small scale selfhosted setup its perfectly fine
 and it requires far less management.
