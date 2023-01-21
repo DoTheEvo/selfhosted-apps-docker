@@ -138,10 +138,16 @@ its on by default
 ---
 
 <details>
-<summary><h1>First login and basic setup</h1></summary>
+<summary><h1>First login and basics</h1></summary>
 
-* at the LAN ip login
-* click through wizzard, use 8.8.8.8 and 1.1.1.1 for DNS
+* click through wizzard, keep mostly defaults
+  * hostname, DNS use 8.8.8.8 and/or 1.1.1.1
+  * timezone and ntp server
+  * WAN - DHCP , defaults
+  * LAN - set network and mask, I prefer not default 10.0.X.1
+  * root password
+* Update
+* I like the simple os-vnstat plugin for WAN to have some general idea about traffic
 * 
 
 </details>
