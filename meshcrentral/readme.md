@@ -27,7 +27,7 @@ The architecture is relatively simple.
   which allows full control of the device from the servers web
 
 Theres also an entire aspect of possibility of using
-Intel AMT - Active Management Technology.
+Intel AMT - Active Management Technology through port 4433.
 
 ---
 
@@ -173,10 +173,75 @@ mesh.{$MY_DOMAIN} {
 
 # The usage on clients
 
-
+# Improved safety
 
 
 # Trouble shooting
+
+# Running without separate database
+
+`docker-compose.yml`
+```yml
+services:
+
+  meshcentral:
+    image: ghcr.io/ylianst/meshcentral:latest
+    container_name: meshcentral
+    hostname: meshcentral
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      # config.json and other important files live here. A must for data persistence
+      - ./meshcentral/data:/opt/meshcentral/meshcentral-data
+      # where file uploads for users live
+      - ./meshcentral/user_files:/opt/meshcentral/meshcentral-files
+      # location for the meshcentral-backups - this should be mounted to an external storage
+      - ./meshcentral/backup:/opt/meshcentral/meshcentral-backup
+      # location for site customization files
+      - ./meshcentral/web:/opt/meshcentral/meshcentral-web
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true      
+```
+
+`.env`
+```bash
+# GENERAL
+MY_DOMAIN=example.com
+DOCKER_MY_NETWORK=caddy_net
+TZ=Europe/Bratislava
+
+# MESHCENTRAL
+NODE_ENV=production
+
+# initial mongodb-variables
+MONGO_INITDB_ROOT_USERNAME=mongodbadmin
+MONGO_INITDB_ROOT_PASSWORD=mongodbpasswd
+
+# initial meshcentral-variables
+# the following options are only used if no config.json exists in the data-folder
+
+# your hostname
+HOSTNAME=mesh.example.com
+USE_MONGODB=false
+# set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy 
+REVERSE_PROXY=example.com
+REVERSE_PROXY_TLS_PORT=443
+# set to true if you wish to enable iframe support
+IFRAME=false
+# set to false if you want disable self-service creation of new accounts besides the first (admin)
+ALLOW_NEW_ACCOUNTS=true
+# set to true to enable WebRTC - per documentation it is not officially released with meshcentral and currently experimental. Use with caution
+WEBRTC=false
+# set to true to allow plugins
+ALLOWPLUGINS=false
+# set to true to allow session recording
+LOCALSESSIONRECORDING=false
+# set to enable or disable minification of json, reduces traffic
+MINIFY=true
+```
 
 
 
