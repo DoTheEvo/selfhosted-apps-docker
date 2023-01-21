@@ -46,6 +46,8 @@ with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
 
 [The official documentation.](https://www.truenas.com/docs/scale/gettingstarted/install/installingscale/)
 
+Make sure the Esxi host has correc time and ntp sync.
+
 * [download ISO](https://www.truenas.com/download-truenas-scale/)
 * upload it to ESXi datastore
 * create new VM
@@ -106,9 +108,8 @@ check few things
 ![timedatectl](https://i.imgur.com/aIMm7WT.png)
 
 I faced an issue of time being out of sync after restarts and ntpq command
-failing to connect. What I think did the trick was force sync time through dashboard,
-or through cli commands, then restart the ntp service.
-Then set the UTC time in bios using `hwclock --systohc --utc`
+failing to connect. Reason for this was Esxi host not having default gateway
+correctly set and so never being able to sync its time.
 
 ### Pools and Datasets
 
