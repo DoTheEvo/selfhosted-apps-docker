@@ -26,6 +26,8 @@
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [arch_linux_host_install](arch_linux_host_install)
 
+Check also plan directories for work in progress
+
 Check also [StarWhiz / docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)<br>
 Who documents self hosted apps in similar format and also uses caddy for reverse proxy
 
