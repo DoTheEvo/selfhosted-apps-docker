@@ -85,10 +85,10 @@ Two physical network cards - NICs
 ![esxi-network](https://i.imgur.com/WnVQiZC.gif)
 
 * the Default Switch will not be used.
-* create new virtual switch - `vWAN`<br>
+* create new virtual switch - `WAN`<br>
   `external`, unchecked - *Allow management operating system to share this network adapter*<br>
   set correct physical NIC
-* create new virtual switch - `vLAN`<br>
+* create new virtual switch - `LAN`<br>
   `external`, set correct physical NIC<br>
 
 A cable with a live device at the end must be connected to LAN NIC 
@@ -130,7 +130,19 @@ Disconnect your current router and plug stuff in to the ESXi host.
 * done
 
 No need to install some hyperv plugin after the installation,
-its on by default
+its included automaticly.
+
+**In case of disconnect of LAN side cable/switch, the hyperv host also loses connection**<br>
+Even if one might think it should work - WAN side is there, firewall is running,
+but it's the way hyperv external vswitches work. The physical NIC must be alive.<br>
+If the switch would be `internal` then it would be entirely virtual and independent
+of physical NIC state, but in host windows network connections,
+one cant bridge internal and external, switches nor NICs.<br>
+One way to solve this mild annoyance is to have external WAN, internal LAN1,
+and external LAN2. LAN1 and LAN2 would be
+[bridged in opnsense](https://docs.opnsense.org/manual/how-tos/lan_bridge.html).
+But seems this is rather cpu intensive and not recommended.<br>
+So I guess its living with this.
 
 </details>
 
