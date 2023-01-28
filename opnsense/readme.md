@@ -156,6 +156,49 @@ its on by default
 ---
 
 <details>
+<summary><h1>Web GUI access from WAN side</h1></summary>
+
+For example in cases where the only thing under protection of opnsense
+are some VMs on a hypervisor, but managment is easier done from the host.<br>
+Or if the risk is acceptabale,hoping random port, long password for a non-root user,
+and maybe some IP restrictios will be enough.
+
+- `pfctl -d` disables firewall and allows immediate web gui access on the WAN IP.<br>
+  A restart of opnsense will always re-enable packet filtering
+- Disable `Block private networks` in `Interfaces: [WAN]`.
+- Set up a firewall rule that allows WAN traffic in `Firewall: Rules: WAN`<br>
+  Add new rule; everything is left default except the `Destination`
+  is set to `This Firewall`.<br>
+  Can also enable `Log packets that are handled by this rule` if use of this rule
+  should be visible in `Firewall: Log Files: Live View`.
+- Turn on `Disable reply-to` in `Firewall: Settings: Advanced`,<br>
+  otherwise connections made from the same network will not get through.<br>
+  Some [read on this.](https://forum.opnsense.org/index.php?topic=15900.0)
+- Reboot.<br>
+  Afterwards opnsense should be accessible on WAN IP, without the need for `pfctl -d`.
+
+For some harderining of security.
+
+* Change the default web gui port in `System: Settings: Administration`.<br>
+  From `443` to something random in range of 1024-65k, something like 32179.<br>
+  Afterwards to access opnsense the port must be added to the url `<IP>:32179`
+* Turn off `HTTP Redirect` in `System: Settings: Administration`.<br>
+  This only allows https encrypted communication.
+* Create a new user; add to administrators; disable `root` user
+  in `System: Access: Users`.<br>
+  Brute forcing username and password is more difficult than brute force
+  password for a known user `root`.
+* Adjust the firewall WAN rule to be more restrictive.<br>
+  Instead of `source` being `any`, setting a specific single machine IP.<br>
+  Either right in the rule with `Single host or Network` and `192.168.1.200/32`,<br>
+  or setting up an alias in `Firewall: Aliases`, setting IP in the `Content` field
+
+</details>
+
+---
+---
+
+<details>
 <summary><h1>Port fowarding and NAT reflection(hairpin/loopback)</h1></summary>
 
 [source](https://forum.opnsense.org/index.php?topic=8783.0)
@@ -319,11 +362,14 @@ Assuming you are not in the country from which these run their test.
 <details>
 <summary><h1>Monitoring</h1></summary>
 
-### current live view of connections
+### live view of connections
 
 Firewall: Log Files: Live View<br>
-The filter and autorefresh on/off allow to investigate traffic
+Great tool to investigate settings and behavior with it's filter
+and autorefresh on/off and up to 20k last entries
 
+* checking out a specific firewall rule latest use<br>
+  `label` `contains` `some string from the rules description`<br>
 * targeting specific ip on the LAN, for example docker host<br>
   `dst` `is` `192.168.19.200`<br> 
   or ip address of a reverse proxy in docker, for me it was `10.36.44.8`
@@ -336,8 +382,6 @@ The filter and autorefresh on/off allow to investigate traffic
   - IN on WAN interface means traffic is coming in to 
   - OUT on LAN means its leaving firewall and heading to LAN 
   - OUT on WAN means its leaving firewall and heading to the WAN side
-* 
-
 
 </details>
 
