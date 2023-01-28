@@ -156,10 +156,9 @@ So I guess its living with this.
   * hostname, DNS use 8.8.8.8 and/or 1.1.1.1
   * timezone and ntp server
   * WAN - DHCP , defaults
-  * LAN - set network and mask, I prefer not default 10.0.X.1
+  * LAN - set network and mask, I prefer 10.0.X.1
   * root password
 * Update
-* I like the simple os-vnstat plugin for WAN to have some general idea about traffic
 * 
 
 </details>
@@ -400,8 +399,18 @@ and autorefresh on/off and up to 20k last entries
 ---
 ---
 
+<details>
+<summary><h1>Plugins</h1></summary>
+
+* os-vnstat to have some general idea about traffic
+
+</details>
+
+---
+---
+
 ### Extra info and encountered issues
 
 * Health check - `System: Firmware` Run an audit button, Health
-* zenarmor that was disabled caused<br>
+* zenarmor that was disabled caused an error notification<br>
   opnsense and PHP Startup: Unable to load dynamic library 'mongodb.so' 
