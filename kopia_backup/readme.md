@@ -15,24 +15,26 @@ Backups.
 * [Official site](https://kopia.io/)
 * [Github](https://github.com/kopia/kopia)
 
-Kopia is an open source backup utility with basicly all modern features.</br>
+Kopia is a very new open source backup utility with basicly **all** modern features.</br>
 Cross-platform, deduplication, encryption, compression, multithreaded speed,
-cloud storage support, CLI and GUI versions, snapshots mounting,...
+fully build in cloud storage support, GUI versions, snapshots mounting,...
 
 Written in golang.
 
-In this setup kopia cli is installed directly on the host system.</br>
-A script is created that backs up the entire docker directory and /etc locally.</br>
-Systemd service and timer are used to run the backup periodicly.
+In this setup kopia cli is installed directly on a docker host.</br>
+A kopia repository is set up.<br>
+A script that backs up data is scheduled to run regularly<br>
+Bonus info on mounting remote NAS storage on boot using systemd<br>
 
 # Some aspects of Kopia
 
-* backup configuration is stored in a repository where backups will be stored<br>
-  this includes global policy, that is global in sense of repo, not all of kopia
-* you connect and disconnect from a repository before working with it,<br>
-  only one repository can be connected at time
-* currently to ignore some folders, one can create `CACHEDIR.TAG` with specific
-  [content](https://bford.info/cachedir/) and set policy: `--ignore-cache-dirs true`
+* backup configuration is stored in a repository where backups are stored<br>
+  this includes global policy, that is global in sense of a repo, not all of kopia
+* you connect to a repository before using it, and disconnect afterwards<br>
+  only one repository can be connected at the time(at least for cli version)
+* currently to ignore some folders, `CACHEDIR.TAG` file can be placed inside,
+  with specific specific [content](https://bford.info/cachedir/) 
+  and set policy: `--ignore-cache-dirs true`
 * Maintence is automatic
 * ..
 
@@ -55,39 +57,51 @@ Systemd service and timer are used to run the backup periodicly.
   └── kopia-backup-home-etc.sh
 ```
 
+only the script `kopia-backup-home-etc.sh` in /opt is created<br>
+uf, systemd unit files too, but I am not doing /etc/systemd/system/...
+even this will probably get deleted
+
 # The setup
 
-#### install kopia
+### install kopia
 
 for arch linux, kopia is on AUR `yay kopia-bin`
 
-#### repo creation and policy 
+### the initial steps
+
 
 use of sudo so that kopia has access everywhere<br>
-config files are therefore in `/root/config/kopia`
 
-- `sudo kopia policy get --global`
-- `sudo kopia policy list`
-- `sudo kopia policy set --global --ignore-cache-dirs true --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14`
+* **the policy info and change**
 
+`sudo kopia policy get --global`<br>
+`sudo kopia policy list`<br>
+`sudo kopia policy set --global --ignore-cache-dirs true --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14`<br>
 
+* **repo creation**
 
-- `mkdir -p /mnt/mirror/KOPIA/docker_host_kopia`</br>
-- `sudo kopia repository create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
-- `sudo kopia repository connect filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
-- `sudo kopia repository status`
-- `sudo kopia snapshot create /home/spravca/docker /etc`<br>
-- `sudo kopia snapshot list`<br>
-- `sudo kopia mount k7e2b0a503edd7604ff61c68655cd5ad7 /mnt/tmp &`<br>
-- `sudo umount /mnt/tmp`<br>
+`mkdir -p /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repository create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repository connect filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repository status`<br>
 
-#### the backup script
+* **manual run**
+
+`sudo kopia snapshot create /home/spravca/docker /etc`<br>
+`sudo kopia snapshot list`<br>
+
+* **mounting a backup**
+
+`sudo kopia mount k7e2b0a503edd7604ff61c68655cd5ad7 /mnt/tmp &`<br>
+`sudo umount /mnt/tmp`<br>
+
+### the backup script
 
 `/opt/kopia-backup-home-etc.sh`
-```
+```bash
 #!/bin/bash
 
-#sudo kopia policy set --global --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14
+#sudo kopia policy set --global --ignore-cache-dirs true --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
@@ -100,6 +114,46 @@ kopia repository disconnect
 
 ### Automatic execution using systemd
 
+usually cron is used, but systemd provides better logging and control,
+so better get used to using it
+
+```kopia-home-etc.service```
+```ini
+[Unit]
+Description=kopia backup
+Wants=network-online.target
+After=network-online.target
+ConditionACPower=true
+OnFailure=notify-ntfy@%i.service
+
+[Service]
+Type=oneshot
+
+# Lower CPU and I/O priority.
+Nice=19
+CPUSchedulingPolicy=batch
+IOSchedulingPriority=7
+
+IPAccounting=true
+PrivateTmp=true
+Environment="HOME=/root"
+
+ExecStart=/usr/bin/kopia snapshot create --all
+```
+
+
+```kopia-home-etc.timer```
+```
+[Unit]
+Description=Run kopia backup
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
 
 # Accessing the backup files
 
