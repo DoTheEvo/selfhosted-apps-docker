@@ -28,12 +28,12 @@ Bonus info on mounting remote NAS storage on boot using systemd<br>
 
 # Some aspects of Kopia
 
-* backup configuration is stored in a repository where backups are stored<br>
-  this includes global policy, that is global in sense of a repo, not all of kopia
-* you connect to a repository before using it, and disconnect afterwards<br>
-  only one repository can be connected at the time(at least for cli version)
-* currently to ignore some folders, `CACHEDIR.TAG` file can be placed inside,
-  with specific specific [content](https://bford.info/cachedir/) 
+* Backup configuration is stored in a repository where backups are stored.<br>
+  This includes global policy, that is global in sense of a repo, not all of kopia.
+* You connect to a repository before using it, and disconnect afterwards.<br>
+  Only one repository can be connected at the time(at least for cli version).
+* Currently to ignore a folder - `CACHEDIR.TAG` file can be placed inside,
+  with specific [content](https://bford.info/cachedir/) 
   and set policy: `--ignore-cache-dirs true`
 * Maintence is automatic
 * ..
@@ -58,7 +58,7 @@ Bonus info on mounting remote NAS storage on boot using systemd<br>
 ```
 
 only the script `kopia-backup-home-etc.sh` in /opt is created<br>
-uf, systemd unit files too, but I am not doing /etc/systemd/system/...
+uf, systemd unit files too, but I am not "drawing" /etc/systemd/system/ up there...
 even this will probably get deleted
 
 # The setup
@@ -92,6 +92,7 @@ use of sudo so that kopia has access everywhere<br>
 
 * **mounting a backup**
 
+`sudo kopia snapshot list`<br>
 `sudo kopia mount k7e2b0a503edd7604ff61c68655cd5ad7 /mnt/tmp &`<br>
 `sudo umount /mnt/tmp`<br>
 
@@ -115,7 +116,9 @@ kopia repository disconnect
 ### Automatic execution using systemd
 
 usually cron is used, but systemd provides better logging and control,
-so better get used to using it
+so better get used to using it.<br>
+[Heres](https://github.com/kopia/kopia/issues/2685#issuecomment-1384524828)
+some discussion on units. Will be editing it for ntfy 
 
 ```kopia-home-etc.service```
 ```ini
@@ -161,10 +164,12 @@ WantedBy=timers.target
 
 # Mounting using systemd
 
+* file are placed in `/etc/systemd/system`
 * the name of mount and automount files MUST correspond with the path<br>
   instead of `/` a `-` is used, but otherwise it must be the mounting path in name
-* for mounting that does not fail on boot, and mounts the target only on request
-  enable automount file, not mount file, so:<br>
+* for mounting that does not fail on boot if network there are network issues,
+  and mounts the target only on request - enable `automount` file,
+  not `mount` file, so:<br>
   `sudo systemctl enable mnt-mirror.automount`
 
 `mnt-mirror.mount`
