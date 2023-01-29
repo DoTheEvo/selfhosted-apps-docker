@@ -20,39 +20,18 @@ Instant notifications if email feels old timey and crowded
   they need to share single account and so lack the ability to choose
   what to get and what not to get
 * **ntfy** - simple original approach to just subscribing to "topics" without
-  authentification, very simple one line push notification.
-  Drawback is rather high [battery consumption](https://i.imgur.com/TDhj7El.jpg)
-  of the android app, but I did not let it run for long enough it could also
-  just be my phone thing. Just something to keep an eye on.
+  authentification. Very simple single line push notification.
+  Support for multiple user, supports ios.
 * **signal-cli-rest-api** - no gui, need a sim card phone number registred,
-  worse concept for sending notification to multiple users,
-  where you need to manually set everyone who should receive,
-  as oppose to having a "room/topic" to which one can "susbscribe",
-  but if signal is widespread enough and you are not asking people to install
-  another app then its a winner
+  notification are just send to phone numbers.
+  The wider spread of it might make it a winner since no need for another app.
 
-# docker-compose
+Afte few weeks of tinkering with these... ntfy is the winner for me, for now.<br>
+Compose files for the other two are at the end.
 
-`gotify-docker-compose.yml`
-```yml
-services:
+# docker-compose for ntfy
 
-  gotify:
-    image: gotify/server
-    container_name: gotify
-    hostname: gotify
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - "./gotify_data:/app/data"
-
-networks:
-  default:
-    name: caddy_net
-    external: true
-```
-
-`ntfy-docker-compose.yml`
+`docker-compose.yml`
 ```yml
 services:
 
@@ -74,6 +53,110 @@ networks:
     external: true
 ```
 
+`.env`
+```bash
+# GENERAL
+MY_DOMAIN=example.com
+DOCKER_MY_NETWORK=caddy_net
+TZ=Europe/Bratislava
+```
+
+# Reverse proxy
+
+Caddy is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+
+`Caddyfile`
+```
+ntfy.{$MY_DOMAIN} {
+  reverse_proxy ntfy:80
+}
+```
+
+# The usage
+
+[Documentations](https://docs.ntfy.sh/publish/)
+
+#### Linux
+
+`curl -d "blablablaaa" https://ntfy.example.com/whatevers`
+
+#### Windows
+
+* win10+
+
+  `Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/whatevers -Body "blablablaaa" -UseBasicParsing`
+
+* win8.1 and older need bit extra for https to work<br>
+
+  ```
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/whatevers -Body "blablablaaa" -UseBasicParsing
+  ```
+
+#### Linux systemd unit file service
+
+To allows use of ntfy `OnFailure` and `OnSuccess` inside systemd unit files.
+
+To send useful info [specifiers](https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Specifiers)
+are used.
+
+* %n - full unit name
+* %p - prefix part of the name
+* %i - instance name, between @ and suffix
+* %H - machine hostname
+
+Systemd template unit file is used.
+These contains `@` to allow for dynamical naming at runtime.
+They are called with additional info added between `@` and the suffix `.service`
+
+`ntfy@.service`
+```
+[Unit]
+Description=ntfy notification service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/curl -d "%i | %H" https://ntfy.example.com/systemd
+```
+
+example of a service using the above defined service to send notifications.
+
+`borg.service`
+```
+[Unit]
+Description=BorgBackup docker
+OnFailure=ntfy@failure-%p.service
+OnSuccess=ntfy@success-%p.service
+
+[Service]
+Type=simple
+ExecStart=/opt/borg_backup.sh
+```
+
+<details>
+<summary><h1>gotify and signal compose</h1></summary>
+
+`gotify-docker-compose.yml`
+```yml
+services:
+
+  gotify:
+    image: gotify/server
+    container_name: gotify
+    hostname: gotify
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - "./gotify_data:/app/data"
+
+networks:
+  default:
+    name: caddy_net
+    external: true
+```
+
 `signal-docker-compose.yml`
 ```yml
   signal:
@@ -87,25 +170,11 @@ networks:
 
 networks:
   default:
-    name: $DOCKER_MY_NETWORK
+    name: caddy_net
     external: true
 ```
 
-# Port forwarding
+</details>
 
-# The usage on clients
-
-# Encrypted use
-
-
-# Trouble shooting
-
-# Update
-
-# Backup and restore
-
-#### Backup
-  
-#### Restore
-
-
+---
+---
