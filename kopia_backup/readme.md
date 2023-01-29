@@ -115,10 +115,13 @@ kopia repository disconnect
 
 ### Automatic execution using systemd
 
-usually cron is used, but systemd provides better logging and control,
+Usually cron is used, but systemd provides better logging and control,
 so better get used to using it.<br>
 [Heres](https://github.com/kopia/kopia/issues/2685#issuecomment-1384524828)
 some discussion on units. Will be editing it for ntfy 
+
+[ntfy](https://github.com/binwiederhier/ntfy) is used for notifications,
+more info [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal#linux-systemd-unit-file-service)
 
 ```kopia-home-etc.service```
 ```ini
@@ -127,7 +130,8 @@ Description=kopia backup
 Wants=network-online.target
 After=network-online.target
 ConditionACPower=true
-OnFailure=notify-ntfy@%i.service
+OnFailure=ntfy@failure-%p.service
+# OnSuccess=ntfy@success-%p.service
 
 [Service]
 Type=oneshot
@@ -141,7 +145,7 @@ IPAccounting=true
 PrivateTmp=true
 Environment="HOME=/root"
 
-ExecStart=/usr/bin/kopia snapshot create --all
+ExecStart=/opt/kopia-backup-home-etc.sh
 ```
 
 
@@ -151,18 +155,15 @@ ExecStart=/usr/bin/kopia snapshot create --all
 Description=Run kopia backup
 
 [Timer]
-OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+RandomizedDelaySec=10min
 Persistent=true
 
 [Install]
 WantedBy=timers.target
 ```
 
-# Accessing the backup files
-
-
-
-# Mounting using systemd
+# Mounting backup storage using systemd
 
 * file are placed in `/etc/systemd/system`
 * the name of mount and automount files MUST correspond with the path<br>
