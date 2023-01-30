@@ -29,15 +29,16 @@ My home server runs ESXi.<br>
 TrueNAS is one of the virtual machines,
 with Fujitsu D3307 [flashed in to IT Mode](https://forums.servethehome.com/index.php?threads/the-versatile-sas3008-chipset-my-vendor-crossflashing-adventures.28297/page-4#post-319106)
 and pass-through in to the VM so that truenas has direct access to the disks,
-without any in between layer.
+without any in between layer. If I would have not lucked out with the HBA card,
+I would be buying Fujitsu 9211-8i from ebay.
 
 I hold strong opinion on backups > raid.<br>
-So I make zero use of zfs raid features and use it just as nice web GUI
+And I also have only few drives.
+So I make just little use of zfs raid features and use it just as nice web GUI
 for samba and nfs sharing.
 
-Good alterntive is [openmediavault](https://www.openmediavault.org/),
-but truenas seems a bigger player. And if I would have not lucked out
-with the HBA card, I would be buying Fujitsu 9211-8i from ebay.
+Good alterntive worth mention - [openmediavault](https://www.openmediavault.org/),
+but truenas seems a bigger player.
 
 <details>
 <summary><h1>Installation as a VM in VMware ESXi</h1></summary>
