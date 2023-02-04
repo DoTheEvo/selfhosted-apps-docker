@@ -16,10 +16,12 @@ Everything here is based on the magnificent
 [stefanprodan/dockprom.](https://github.com/stefanprodan/dockprom)</br>
 So maybe just go get that.
 
-[Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
-Here's [veeam-prometheus-grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)
-how to setup pushgateway a and send to it info on done backups
-and visualize history of that in grafana. 
+[Great youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
+Here's my [veeam-prometheus-grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)
+how to setup pushgateway and send to it info on done backups
+and visualize history of that in grafana.<br>
+Also soon to be added, [Loki](https://youtu.be/h_GGd7HfKQ8) for logs,
+to get that ntfy alarm when something happens in a log in a docker container.
 ---
 
 Prometheus is an open source system for monitoring and alerting,
@@ -218,14 +220,16 @@ GF_USERS_ALLOW_SIGN_UP=false
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
-# Prometheus configuration
-
-* /prometheus/**prometheus.yml**
+# prometheus.yml
 
 [Official documentation.](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 
 A config file for prometheus, bind mounted in to prometheus container.</br>
 Contains the bare minimum setup of targets from where metrics are to be pulled.
+
+Stefanprodan [gives](https://github.com/stefanprodan/dockprom/blob/master/prometheus/prometheus.yml)
+a custom shorter scrape intervals, but I feel thats not really
+[necessary](https://www.robustperception.io/keep-it-simple-scrape_interval-id/).
 
 `prometheus.yml`
 ```yml
@@ -270,28 +274,24 @@ push.{$MY_DOMAIN} {
 
 # First run and Grafana configuration
 
-* login admin/admin, afterwards change password
-* add Prometheus as a `Data source` in configuration<br>
-  set `URL` to `http://prometheus:9090`<br>
-  Save & test should return *Green*
+* login admin/admin to `graf.example.com`, change the password
+* add Prometheus as a Data source in configuration<br>
+  set URL to `http://prometheus:9090`<br>
 * import dashboards from [json files in this repo](dashboards/)<br>
-  Dashboards > +import > ..either copy paste or point to downloaded file
-
   
-Preconfigured dashboards from
-[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom).</br>
-Mostly unchanged, except for the default time range shown,
-changed from 15min to 1hour,
-and [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
-for host network monitoring not showing traffick.
+These dashboards are the preconfigured ones from
+[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
+with few changes.<br>
+`docker_host.json` did not show free disk space, it needed `fstype` changed from
+`aufs` to `ext4`. Also [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
+for host network monitoring not showing traffick. And in all of them
+the time interval is set to show last 1h instead of last 15m
 
-* **docker_host.json** - dashboard showing linux host metrics
+* **docker_host.json** - dashboard showing linux host machine metrics
 * **docker_containers.json** - dashboard showing docker containers metrics,
   except the ones labeled as `monitoring` in the compose file
 * **monitoring_services.json** - dashboar showing docker containers metrics
-  of containers that are labeled `monitoring`, which are this repo containers.
-
-
+  of containers that are labeled `monitoring`
 
 ---
 
