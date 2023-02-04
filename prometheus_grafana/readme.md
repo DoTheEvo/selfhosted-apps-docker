@@ -12,19 +12,21 @@ Monitoring of the host and the running cointaners.
 * [Github](https://github.com/prometheus)
 * [DockerHub](https://hub.docker.com/r/prom/prometheus/)
 
-[Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
 Everything here is based on the magnificent
-[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom),</br>
+[stefanprodan/dockprom.](https://github.com/stefanprodan/dockprom)</br>
 So maybe just go get that.
 
+[Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
+Here's [veeam-prometheus-grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)
+how to setup pushgateway a and send to it info on done backups
+and visualize history of that in grafana. 
 ---
 
-Prometheus is an open source system application used for monitoring and alerting.
-It collects metrics from configured targets at given intervals,
-exposes collected metrics for visualization, evaluates rule expressions,
-and can trigger alerts if some condition is observed to be true.
-
-Prometheus is relatively new project, it is a **pull type** monitoring
+Prometheus is an open source system for monitoring and alerting,
+written in golang.<br>
+It periodicly collects metrics from configured targets,
+exposes collected metrics for visualization, and can trigger alerts.<br>
+Prometheus is relatively young project, it is a **pull type** monitoring
 and consists of several components.
 
 * **Prometheus Server** is the core of the system, responsible for
@@ -38,10 +40,14 @@ and consists of several components.
      and exposes them at an endpoint so they can be pulled
 * **AlertManager** - responsible for handling alerts from Prometheus Server,
   and sending notifications through email, slack, pushover,..
+  In this setup [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) webhook will be used.<br>
+  Grafana comes with own alerts, but grafana kinda feels... b-tier
 * **pushgateway** - allows push type of monitoring.
   Should not be overused as it goes against the pull philosophy of prometheus.
   Most commonly it is used to collect data from batch jobs, or from services
-  that have short execution time. Like a backup script.
+  that have short execution time. Like a backup script.<br>
+  [Here's](https://github.com/DoTheEvo/veeam-prometheus-grafana) my use of it
+  to monitor veeam backup servers.
 * **Grafana** - for web UI visualization of the collected metrics 
 
 [glossary](https://prometheus.io/docs/introduction/glossary/)
@@ -52,29 +58,19 @@ and consists of several components.
 
 ```
 /home/
-└── ~/
-    └── docker/
-        └── prometheus/
-            │ 
-            ├── grafana/
-            │   └── provisioning/
-            │       ├── dashboards/
-            │       │   ├── dashboard.yml            
-            │       │   ├── docker_host.json
-            │       │   ├── docker_containers.json
-            │       │   └── monitor_services.json
-            │       │
-            │       └── datasources/ 
-            │           └── datasource.yml
-            │
-            ├── grafana-data/
-            ├── prometheus-data/
-            │
-            ├── .env
-            ├── docker-compose.yml
-            └── prometheus.yml
+ └── ~/
+     └── docker/
+         └── prometheus/
+             ├─── alertmanager/
+             ├─── grafana/
+             ├─── grafana-data/
+             ├─── prometheus-data/
+             ├── docker-compose.yml
+             ├── .env
+             └── prometheus.yml
 ```
 
+* `alertmanager/` - ...
 * `grafana/` - a directory containing grafanas configs and dashboards
 * `grafana-data/` - a directory where grafana stores its data
 * `prometheus-data/` - a directory where prometheus stores its database and data
@@ -82,18 +78,10 @@ and consists of several components.
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `prometheus.yml` - a configuration file for prometheus
 
-All files must be provided.</br>
-As well as `grafana` directory and its subdirectories and files.
-
-the directories `grafana-data` and `prometheus-data` are created
-by docker compose on the first run.
+The three files must be provided.</br>
+The directories are created by docker compose on the first run.
 
 # docker-compose
-
-Four containers to spin up.</br>
-While [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
-also got alertmanager and pushgateway, this is a simpler setup for now.</br>
-Just want pretty graphs.
 
 * **Prometheus** - prometheus server, pulling, storing, evaluating metrics
 * **Grafana** - web UI visualization of the collected metrics
@@ -103,6 +91,7 @@ Just want pretty graphs.
   like uptime, cpu load, memory use, network bandwidth use, disk space,...
 * **cAdvisor** - exporter for gathering docker **containers** metrics,
   showing cpu, memory, network use of each container
+* **alertmanager** - guess what that one do
 
 `docker-compose.yml`
 ```yml
@@ -110,7 +99,7 @@ services:
 
   # MONITORING SYSTEM AND THE METRICS DATABASE
   prometheus:
-    image: prom/prometheus:v2.35.0
+    image: prom/prometheus:v2.42.0
     container_name: prometheus
     hostname: prometheus
     restart: unless-stopped
@@ -134,15 +123,12 @@ services:
 
   # WEB BASED UI VISUALISATION OF THE METRICS
   grafana:
-    image: grafana/grafana:8.4.5
+    image: grafana/grafana:9.3.6
     container_name: grafana
     hostname: grafana
     restart: unless-stopped
+    env_file: .env
     user: root
-    environment:
-      - GF_SECURITY_ADMIN_USER
-      - GF_SECURITY_ADMIN_PASSWORD
-      - GF_USERS_ALLOW_SIGN_UP
     volumes:
       - ./grafana_data:/var/lib/grafana
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
@@ -152,9 +138,9 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-  # HOSTS METRICS COLLECTOR
+  # HOST MACHINE METRICS EXPORTER
   nodeexporter:
-    image: prom/node-exporter:v1.3.1
+    image: prom/node-exporter:v1.5.0
     container_name: nodeexporter
     hostname: nodeexporter
     restart: unless-stopped
@@ -162,7 +148,7 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -172,9 +158,9 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-  # DOCKER CONTAINERS METRICS COLLECTOR
+  # DOCKER CONTAINERS METRICS EXPORTER
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.44.0
+    image: gcr.io/cadvisor/cadvisor:v0.47.1
     container_name: cadvisor
     hostname: cadvisor
     restart: unless-stopped
@@ -189,6 +175,22 @@ services:
       - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
     expose:
       - 3000
+    labels:
+      org.label-schema.group: "monitoring"
+
+  # NOTIFICATIONS MANAGMENT
+  alertmanager:
+    image: prom/alertmanager:v0.25.0
+    container_name: alertmanager
+    hostname: alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    expose:
+      - 9093
     labels:
       org.label-schema.group: "monitoring"
 
@@ -218,8 +220,6 @@ If one does not exist yet: `docker network create caddy_net`
 
 # Prometheus configuration
 
-#### prometheus.yml
-
 * /prometheus/**prometheus.yml**
 
 [Official documentation.](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
@@ -236,86 +236,48 @@ global:
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
   - job_name: 'nodeexporter'
-    scrape_interval: 5s
     static_configs:
       - targets: ['nodeexporter:9100']
 
   - job_name: 'cadvisor'
-    scrape_interval: 5s
     static_configs:
       - targets: ['cadvisor:8080']
 
   - job_name: 'prometheus'
-    scrape_interval: 10s
     static_configs:
       - targets: ['localhost:9090']
 ```
 
-# Grafana configuration
+# Reverse proxy
 
-Some of the grafana config files could be ommited
-and info passed on the first run, or through settings.
-But setting it through GUI wont generate these files which hinders backup 
-and ease of migration.
+Caddy v2 is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
-#### datasource.yml
+`Caddyfile`
+```
+graf.{$MY_DOMAIN} {
+  reverse_proxy grafana:3000
+}
 
-* /prometheus/grafana/provisioning/datasources/**datasource.yml**
+prom.{$MY_DOMAIN} {
+  reverse_proxy prometheus:9090
+}
 
-[Official documentation.](https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources)
-
-Grafana's datasources config file, from where it suppose to get metrics.</br>
-In this case it points at the prometheus container.
-
-`datasource.yml`
-```yml
-apiVersion: 1
-
-datasources:
-  - name: Prometheus
-    type: prometheus
-    access: proxy
-    orgId: 1
-    url: http://prometheus:9090
-    basicAuth: false
-    isDefault: true
-    editable: false
+push.{$MY_DOMAIN} {
+  reverse_proxy pushgateway:9091
+}
 ```
 
-#### dashboard.yml
+# First run and Grafana configuration
 
-* /prometheus/grafana/provisioning/dashboards/**dashboard.yml**
+* login admin/admin, afterwards change password
+* add Prometheus as a `Data source` in configuration<br>
+  set `URL` to `http://prometheus:9090`<br>
+  Save & test should return *Green*
+* import dashboards from [json files in this repo](dashboards/)<br>
+  Dashboards > +import > ..either copy paste or point to downloaded file
 
-[Official documentation](https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards)
-
-Config file telling grafana from where to load dashboards.
-
-`dashboard.yml`
-```yml
-apiVersion: 1
-
-providers:
-  - name: 'Prometheus'
-    orgId: 1
-    folder: ''
-    type: file
-    disableDeletion: false
-    editable: false
-    allowUiUpdates: false
-    options:
-      path: /etc/grafana/provisioning/dashboards
-```
-
-#### \<dashboards>.json
-
-* /prometheus/grafana/provisioning/dashboards/**<dashboards.json>**
-
-[Official documentation.](https://grafana.com/docs/grafana/latest/reference/dashboard/)
-
-The dashboards files are in
-[the dashboards](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana/dashboards)
-directory of this repository.
-
+  
 Preconfigured dashboards from
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom).</br>
 Mostly unchanged, except for the default time range shown,
@@ -329,23 +291,13 @@ for host network monitoring not showing traffick.
 * **monitoring_services.json** - dashboar showing docker containers metrics
   of containers that are labeled `monitoring`, which are this repo containers.
 
-# Reverse proxy
 
-Caddy v2 is used, details
-[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
-
-The setup is accessed through grafana.
-But occasionally there might be need to check with prometheus or pushgateway
-which are available on \<docker-host-ip>:9090.</br>
 
 ---
 
 ![interface-pic](https://i.imgur.com/wzwgBkp.png)
 
 # Update
-
-[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically.
 
 Manual image update:
 
