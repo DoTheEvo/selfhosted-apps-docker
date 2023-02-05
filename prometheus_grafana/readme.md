@@ -419,7 +419,7 @@ networks:
 
 <details>
 <summary>`alertmanager.yml`</summary>
-```
+```yml
 route:
     receiver: 'ntfy'
 
@@ -433,7 +433,7 @@ receivers:
 
 <details>
 <summary>alert.rules</summary>
-```
+```yml
 groups:
   - name: host
     rules:
@@ -449,7 +449,7 @@ groups:
 
 <details>
 <summary>prometheus.yml</summary>
-```
+```yml
 global:
   scrape_interval:     15s
   evaluation_interval: 15s
