@@ -447,43 +447,12 @@ groups:
 ```
 </details>
 
-
-
 <details>
 <summary>`prometheus.yml`</summary>
-```yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
-
-scrape_configs:
-  - job_name: 'nodeexporter'
-    static_configs:
-      - targets: ['nodeexporter:9100']
-
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
-
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
-
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets: 
-      - 'alertmanager:9093'
-
-rule_files:
-  - '/etc/prometheus/rules/alert.rules'
-```
+aaa
 </details>
 
 
-[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-will be used to notify about prometheus alerts.
 
 test:<br>
 `curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
