@@ -419,17 +419,27 @@ Including pushing information from windows powershell.
   </details>
 
   <details>
-    <summary>`alertmanager.yml`</summary>
+    <summary>alertmanager.yml</summary>
 
   ```yml
   route:
-      receiver: 'ntfy'
+    receiver: 'email'
 
   receivers:
-  - name: "ntfy"
-    webhook_configs:
-    - url: 'https://ntfy.example.com/alertmanager'
-      send_resolved: true
+
+    - name: "ntfy"
+      webhook_configs:
+      - url: 'https://ntfy.example.com/alertmanager'
+        send_resolved: true
+        
+    - name: 'email'
+      email_configs:
+      - to: 'whoever@example.com'
+        from: 'alertmanager@example.com'
+        smarthost: smtp-relay.sendinblue.com:587
+        auth_username: '<registration_email@gmail.com>'
+        auth_identity: '<registration_email@gmail.com>'
+        auth_password: '<long ass generated SMTP key>'
   ```
   </details>
 
