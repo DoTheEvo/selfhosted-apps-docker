@@ -419,7 +419,8 @@ Including pushing information from windows powershell.
   </details>
 
   <details>
-  <summary>`alertmanager.yml`</summary>
+    <summary>`alertmanager.yml`</summary>
+
   ```yml
   route:
       receiver: 'ntfy'
@@ -434,6 +435,7 @@ Including pushing information from windows powershell.
 
   <details>
   <summary>alert.rules</summary>
+
   ```yml
   groups:
     - name: host
@@ -449,7 +451,8 @@ Including pushing information from windows powershell.
   </details>
 
   <details>
-  <summary>prometheus.yml</summary>
+    <summary>prometheus.yml</summary>
+
   ```yml
   global:
     scrape_interval:     15s
