@@ -293,197 +293,198 @@ Including pushing information from windows powershell.
 ---
 
 <details>
-<summary><h1>Alertmanager</h1></summary>
+  <summary><h1>Alertmanager</h1></summary>
 
-Several changes are needed
+  Several changes are needed
 
-- New container - `alertmanager` added to the compose file.
-- New file - `alertmanager.yml` bind mounted in the alertmanager container.<br>
-  This file contains configuration about where and how to deliver alerts.<br>
-  A selfhosted
-  [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-  webhook is used that gets alerts to a phone app.
-- New file - `alert.rules` mounted in to prometheus container<br>
-  This files defines when value of some metric becomes an alert event.
-- Changed file - `prometheus.yml` added `alerting` section
-  and the path to the `rule_files`
+  - New container - `alertmanager` added to the compose file.
+  - New file - `alertmanager.yml` bind mounted in the alertmanager container.<br>
+    This file contains configuration about where and how to deliver alerts.<br>
+    A selfhosted
+    [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
+    webhook is used that gets alerts to a phone app.
+  - New file - `alert.rules` mounted in to prometheus container<br>
+    This files defines when value of some metric becomes an alert event.
+  - Changed file - `prometheus.yml` added `alerting` section
+    and the path to the `rule_files`
 
-<details>
-<summary>docker-compose.yml</summary>
-```yml
-services:
+  <details>
+    <summary>docker-compose.yml</summary>
+  
+  ```yml
+  services:
 
-  # MONITORING SYSTEM AND THE METRICS DATABASE
-  prometheus:
-    image: prom/prometheus:v2.42.0
-    container_name: prometheus
-    hostname: prometheus
-    restart: unless-stopped
-    user: root
-    depends_on:
-      - cadvisor
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=500h'
-      - '--web.enable-lifecycle'
-    volumes:
-      - ./prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./alert.rules:/etc/prometheus/rules/alert.rules
-    expose:
-      - 9090:9090
-    labels:
-      org.label-schema.group: "monitoring"
+    # MONITORING SYSTEM AND THE METRICS DATABASE
+    prometheus:
+      image: prom/prometheus:v2.42.0
+      container_name: prometheus
+      hostname: prometheus
+      restart: unless-stopped
+      user: root
+      depends_on:
+        - cadvisor
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--web.console.libraries=/etc/prometheus/console_libraries'
+        - '--web.console.templates=/etc/prometheus/consoles'
+        - '--storage.tsdb.retention.time=500h'
+        - '--web.enable-lifecycle'
+      volumes:
+        - ./prometheus_data:/prometheus
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./alert.rules:/etc/prometheus/rules/alert.rules
+      expose:
+        - 9090:9090
+      labels:
+        org.label-schema.group: "monitoring"
 
-  # WEB BASED UI VISUALISATION OF METRICS
-  grafana:
-    image: grafana/grafana:9.3.6
-    container_name: grafana
-    hostname: grafana
-    restart: unless-stopped
-    env_file: .env
-    user: root
-    volumes:
-      - ./grafana_data:/var/lib/grafana
-    expose:
-      - 3000
-    labels:
-      org.label-schema.group: "monitoring"
+    # WEB BASED UI VISUALISATION OF METRICS
+    grafana:
+      image: grafana/grafana:9.3.6
+      container_name: grafana
+      hostname: grafana
+      restart: unless-stopped
+      env_file: .env
+      user: root
+      volumes:
+        - ./grafana_data:/var/lib/grafana
+      expose:
+        - 3000
+      labels:
+        org.label-schema.group: "monitoring"
 
-  # HOST LINUX MACHINE METRICS EXPORTER
-  nodeexporter:
-    image: prom/node-exporter:v1.5.0
-    container_name: nodeexporter
-    hostname: nodeexporter
-    restart: unless-stopped
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    expose:
-      - 9100
-    labels:
-      org.label-schema.group: "monitoring"
+    # HOST LINUX MACHINE METRICS EXPORTER
+    nodeexporter:
+      image: prom/node-exporter:v1.5.0
+      container_name: nodeexporter
+      hostname: nodeexporter
+      restart: unless-stopped
+      command:
+        - '--path.procfs=/host/proc'
+        - '--path.rootfs=/rootfs'
+        - '--path.sysfs=/host/sys'
+        - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      volumes:
+        - /proc:/host/proc:ro
+        - /sys:/host/sys:ro
+        - /:/rootfs:ro
+      expose:
+        - 9100
+      labels:
+        org.label-schema.group: "monitoring"
 
-  # DOCKER CONTAINERS METRICS EXPORTER
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.1
-    container_name: cadvisor
-    hostname: cadvisor
-    restart: unless-stopped
-    privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    expose:
-      - 3000
-    labels:
-      org.label-schema.group: "monitoring"
+    # DOCKER CONTAINERS METRICS EXPORTER
+    cadvisor:
+      image: gcr.io/cadvisor/cadvisor:v0.47.1
+      container_name: cadvisor
+      hostname: cadvisor
+      restart: unless-stopped
+      privileged: true
+      devices:
+        - /dev/kmsg:/dev/kmsg
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro
+        - /sys:/sys:ro
+        - /var/lib/docker:/var/lib/docker:ro
+        - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+      expose:
+        - 3000
+      labels:
+        org.label-schema.group: "monitoring"
 
-  # ALERT MANAGMENT BY PROMETHEUS
-  alertmanager:
-    image: prom/alertmanager:v0.25.0
-    container_name: alertmanager
-    hostname: alertmanager
-    restart: unless-stopped
-    volumes:
-      - ./alertmanager.yml:/etc/alertmanager.yml
-      - ./alertmanager_data:/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-    expose:
-      - 9093
-    labels:
-      org.label-schema.group: "monitoring"
+    # ALERT MANAGMENT BY PROMETHEUS
+    alertmanager:
+      image: prom/alertmanager:v0.25.0
+      container_name: alertmanager
+      hostname: alertmanager
+      restart: unless-stopped
+      volumes:
+        - ./alertmanager.yml:/etc/alertmanager.yml
+        - ./alertmanager_data:/alertmanager
+      command:
+        - '--config.file=/etc/alertmanager.yml'
+        - '--storage.path=/alertmanager'
+      expose:
+        - 9093
+      labels:
+        org.label-schema.group: "monitoring"
 
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
-```
-</details>
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
 
-<details>
-<summary>`alertmanager.yml`</summary>
-```yml
-route:
-    receiver: 'ntfy'
+  <details>
+  <summary>`alertmanager.yml`</summary>
+  ```yml
+  route:
+      receiver: 'ntfy'
 
-receivers:
-- name: "ntfy"
-  webhook_configs:
-  - url: 'https://ntfy.example.com/alertmanager'
-    send_resolved: true
-```
-</details>
+  receivers:
+  - name: "ntfy"
+    webhook_configs:
+    - url: 'https://ntfy.example.com/alertmanager'
+      send_resolved: true
+  ```
+  </details>
 
-<details>
-<summary>alert.rules</summary>
-```yml
-groups:
-  - name: host
-    rules:
-      - alert: DiskspaceLow
-        expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 88.2
-        for: 10s
-        labels:
-          severity: critical
-        annotations:
-          description: "Diskspace is low!"
-```
-</details>
+  <details>
+  <summary>alert.rules</summary>
+  ```yml
+  groups:
+    - name: host
+      rules:
+        - alert: DiskspaceLow
+          expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 88.2
+          for: 10s
+          labels:
+            severity: critical
+          annotations:
+            description: "Diskspace is low!"
+  ```
+  </details>
 
-<details>
-<summary>prometheus.yml</summary>
-```yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
+  <details>
+  <summary>prometheus.yml</summary>
+  ```yml
+  global:
+    scrape_interval:     15s
+    evaluation_interval: 15s
 
-scrape_configs:
-  - job_name: 'nodeexporter'
-    static_configs:
-      - targets: ['nodeexporter:9100']
+  scrape_configs:
+    - job_name: 'nodeexporter'
+      static_configs:
+        - targets: ['nodeexporter:9100']
 
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
+    - job_name: 'cadvisor'
+      static_configs:
+        - targets: ['cadvisor:8080']
 
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
+    - job_name: 'prometheus'
+      static_configs:
+        - targets: ['localhost:9090']
 
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets: 
-      - 'alertmanager:9093'
+  alerting:
+    alertmanagers:
+    - scheme: http
+      static_configs:
+      - targets: 
+        - 'alertmanager:9093'
 
-rule_files:
-  - '/etc/prometheus/rules/alert.rules'
-```
-</details>
+  rule_files:
+    - '/etc/prometheus/rules/alert.rules'
+  ```
+  </details>
 
-test:<br>
-`curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
+  test:<br>
+  `curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
 
-reload rules
-`curl -X POST http://admin:admin@<host-ip>:9090/-/reload`
+  reload rules
+  `curl -X POST http://admin:admin@<host-ip>:9090/-/reload`
 
 </details>
 
