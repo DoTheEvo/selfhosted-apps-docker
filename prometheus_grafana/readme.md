@@ -283,9 +283,10 @@ the time interval is set to show last 1h instead of last 15m
 
 The setup and real world use of pushgateway, along with small steps 
 when learning it are in the repo - 
-[Veeam Prometheus Grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)
-
+[Veeam Prometheus Grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)<br>
 Including pushing information from windows powershell.
+
+![veeam-dash](https://i.imgur.com/dUyzuyl.png)
 
 </details>
 
@@ -426,7 +427,6 @@ Including pushing information from windows powershell.
     receiver: 'email'
 
   receivers:
-
     - name: "ntfy"
       webhook_configs:
       - url: 'https://ntfy.example.com/alertmanager'
@@ -450,8 +450,8 @@ Including pushing information from windows powershell.
   groups:
     - name: host
       rules:
-        - alert: DiskspaceLow
-          expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 88.2
+        - alert: DiskSpaceLow
+          expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 19
           for: 10s
           labels:
             severity: critical
