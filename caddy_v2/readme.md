@@ -4,6 +4,7 @@
 
 ![logo](https://i.imgur.com/xmSY5qu.png)
 
+[update with this in mind](https://www.reddit.com/r/selfhosted/comments/10r9o4d/reverse_proxies_with_nginx_proxy_manager/)
 
 1. [Purpose & Overview](#Purpose--Overview)
 2. [Caddy as a reverse proxy in docker](#Caddy-as-a-reverse-proxy-in-docker)
@@ -55,6 +56,8 @@ and only some special casess with extra functionality need extra work.
 
 Caddy will be running as a docker container and will route traffic to other containers,
 or machines on the network.
+
+[gurucomputing caddy guide](https://blog.gurucomputing.com.au/reverse-proxies-with-caddy/)
 
 ### - Requirements
 

@@ -43,7 +43,7 @@ Tested with wireshark. Pinging for a nonexisting hostname mans LLMNR
 broadcast to every device on network is send asking who is that hostname.
 Works same when pinging from archlinux or pinging from win8.1
  
-
+[TCP vs UDP](https://youtu.be/jE_FcgpQ7Co)
 
 # asdasdasd
 

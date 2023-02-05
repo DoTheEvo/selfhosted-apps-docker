@@ -121,7 +121,7 @@ Type=simple
 ExecStart=/bin/curl -d "%i | %H" https://ntfy.example.com/systemd
 ```
 
-example of a service using the above defined service to send notifications.
+Example of a service using the above defined service to send notifications.
 
 `borg.service`
 ```

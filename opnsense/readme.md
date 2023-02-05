@@ -233,8 +233,9 @@ checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
 Many consider NAT reflection to be a hack that should not be used.<br>
 That the correct way is split DNS, where you maintain separate DNS records for
 LAN side so that `a.example.com` points directly to some local ip.
-Reason being that machines on LAN that use FQDN to access other machine on LAN
-are not hitting the firewall with every traffic that goes between them.
+Reason being that this way machines on LAN side that use FQDN(a.example.com)
+to access other machine on LAN are not hitting the firewall with traffic
+that goes between them.
 But IMO in small scale selfhosted setup its perfectly fine
 and it requires far less management.
 
@@ -371,7 +372,23 @@ Assuming you are not in the country from which these run their test.
 ---
 
 <details>
+<summary><h1>DNS - Unbound</h1></summary>
+
+Build in DNS server, enabled by default, listening at port 53
+
+Services: Unbound DNS: General
+
+</details>
+
+---
+---
+
+<details>
 <summary><h1>Monitoring</h1></summary>
+
+### ARP table
+
+Interfaces: Diagnostics: ARP Table<br>
 
 ### live view of connections
 
@@ -412,5 +429,13 @@ and autorefresh on/off and up to 20k last entries
 ### Extra info and encountered issues
 
 * Health check - `System: Firmware` Run an audit button, Health
-* zenarmor that was disabled caused an error notification<br>
-  opnsense and PHP Startup: Unable to load dynamic library 'mongodb.so' 
+* got error notice:<br>
+  *opnsense and PHP Startup: Unable to load dynamic library 'mongodb.so'*<br>
+  seems its some remnant of zenarmor.
+  [Heres](https://forum.opnsense.org/index.php?topic=29721.0) the talk on it.<br>
+  `pkg list | grep mongo` to get exact package name.<br>
+  `pkg remove php74-pecl-mongodb` to remove the package
+
+ 
+zenarmor that was disabled caused an error notification<br>
+  

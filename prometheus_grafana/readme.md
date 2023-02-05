@@ -8,29 +8,36 @@
 
 Monitoring of the host and the running cointaners.
 
-* [Official site](https://prometheus.io/)
+* [Official Prometheus site](https://prometheus.io/)
 * [Github](https://github.com/prometheus)
-* [DockerHub](https://hub.docker.com/r/prom/prometheus/)
 
-Everything here is based on the magnificent
+Most of the stuff here is based off the magnificent
 [stefanprodan/dockprom.](https://github.com/stefanprodan/dockprom)</br>
-So maybe just go get that.
+So maybe just go play with that.
 
-[Great youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
-Here's my [veeam-prometheus-grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)
-how to setup pushgateway and send to it info on done backups
-and visualize history of that in grafana.<br>
-Also soon to be added, [Loki](https://youtu.be/h_GGd7HfKQ8) for logs,
-to get that ntfy alarm when something happens in a log in a docker container.
+# Chapters
 
----
+6. [redirect HTTP traffic to HTTPS](#6-redirect-HTTP-traffic-to-HTTPS)
+
+Setup here starts off with the basics and then theres chapters how to add features
+
+* **[Core prometheus+grafana](Overview)** - to get nice dashboards with metrics from docker host and containers
+* **Pushgateway** - how to use it to allow pushing metrics in to prometheus from anywhere
+* **Alertmanager** - how to use it for notifications
+* **Loki** - how to do the above things but for logs, not just metrics
+* **Caddy** - adding dashboard for reverse proxy info
+
+# Overview
+
+[Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>
 
 Prometheus is an open source system for monitoring and alerting,
 written in golang.<br>
 It periodicly collects metrics from configured targets,
-exposes collected metrics for visualization, and can trigger alerts.<br>
-Prometheus is relatively young project, it is a **pull type** monitoring
-and consists of several components.
+makes these metrics available for visualization, and can trigger alerts.<br>
+Prometheus is relatively young project, it is a **pull type** monitoring.
+
+[Glossary.](https://prometheus.io/docs/introduction/glossary/)
 
 * **Prometheus Server** is the core of the system, responsible for
   * pulling new metrics
@@ -41,7 +48,7 @@ and consists of several components.
   *  **exporter** - a script or a service that gathers metrics on the target,
      converts them to prometheus server format,
      and exposes them at an endpoint so they can be pulled
-* **AlertManager** - responsible for handling alerts from Prometheus Server,
+* **Alertmanager** - responsible for handling alerts from Prometheus Server,
   and sending notifications through email, slack, pushover,..
   In this setup [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) webhook will be used.<br>
   Grafana comes with own alerts, but grafana kinda feels... b-tier
@@ -49,11 +56,8 @@ and consists of several components.
   Should not be overused as it goes against the pull philosophy of prometheus.
   Most commonly it is used to collect data from batch jobs, or from services
   that have short execution time. Like a backup script.<br>
-  [Here's](https://github.com/DoTheEvo/veeam-prometheus-grafana) my use of it
-  to monitor veeam backup servers.
-* **Grafana** - for web UI visualization of the collected metrics 
+* **Grafana** - for web UI visualization of the collected metrics
 
-[glossary](https://prometheus.io/docs/introduction/glossary/)
 
 ![prometheus components](https://i.imgur.com/AxJCg8C.png)
 
@@ -64,19 +68,15 @@ and consists of several components.
  └── ~/
      └── docker/
          └── prometheus/
-             ├─── alertmanager/
-             ├─── grafana/
-             ├─── grafana-data/
-             ├─── prometheus-data/
+             ├──── grafana_data/
+             ├──── prometheus_data/
              ├── docker-compose.yml
              ├── .env
              └── prometheus.yml
 ```
 
-* `alertmanager/` - ...
-* `grafana/` - a directory containing grafanas configs and dashboards
-* `grafana-data/` - a directory where grafana stores its data
-* `prometheus-data/` - a directory where prometheus stores its database and data
+* `grafana_data/` - a directory where grafana stores its data
+* `prometheus_data/` - a directory where prometheus stores its database and data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `prometheus.yml` - a configuration file for prometheus
@@ -86,15 +86,22 @@ The directories are created by docker compose on the first run.
 
 # docker-compose
 
-* **Prometheus** - prometheus server, pulling, storing, evaluating metrics
-* **Grafana** - web UI visualization of the collected metrics
-  in nice dashboards
+* **Prometheus** - Container with some extra commands run at the start up.
+  Setting stuff like storage, data rentetion (500hours - 20 days)...
+  Bind mounted prometheus_data for persistent storage
+  and `prometheus.yml` for some basic configuration.
+* **Grafana** - Cotainer, bind mounted directory for persistent data storage
 * **NodeExporter** - an exporter for linux machines,
   in this case gathering the metrics of the linux machine runnig docker,
-  like uptime, cpu load, memory use, network bandwidth use, disk space,...
-* **cAdvisor** - exporter for gathering docker **containers** metrics,
-  showing cpu, memory, network use of each container
-* **alertmanager** - guess what that one do
+  like uptime, cpu load, memory use, network bandwidth use, disk space,...<br>
+  Also bind mount of some system directories to have access to required info.
+* **cAdvisor** - an exporter for gathering docker **containers** metrics,
+  showing cpu, memory, network use of each container<br>
+  Runs in `privileged` mode and has some bind mounts of system directories
+  to have access to required info.
+
+*Note* - ports are only `expose`, since expectation of use of a reverse proxy
+and accessing the services by hostname, not ip and port.
 
 `docker-compose.yml`
 ```yml
@@ -106,7 +113,6 @@ services:
     container_name: prometheus
     hostname: prometheus
     restart: unless-stopped
-    user: root
     depends_on:
       - cadvisor
     command:
@@ -114,17 +120,17 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
+      - '--storage.tsdb.retention.time=500h'
       - '--web.enable-lifecycle'
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus_data:/prometheus
-    ports:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    expose:
       - 9090:9090
     labels:
       org.label-schema.group: "monitoring"
 
-  # WEB BASED UI VISUALISATION OF THE METRICS
+  # WEB BASED UI VISUALISATION OF METRICS
   grafana:
     image: grafana/grafana:9.3.6
     container_name: grafana
@@ -134,14 +140,12 @@ services:
     user: root
     volumes:
       - ./grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     expose:
       - 3000
     labels:
       org.label-schema.group: "monitoring"
 
-  # HOST MACHINE METRICS EXPORTER
+  # HOST LINUX MACHINE METRICS EXPORTER
   nodeexporter:
     image: prom/node-exporter:v1.5.0
     container_name: nodeexporter
@@ -178,22 +182,6 @@ services:
       - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
     expose:
       - 3000
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # NOTIFICATIONS MANAGMENT
-  alertmanager:
-    image: prom/alertmanager:v0.25.0
-    container_name: alertmanager
-    hostname: alertmanager
-    restart: unless-stopped
-    volumes:
-      - ./alertmanager:/etc/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-    expose:
-      - 9093
     labels:
       org.label-schema.group: "monitoring"
 
@@ -238,6 +226,9 @@ global:
   scrape_interval:     15s
   evaluation_interval: 15s
 
+rule_files:
+  - "/etc/prometheus/rules/*.rules"
+
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
   - job_name: 'nodeexporter'
@@ -279,7 +270,7 @@ push.{$MY_DOMAIN} {
 * add Prometheus as a Data source in configuration<br>
   set URL to `http://prometheus:9090`<br>
 * import dashboards from [json files in this repo](dashboards/)<br>
-  
+
 These dashboards are the preconfigured ones from
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
 with few changes.<br>
@@ -298,6 +289,45 @@ the time interval is set to show last 1h instead of last 15m
 
 ![interface-pic](https://i.imgur.com/wzwgBkp.png)
 
+# Alertmanager
+
+[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
+will be used to notify about prometheus alerts.
+
+`alertmanager.yml`
+```yml
+route:
+    receiver: 'ntfy'
+
+receivers:
+- name: "ntfy"
+  webhook_configs:
+  - url: 'https://ntfy.example.com/alertmanager'
+    send_resolved: true
+```
+
+test:<br>
+`curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
+
+reload rules
+`curl -X POST http://admin:admin@<host-ip>:9090/-/reload`
+
+
+`alert.rules`
+```yml
+groups:
+  - name: host
+    rules:
+      - alert: DiskspaceLow
+        expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 88.2
+        for: 10s
+        labels:
+          severity: critical
+        annotations:
+          description: "Diskspace is low!"
+```
+
+
 # Update
 
 Manual image update:
@@ -312,7 +342,7 @@ Manual image update:
 
 Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
 that makes daily snapshot of the entire directory.
-  
+
 #### Restore
 
 * down the prometheus containers `docker-compose down`</br>

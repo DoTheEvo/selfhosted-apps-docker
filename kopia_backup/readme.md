@@ -15,9 +15,9 @@ Backups.
 * [Official site](https://kopia.io/)
 * [Github](https://github.com/kopia/kopia)
 
-Kopia is a very new open source backup utility with basicly **all** modern features.</br>
+Kopia is a new open source backup utility with basicly **all** modern features.</br>
 Cross-platform, deduplication, encryption, compression, multithreaded speed,
-fully build in cloud storage support, GUI versions, snapshots mounting,...
+native cloud storage support, GUI versions, snapshots mounting,...
 
 Written in golang.
 
@@ -163,7 +163,7 @@ Persistent=true
 WantedBy=timers.target
 ```
 
-# Mounting backup storage using systemd
+# Mounting network storage using systemd
 
 * file are placed in `/etc/systemd/system`
 * the name of mount and automount files MUST correspond with the path<br>
