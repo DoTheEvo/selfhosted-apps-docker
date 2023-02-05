@@ -17,11 +17,9 @@ So maybe just go play with that.
 
 # Chapters
 
-6. [redirect HTTP traffic to HTTPS](#6-redirect-HTTP-traffic-to-HTTPS)
-
 Setup here starts off with the basics and then theres chapters how to add features
 
-* **[Core prometheus+grafana](Overview)** - to get nice dashboards with metrics from docker host and containers
+* **[Core prometheus+grafana](#Overview)** - to get nice dashboards with metrics from docker host and containers
 * **Pushgateway** - how to use it to allow pushing metrics in to prometheus from anywhere
 * **Alertmanager** - how to use it for notifications
 * **Loki** - how to do the above things but for logs, not just metrics
