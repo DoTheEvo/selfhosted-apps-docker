@@ -504,6 +504,228 @@ Including pushing information from windows powershell.
 ---
 ---
 
+<details>
+  <summary><h1>Loki</h1></summary>
+
+  - New container - `loki` added to the compose file. It stores logs and makes
+    them available for grafana to visualize.
+  - New container - `promtail` added to the compose file. Agent that pushes
+    logs content to loki.
+  - New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
+    The file is [all default](https://github.com/grafana/loki/tree/main/cmd/loki),
+    except for alertmanager url.<br>
+  - New file - `promtail-config.yml` mounted in to promtail container<br>
+    This files defines source of logs. Any such source much be accessible
+    by the promtail container.
+
+  <details>
+    <summary>docker-compose.yml</summary>
+  
+  ```yml
+  services:
+
+    # MONITORING SYSTEM AND THE METRICS DATABASE
+    prometheus:
+      image: prom/prometheus:v2.42.0
+      container_name: prometheus
+      hostname: prometheus
+      restart: unless-stopped
+      user: root
+      depends_on:
+        - cadvisor
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--web.console.libraries=/etc/prometheus/console_libraries'
+        - '--web.console.templates=/etc/prometheus/consoles'
+        - '--storage.tsdb.retention.time=500h'
+        - '--web.enable-lifecycle'
+      volumes:
+        - ./prometheus_data:/prometheus
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./alert.rules:/etc/prometheus/rules/alert.rules
+      expose:
+        - 9090:9090
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # WEB BASED UI VISUALISATION OF METRICS
+    grafana:
+      image: grafana/grafana:9.3.6
+      container_name: grafana
+      hostname: grafana
+      restart: unless-stopped
+      env_file: .env
+      user: root
+      volumes:
+        - ./grafana_data:/var/lib/grafana
+      expose:
+        - 3000
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # HOST LINUX MACHINE METRICS EXPORTER
+    nodeexporter:
+      image: prom/node-exporter:v1.5.0
+      container_name: nodeexporter
+      hostname: nodeexporter
+      restart: unless-stopped
+      command:
+        - '--path.procfs=/host/proc'
+        - '--path.rootfs=/rootfs'
+        - '--path.sysfs=/host/sys'
+        - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      volumes:
+        - /proc:/host/proc:ro
+        - /sys:/host/sys:ro
+        - /:/rootfs:ro
+      expose:
+        - 9100
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # DOCKER CONTAINERS METRICS EXPORTER
+    cadvisor:
+      image: gcr.io/cadvisor/cadvisor:v0.47.1
+      container_name: cadvisor
+      hostname: cadvisor
+      restart: unless-stopped
+      privileged: true
+      devices:
+        - /dev/kmsg:/dev/kmsg
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro
+        - /sys:/sys:ro
+        - /var/lib/docker:/var/lib/docker:ro
+        - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+      expose:
+        - 3000
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # ALERT MANAGMENT BY PROMETHEUS
+    alertmanager:
+      image: prom/alertmanager:v0.25.0
+      container_name: alertmanager
+      hostname: alertmanager
+      restart: unless-stopped
+      volumes:
+        - ./alertmanager.yml:/etc/alertmanager.yml
+        - ./alertmanager_data:/alertmanager
+      command:
+        - '--config.file=/etc/alertmanager.yml'
+        - '--storage.path=/alertmanager'
+      expose:
+        - 9093
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # LOG MANAGMENT WITH LOKI
+    loki:
+      image: grafana/loki:2.7.3
+      container_name: loki
+      hostname: loki
+      restart: unless-stopped
+      volumes:
+        - ./loki_data:/loki
+        - ./loki-docker-config.yml:/etc/loki-docker-config.yml
+      command:
+        - '-config.file=/etc/loki-docker-config.yml'
+      ports:
+        - 3100:3100
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # LOG AGENT PUSHING LOGS TO LOKI
+    promtail:
+      image: grafana/promtail:2.7.3
+      container_name: promtail
+      hostname: promtail
+      restart: unless-stopped
+      user: root
+      volumes:
+        - /var/log:/var/log:ro
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - ./promtail-config.yml:/etc/promtail-config.yml
+      command:
+        - '-config.file=/etc/promtail-config.yml'
+      labels:
+        org.label-schema.group: "monitoring"     
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
+  <details>
+    <summary>loki-docker-config.yml</summary>
+
+  ```yml
+  auth_enabled: false
+
+  server:
+    http_listen_port: 3100
+
+  common:
+    path_prefix: /loki
+    storage:
+      filesystem:
+        chunks_directory: /loki/chunks
+        rules_directory: /loki/rules
+    replication_factor: 1
+    ring:
+      kvstore:
+        store: inmemory
+
+  schema_config:
+    configs:
+      - from: 2020-10-24
+        store: boltdb-shipper
+        object_store: filesystem
+        schema: v11
+        index:
+          prefix: index_
+          period: 24h
+
+  ruler:
+    alertmanager_url: http://alertmanager:9093
+
+  analytics:
+    reporting_enabled: false
+  ```
+  </details>
+
+  <details>
+    <summary>promtail-config.yml</summary>
+
+  ```yml
+  server:
+    http_listen_port: 9080
+    grpc_listen_port: 0
+
+  positions:
+    filename: /tmp/positions.yaml
+
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+  scrape_configs:
+  - job_name: my-container-logs
+    static_configs:
+    - targets: # tells promtail to look for the logs on the current machine/host
+        - localhost
+      labels: # labels with which all the following logs should be labelled
+        job: minecraft-container      # label-1
+        host: docker-host-archlinux   # label-2
+        __path__: /var/lib/docker/containers/60a617a7c1376ad42*/60a617a7c1376ad42*.log 
+  ```
+  </details>
+
+</details>
+
 # Update
 
 Manual image update:
