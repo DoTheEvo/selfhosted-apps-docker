@@ -147,7 +147,7 @@ ExecStart=/opt/kopia-backup-home-etc.sh
 
 
 ```kopia-home-etc.timer```
-```
+```ini
 [Unit]
 Description=Run kopia backup
 
