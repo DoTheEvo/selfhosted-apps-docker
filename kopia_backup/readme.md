@@ -17,14 +17,12 @@ Backups.
 
 Kopia is a new open source backup utility with basicly **all** modern features.</br>
 Cross-platform, deduplication, encryption, compression, multithreaded speed,
-native cloud storage support, GUI versions, snapshots mounting,...
+native cloud storage support, GUI versions, repository replication, snapshots mounting,...
 
 Written in golang.
 
-In this setup kopia cli is installed directly on a docker host.</br>
-A kopia repository is set up.<br>
-A script that backs up data is scheduled to run regularly<br>
-Bonus info on mounting remote NAS storage on boot using systemd<br>
+In this setup kopia cli is used to backup docker containers and the host,
+but general use and concepts are universal.</br>
 
 # Some aspects of Kopia
 
@@ -113,13 +111,12 @@ kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 ```
 
-### Automatic execution using systemd
+### Scheduled backups using systemd
 
 Usually cron is used, but systemd provides better logging and control,
 so better get used to using it.<br>
 [Heres](https://github.com/kopia/kopia/issues/2685#issuecomment-1384524828)
-some discussion on units. Will be editing it for ntfy 
-
+some discussion on unit files.<br>
 [ntfy](https://github.com/binwiederhier/ntfy) is used for notifications,
 more info [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal#linux-systemd-unit-file-service)
 
@@ -130,7 +127,7 @@ Description=kopia backup
 Wants=network-online.target
 After=network-online.target
 ConditionACPower=true
-OnFailure=ntfy@failure-%p.service
+# OnFailure=ntfy@failure-%p.service
 # OnSuccess=ntfy@success-%p.service
 
 [Service]
@@ -165,10 +162,11 @@ WantedBy=timers.target
 
 # Mounting network storage using systemd
 
-* file are placed in `/etc/systemd/system`
+* files are placed in `/etc/systemd/system`
 * the name of mount and automount files MUST correspond with the path<br>
-  instead of `/` a `-` is used, but otherwise it must be the mounting path in name
-* for mounting that does not fail on boot if network there are network issues,
+  replacing `/` with a `-`,
+  but otherwise it must be the mounting path in the name
+* for mounting that does not fail on boot if there are network issues,
   and mounts the target only on request - enable `automount` file,
   not `mount` file, so:<br>
   `sudo systemctl enable mnt-mirror.automount`
@@ -202,4 +200,5 @@ WantedBy=multi-user.target
 
 # Remote backup
 
+...
 
