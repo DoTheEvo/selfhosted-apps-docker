@@ -508,27 +508,45 @@ Including pushing information from windows powershell.
 <details>
   <summary><h1>Loki</h1></summary>
 
-  Loki is made by grafana team, who call it Prometheus for logs.<br>
-  It is a **push** type monitoring, where an agent(**promtail**)
-  pushes logs on to a Loki instance.
+  Loki is made by the grafana team, and they call it Prometheus for logs.<br>
+  It is a **push** type monitoring, where an agent - **promtail**
+  pushes logs on to a Loki instance, or **loki-docker-driver** is installed
+  on a docker host and log pushing is set either globally in /etc/docker/daemon.json
+  or per container in compose files.
 
   What this example will set out to do is monitor logs of a
   [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)
-  Have some dashboards about logs and have an alert when a player joins.
+  Have some dashboards about logs and have an alert when a player joins.<br>
+  Its just proof of concept, as there are prometheus exporters for minecraft,
+  so digging through logs to get alert is less optimal.
 
-  To add to the existing setup:
+  What needs to be done:
 
-  - New container - `loki` added to the compose file. It stores logs and makes
+  - New container - `loki` added to the compose file. Loki stores logs and makes
     them available for grafana to visualize.
-  - New container - `promtail` added to the compose file. Agent that pushes
-    logs content to loki. This container needs access to logs to be pushed
-    and so docker host `/var/lib/docker/containers` directory is bind mounted.
   - New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
     The file is [all default](https://github.com/grafana/loki/tree/main/cmd/loki),
     except for alertmanager url.<br>
-  - New file - `promtail-config.yml` mounted in to promtail container<br>
-    This files defines source of logs. In here a minecraft container is set,
-    with some added labels for easier targeting of logs.
+  - install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
+    `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
+  - adding logging section to compose files of a containers 
+    that should be monitored, like so:<br>
+    ```
+    services:
+      whoami:
+        image: "containous/whoami"
+        container_name: "whoami"
+        hostname: "whoami"
+        ports:
+         - 88:80
+        logging:
+          driver: "loki"
+          options:
+            loki-url: "http://localhost:3100/loki/api/v1/push"
+    ```
+
+  Promtail can be used to push logs to loki, older version of this readme
+  has details - [here.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/70830ac8679d81e73265c8522e06312db4905f3b/prometheus_grafana)
 
   <details>
     <summary>docker-compose.yml</summary>
@@ -650,22 +668,6 @@ Including pushing information from windows powershell.
       labels:
         org.label-schema.group: "monitoring"
 
-    # LOG AGENT PUSHING LOGS TO LOKI
-    promtail:
-      image: grafana/promtail:2.7.3
-      container_name: promtail
-      hostname: promtail
-      user: root
-      restart: unless-stopped
-      volumes:
-        - /var/log:/var/log:ro
-        - /var/lib/docker/containers:/var/lib/docker/containers:ro
-        - ./promtail-config.yml:/etc/promtail-config.yml
-      command:
-        - '-config.file=/etc/promtail-config.yml'
-      labels:
-        org.label-schema.group: "monitoring"     
-
   networks:
     default:
       name: $DOCKER_MY_NETWORK
@@ -711,40 +713,21 @@ Including pushing information from windows powershell.
   ```
   </details>
 
-  <details>
-    <summary>promtail-config.yml</summary>
+  
+Now with driver installed, files in place, compose edited,..
 
-  ```yml
-  server:
-    http_listen_port: 9080
-    grpc_listen_port: 0
-
-  positions:
-    filename: /tmp/positions.yaml
-
-  clients:
-    - url: http://loki:3100/loki/api/v1/push
-
-  scrape_configs:
-  - job_name: my-container-logs
-    static_configs:
-    - targets: # tells promtail to look for the logs on the current machine/host
-        - localhost
-      labels: # labels with which all the following logs should be labelled
-        job: minecraft-container      # label-1
-        host: docker-host-archlinux   # label-2
-        __path__: /var/lib/docker/containers/60a617a7c1376ad42*/60a617a7c1376ad42*.log 
-  ```
-  </details>
-
-There was also an option to use loki logging driver to just get docker containers.
-But any container re-recreated with that setting set took always long time to down.<br>
-
-Anyway, now with these files in place..
-
-* Loki needs to be added to in grafana as a datasource.<br>
-  If everything works as it should, there should be no notice, down left side:<br>
+* In grafana, loki needs to be added as a datasource.<br>
+  If everything works as it should, there should be no red notice, down left side
+  only gree:<br>
   `Data source connected and labels found.`
+* In `Explore` section, if the input is set to `Builder`, picking from dropdown
+  filter menu container_name = minecraft, and hitting run query.. 
+  this should result in seeing minecraft logs. 
+* In Alert grafana section, 
+
+
+
+
 
 </details>
 
