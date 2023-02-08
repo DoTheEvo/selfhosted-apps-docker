@@ -4,12 +4,15 @@
 
 ![logo](https://i.imgur.com/e03aF8d.png)
 
+WORK IN PROGRESS<br>
+Loki and caddy monitoring parts are not finished yet
+
 # Purpose
 
 Monitoring of the host and the running cointaners.
 
 * [Official Prometheus site](https://prometheus.io/)
-* [Github](https://github.com/prometheus)
+* [Official Grafana site](https://grafana.com/)
 
 Most of the stuff here is based off the magnificent
 [stefanprodan/dockprom.](https://github.com/stefanprodan/dockprom)</br>
@@ -17,13 +20,11 @@ So maybe just go play with that.
 
 # Chapters
 
-Setup here starts off with the basics and then theres chapters how to add features
-
 * **[Core prometheus+grafana](#Overview)** - to get nice dashboards with metrics from docker host and containers
 * **[Pushgateway](#Pushgateway)** - how to use it to allow pushing metrics in to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - how to use it for notifications
-* **Loki** - how to do the above things but for logs, not just metrics
-* **Caddy** - adding dashboard for reverse proxy info
+* **[Loki](#Loki)** - how to do the above things but for logs, not just metrics
+* **[Caddy monitoring](#Caddy_monitoring)** - adding dashboard for reverse proxy info
 
 # Overview
 
@@ -110,8 +111,8 @@ services:
     image: prom/prometheus:v2.42.0
     container_name: prometheus
     hostname: prometheus
-    restart: unless-stopped
     user: root
+    restart: unless-stopped
     depends_on:
       - cadvisor
     command:
@@ -134,9 +135,9 @@ services:
     image: grafana/grafana:9.3.6
     container_name: grafana
     hostname: grafana
+    user: root
     restart: unless-stopped
     env_file: .env
-    user: root
     volumes:
       - ./grafana_data:/var/lib/grafana
     expose:
@@ -320,8 +321,8 @@ Including pushing information from windows powershell.
       image: prom/prometheus:v2.42.0
       container_name: prometheus
       hostname: prometheus
-      restart: unless-stopped
       user: root
+      restart: unless-stopped
       depends_on:
         - cadvisor
       command:
@@ -345,9 +346,9 @@ Including pushing information from windows powershell.
       image: grafana/grafana:9.3.6
       container_name: grafana
       hostname: grafana
+      user: root
       restart: unless-stopped
       env_file: .env
-      user: root
       volumes:
         - ./grafana_data:/var/lib/grafana
       expose:
@@ -507,16 +508,27 @@ Including pushing information from windows powershell.
 <details>
   <summary><h1>Loki</h1></summary>
 
+  Loki is made by grafana team, who call it Prometheus for logs.<br>
+  It is a **push** type monitoring, where an agent(**promtail**)
+  pushes logs on to a Loki instance.
+
+  What this example will set out to do is monitor logs of a
+  [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)
+  Have some dashboards about logs and have an alert when a player joins.
+
+  To add to the existing setup:
+
   - New container - `loki` added to the compose file. It stores logs and makes
     them available for grafana to visualize.
   - New container - `promtail` added to the compose file. Agent that pushes
-    logs content to loki.
+    logs content to loki. This container needs access to logs to be pushed
+    and so docker host `/var/lib/docker/containers` directory is bind mounted.
   - New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
     The file is [all default](https://github.com/grafana/loki/tree/main/cmd/loki),
     except for alertmanager url.<br>
   - New file - `promtail-config.yml` mounted in to promtail container<br>
-    This files defines source of logs. Any such source much be accessible
-    by the promtail container.
+    This files defines source of logs. In here a minecraft container is set,
+    with some added labels for easier targeting of logs.
 
   <details>
     <summary>docker-compose.yml</summary>
@@ -529,8 +541,8 @@ Including pushing information from windows powershell.
       image: prom/prometheus:v2.42.0
       container_name: prometheus
       hostname: prometheus
-      restart: unless-stopped
       user: root
+      restart: unless-stopped
       depends_on:
         - cadvisor
       command:
@@ -554,9 +566,9 @@ Including pushing information from windows powershell.
       image: grafana/grafana:9.3.6
       container_name: grafana
       hostname: grafana
+      user: root
       restart: unless-stopped
       env_file: .env
-      user: root
       volumes:
         - ./grafana_data:/var/lib/grafana
       expose:
@@ -626,6 +638,7 @@ Including pushing information from windows powershell.
       image: grafana/loki:2.7.3
       container_name: loki
       hostname: loki
+      user: root
       restart: unless-stopped
       volumes:
         - ./loki_data:/loki
@@ -642,8 +655,8 @@ Including pushing information from windows powershell.
       image: grafana/promtail:2.7.3
       container_name: promtail
       hostname: promtail
-      restart: unless-stopped
       user: root
+      restart: unless-stopped
       volumes:
         - /var/log:/var/log:ro
         - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -724,7 +737,27 @@ Including pushing information from windows powershell.
   ```
   </details>
 
+There was also an option to use loki logging driver to just get docker containers.
+But any container re-recreated with that setting set took always long time to down.<br>
+
+Anyway, now with these files in place..
+
+* Loki needs to be added to in grafana as a datasource.<br>
+  If everything works as it should, there should be no notice, down left side:<br>
+  `Data source connected and labels found.`
+
 </details>
+
+---
+---
+
+<details>
+  <summary><h1>Caddy monitoring</h1></summary>
+
+</details>
+
+---
+---
 
 # Update
 
