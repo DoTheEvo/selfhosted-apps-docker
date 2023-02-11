@@ -27,15 +27,15 @@ which uses nginx as a web server.
 └── ~/
     └── docker/
         └── bookstack/
-            ├── bookstack-data/
-            ├── bookstack-db-data/
+            ├── bookstack_data/
+            ├── bookstack_db_data/
             ├── .env
             ├── docker-compose.yml
             └── bookstack-backup-script.sh
 ```
 
-* `bookstack-data/` - a directory where bookstack will store its web app data
-* `bookstack-db-data/` - a directory where bookstack will store its MySQL database data
+* `bookstack_data/` - a directory where bookstack will store its web app data
+* `bookstack_db_data/` - a directory where bookstack will store its MySQL database data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `bookstack-backup-script.sh` - a backup script if you want it
@@ -50,7 +50,6 @@ Dockerhub linuxserver/bookstack
 
 `docker-compose.yml`
 ```yml
-version: "2"
 services:
 
   bookstack-db:
@@ -60,7 +59,7 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - ./bookstack-db-data:/config
+      - ./bookstack_db_data:/config
 
   bookstack:
     image: linuxserver/bookstack
@@ -71,12 +70,14 @@ services:
     depends_on:
       - bookstack-db
     volumes:
-      - ./bookstack-data:/config
+      - ./bookstack_data:/config
+    expose:
+      - 80:80
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
@@ -103,14 +104,14 @@ DB_USER=bookstack
 DB_PASS=bookstack
 DB_DATABASE=bookstack
 
-# USING SENDGRID FOR SENDING EMAILS
-MAIL_ENCRYPTION=SSL
+# USING SENDINBLUE FOR SENDING EMAILS
 MAIL_DRIVER=smtp
-MAIL_HOST=smtp.sendgrid.net
-MAIL_PORT=465
+MAIL_ENCRYPTION=tls
+MAIL_HOST=smtp-relay.sendinblue.com
+MAIL_PORT=587
 MAIL_FROM=book@example.com
-MAIL_USERNAME=apikey
-SMTP_PASSWORD=<sendgrid-api-key-goes-here>
+MAIL_USERNAME=<registration-email@gmail.com>
+SMTP_PASSWORD=<sendinblue-smtp-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
@@ -148,6 +149,12 @@ Manual image update:
 - `docker-compose pull`</br>
 - `docker-compose up -d`</br>
 - `docker image prune`
+
+* if there was a major version jump, and bookstack does not work,
+  exec in to the app container and run `php artisan migrate`</br>
+  `docker container exec -it bookstack /bin/bash`</br>
+  `cd /var/www/html/`</br>
+  `php artisan migrate`
 
 # Backup and restore
 
@@ -205,13 +212,13 @@ Running on the host, so that the script will be periodically run.
 Assuming clean start, first restore the database before running the app container.
 
 * start only the database container: `docker-compose up -d bookstack-db`
-* copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack-db-data/`
+* copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack_db_data/`
 * restore the database inside the container</br>
   `docker container exec --workdir /config bookstack-db bash -c 'mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < BACKUP.bookstack.database.sql'`
 * now start the app container: `docker-compose up -d`
 * let it run so it creates its file structure
 * down the containers `docker-compose down`
-* in `bookstack/bookstack-data/www/`</br>
+* in `bookstack/bookstack_data/www/`</br>
   replace directories `files`,`images`,`uploads` and the file `.env`</br>
   with the ones from the BorgBackup repository 
 * start the containers: `docker-compose up -d`
@@ -221,4 +228,5 @@ Assuming clean start, first restore the database before running the app containe
   `php artisan migrate`
 
 Again, the above steps are based on the 
-[official procedure.](https://www.bookstackapp.com/docs/admin/backup-restore/)
+[official procedure](https://www.bookstackapp.com/docs/admin/backup-restore/)
+at the time of writting this.
