@@ -15,7 +15,7 @@ Documentation and notes.
 BookStack is a modern, open source, good looking wiki platform
 for storing and organizing information.
 
-Written in PHP, with MySQL database for the user data.</br>
+Written in PHP, using Laravel framework, with MySQL database for the user data.</br>
 There is no official Dockerhub image so the one maintained by
 [linuxserver.io](https://www.linuxserver.io/) is used,
 which uses nginx as a web server.
@@ -34,14 +34,14 @@ which uses nginx as a web server.
             └── bookstack-backup-script.sh
 ```
 
-* `bookstack_data/` - a directory where bookstack will store its web app data
-* `bookstack_db_data/` - a directory where bookstack will store its MySQL database data
+* `bookstack_data/` - a directory with bookstacks web app data
+* `bookstack_db_data/` - a directory with database data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `bookstack-backup-script.sh` - a backup script if you want it
 
 You only need to provide the files.</br>
-The directories are created by docker compose on the first run.
+The directories are created on the first run.
 
 # docker-compose
 
@@ -160,8 +160,9 @@ Manual image update:
 
 #### Backup
 
-Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory.
+Using [kopia](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/kopia_backup)
+or [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+to make daily snapshot of the entire docker directory.
   
 #### Restore
 
@@ -177,11 +178,10 @@ Users data daily export using the
 For bookstack it means database dump and backing up several directories
 containing user uploaded files.
 
-Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
-takes care of backing up the directories.
+Daily kopia or borg backup run takes care of backing up the directories.
 So only database dump is needed.</br>
 The created backup sqlite3 file is overwritten on every run of the script,
-but that's ok since borg is making daily snapshots.
+but that's ok since kopia/borg are keeping daily snapshots.
 
 #### Create a backup script
 
