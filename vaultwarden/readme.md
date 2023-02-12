@@ -29,6 +29,8 @@ and user data are stored in a simple sqlite database file.
 All the client apps are still official, coming from Bitwarden,
 only the server is a different implementation.
 
+![interface-pic](https://i.imgur.com/5LxEUsA.png)
+
 # Files and directory structure
 
 ```
@@ -83,8 +85,8 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # BITWARDEN
-DOMAIN=https://passwd.example.com
-ADMIN_TOKEN=YdLo1TM4MYzQ948oOVZ69IF4fABSrZMpk9
+DOMAIN=https://vault.example.com
+ADMIN_TOKEN=zzYdLo1TM4MYzQ948oOVZ69IF4fABSrZMpk9
 SIGNUPS_ALLOWED=false
 WEBSOCKET_ENABLED=true
 
@@ -101,12 +103,15 @@ SMTP_PASSWORD=<sendinblue-smtp-key-goes-here>
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
+`DOMAIN` and `SMTP_` stuff in the `.env` file must be set correctly for
+email registration to work.<br>
+`ADMIN_TOKEN` should really be changed to something else than whats up there.
+
 # Reverse proxy
 
 Caddy v2 is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
-Vaultwarden's documentation has a 
-[section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
+Vaultwarden has a very good documentation on [reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
 
 `Caddyfile`
 ```php
@@ -128,13 +133,6 @@ vault.{$MY_DOMAIN} {
        -Server
   }
 
-  # Uncomment to allow access to the admin interface only from local networks
-  @insecureadmin {
-    not remote_ip 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8
-    path /admin*
-  }
-  redir @insecureadmin /
-
   # Notifications redirected to the websockets server
   reverse_proxy /notifications/hub vaultwarden:3012
 
@@ -149,7 +147,7 @@ vault.{$MY_DOMAIN} {
 
 # Forward port 3012 TCP on your router
 
-[WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for notifications
+[WebSocket](https://youtu.be/2Nt-ZrNP22A) protocol is used for communication
 so that all web based clients, including desktop app,
 can immediately sync when a change happens on the server.
 
@@ -160,33 +158,30 @@ same as port 80 and 443 are forwarded
 
 To test if websocket works, have the desktop app open
 and make changes through browser extension, or through the website.
-Changes should immediately appear in the desktop app. If it's not working,
+Changes should immediately appear in the desktop app.<br> If it's not working,
 you need to manually sync for changes to appear.
- 
-# Extra info
 
-**Bitwarden can be managed** at `<url>/admin` and entering `ADMIN_TOKEN`
-set in the `.env` file. Especially if sign ups are disabled it is the only way
-to invite users.
-
-**Push notifications** are not working at this moment.
+**Push notifications** are not working, and it's unlikely to change.
 [Github issue](https://github.com/dani-garcia/bitwarden_rs/issues/126).</br>
 The purpose of [Push notifications](https://www.youtube.com/watch?v=8D1NAezC-Dk)
 is the same as WebSocket notifications, to tell the clients that a change
 happened on the server so that they are synced immediately.
 But they are for apps on mobile devices and it would likely take releasing and
-maintaining own bitwarden_rs version of the Android/iOS mobile apps
-to have them working.</br>
+maintaining own vaultwarden version of Android/iOS mobile apps
+to have this feature working.</br>
 So you better manually sync before making changes.
 
----
+# First run
 
-![interface-pic](https://i.imgur.com/5LxEUsA.png)
+![admin_logon](https://i.imgur.com/vGdJQG0.png)
+
+Login at `https://vault.example.com/admin` using
+`ADMIN_TOKEN` from the `.env` file<br>
+From the admin interface test email can be send, and new users can be invited.
+
+![users_invite](https://i.imgur.com/K2oA1nA.png)
 
 # Update
-
-[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically.
 
 Manual image update:
 
@@ -194,67 +189,79 @@ Manual image update:
 - `docker-compose up -d`</br>
 - `docker image prune`
 
+It is **strongly recommended** to now add current **tags** to the images in the compose.<br>
+Tags will allow you to easily return to a working state if an update goes wrong.
+
 # Backup and restore
 
 #### Backup
 
-Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory.
+Using [kopia](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/kopia_backup)
+or [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+to make daily snapshot of the entire docker directory.
   
 #### Restore
 
-* down the bitwarden container `docker-compose down`</br>
-* delete the entire bitwarden directory</br>
-* from the backup copy back the bitwarden directory</br>
-* start the container `docker-compose up -d`
+* down the containers `docker-compose down`</br>
+* delete/move/rename the entire project directory</br>
+* from the backups copy back the entire project directory</br>
+* start the containers `docker-compose up -d`
 
 # Backup of just user data
 
 Users data daily export using the
-[official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)</br>
-For bitwarden_rs it means sqlite database dump and backing up `attachments` directory.</br>
+[official procedure.](https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault)</br>
+For vaultwarden it means sqlite database dump and backing up `attachments` directory.</br>
 
-Daily [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup) run
-takes care of backing up the directory.
-So only database dump is needed.</br>
+Daily kopia/borg backup run takes care of backing up the directories.
+So only database dump is needed and done with the script.</br>
 The created backup sqlite3 file is overwritten on every run of the script,
-but that's ok since borg is making daily snapshots.
+but that's ok since kopia/borg are keeping daily snapshots.
 
 #### Create a backup script
 
-Placed inside `bitwarden` directory on the host.
+The backup script requires sqlite/sqlite3 package to be installed **on the host**.<br>
+The backup script must be placed on the host with the bind mounted
+`vaultwarden_data` directory next to it.
 
-`bitwarden-backup-script.sh`
+`vaultwarden-backup-script.sh`
 ```bash
 #!/bin/bash
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path"
 
 # CREATE SQLITE BACKUP
-docker container exec bitwarden sqlite3 /data/db.sqlite3 ".backup '/data/BACKUP.bitwarden.db.sqlite3'"
+sqlite3 ./vaultwarden_data/db.sqlite3 "VACUUM INTO './vaultwarden_data/BACKUP.vaultwarden.db.sqlite3'"
 ```
 
-the script must be **executable** - `chmod +x bitwarden-backup-script.sh`
+the script must be **executable** - `chmod +x vaultwarden-backup-script.sh`
 
 #### Cronjob
 
-Running on the host, so that the script will be periodically run.
+Running on the host
 
 * `su` - switch to root
 * `crontab -e` - add new cron job</br>
-* `0 21 * * * /home/bastard/docker/bitwarden/bitwarden-backup-script.sh`</br>
-  runs it every day [at 21:00](https://crontab.guru/#0_21_*_*_*) 
+* `15 01 * * * /home/bastard/docker/vaultwarden/vaultwarden-backup-script.sh`</br>
+  runs it every night [at 01:15](https://crontab.guru/#15_01_*_*_*) 
 * `crontab -l` - list cronjobs to check
 
 # Restore the user data
 
 Assuming clean start.
 
-* start the bitwarden container: `docker-compose up -d`
+* start the vaultwarden container: `docker-compose up -d`
 * let it run so it creates its file structure
 * down the container `docker-compose down`
-* in `bitwarden/bitwarden-data/`</br>
-  replace `db.sqlite3` with the backup one `BACKUP.bitwarden.db.sqlite3`</br>
-  replace `attachments` directory with the one from the borg repository 
+* in `vaultwarden/vaultwarden_data/`</br>
+  delete `db.sqlite3-wal` if it exists<br>
+  delete `db.sqlite3`<br>
+  place backup there `BACKUP.vaultwarden.db.sqlite3`</br>
+  rename it to `db.sqlite3`<br>
+  replace `attachments` directory with the one from the backups<br>
+  additionally `sends` and `config.jso` can also be copied from backups
 * start the container `docker-compose up -d`
 
 Again, the above steps are based on the 
-[official procedure.](https://github.com/dani-garcia/bitwarden_rs/wiki/Backing-up-your-vault)
+[official procedure.](https://github.com/dani-garcia/vaultwarden/wiki/Backing-up-your-vault#backing-up-data).
+Read it for more info whats where as the documentation is really excelent.
