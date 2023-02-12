@@ -79,9 +79,6 @@ networks:
     external: true
 ```
 
-`APP_URL` must be set for bookstack to work.<br>
-`MAIL_` stuff must be set for password reset and new registrations.
-
 `.env`
 ```bash
 # GENERAL
@@ -118,6 +115,9 @@ MAIL_PASSWORD=<sendinblue-smtp-key-goes-here>
 **All containers must be on the same network**.</br>
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
+
+`APP_URL` in the `.env` must be set for bookstack to work.<br>
+`MAIL_` stuff must be set for password reset and new registrations.
 
 # Reverse proxy
 
