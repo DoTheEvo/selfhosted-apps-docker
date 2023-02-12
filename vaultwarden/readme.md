@@ -109,7 +109,7 @@ Vaultwarden's documentation has a
 [section on reverse proxy.](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples)
 
 `Caddyfile`
-```lua
+```go
 vault.{$MY_DOMAIN} {
   encode gzip
 
