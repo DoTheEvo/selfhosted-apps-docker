@@ -79,10 +79,12 @@ networks:
     external: true
 ```
 
+`APP_URL` must be set for bookstack to work.<br>
+`MAIL_` stuff must be set for password reset and new registrations.
+
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
@@ -148,7 +150,7 @@ Default login: `admin@admin.com` // `password`
   Exec in to the container and `printenv` to see.
   Check [mail.php](https://github.com/BookStackApp/BookStack/blob/development/app/Config/mail.php)
   to see exact `MAIL_` env variables names and default values.
-  Test in thunderbird your smtp server working or not.
+  Test in Thunderbird your smtp server working or not.
 
 # Update
 
@@ -239,4 +241,4 @@ Note that database restore must happen before bookstack app is first run.
 
 Again, the above steps are based on the 
 [official procedure](https://www.bookstackapp.com/docs/admin/backup-restore/)
-at the time of writting this.
+at the time of writing this.
