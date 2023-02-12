@@ -59,6 +59,8 @@ services:
     env_file: .env
     volumes:
       - ./bookstack_db_data:/config
+    expose:
+      - 3306:3306
 
   bookstack:
     image: linuxserver/bookstack
@@ -116,7 +118,7 @@ MAIL_PASSWORD=<sendinblue-smtp-key-goes-here>
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
-`APP_URL` in the `.env` must be set for bookstack to work.<br>
+`APP_URL` in the `.env` **must be set** for bookstack to work.<br>
 `MAIL_` stuff must be set for password reset and new registrations.
 
 # Reverse proxy
@@ -160,11 +162,14 @@ Manual image update:
 - `docker-compose up -d`</br>
 - `docker image prune`
 
-* if there was a major version jump, and bookstack does not work,
-  exec in to the app container and run `php artisan migrate`</br>
-  `docker container exec -it bookstack /bin/bash`</br>
-  `cd /app/www`</br>
-  `php artisan migrate`
+It is **strongly recommended** to now add current **tags** to the images in the compose.<br>
+Tags will allow you to easily return to a working state if an update goes wrong.
+
+If there was a **major version jump**, and bookstack does not work,
+exec in to the app container and run php artisan migrate</br>
+`docker container exec -it bookstack /bin/bash`</br>
+`cd /app/www`</br>
+`php artisan migrate`
 
 # Backup and restore
 
@@ -176,9 +181,9 @@ to make daily snapshot of the entire docker directory.
   
 #### Restore
 
-* down the bookstack containers `docker-compose down`</br>
-* delete the entire bookstack directory</br>
-* from the backup copy back the bookstack directory</br>
+* down the containers `docker-compose down`</br>
+* delete/move/rename the entire project directory</br>
+* from the backups copy back the entire project directory</br>
 * start the containers `docker-compose up -d`
 
 # Backup of just user data
