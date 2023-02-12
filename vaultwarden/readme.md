@@ -85,12 +85,12 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # BITWARDEN
-DOMAIN=https://vault.example.com
 ADMIN_TOKEN=zzYdLo1TM4MYzQ948oOVZ69IF4fABSrZMpk9
 SIGNUPS_ALLOWED=false
 WEBSOCKET_ENABLED=true
 
 # USING SENDINBLUE FOR SENDING EMAILS
+DOMAIN=https://vault.example.com
 SMTP_SECURITY=starttls
 SMTP_HOST=smtp-relay.sendinblue.com
 SMTP_PORT=587
