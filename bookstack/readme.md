@@ -140,7 +140,10 @@ Default login: `admin@admin.com` // `password`
 
 # Trouble shooting
 
-If after update you cant see edit tools. Clear cookies.
+* It did not start.<br>
+  Ctrl+f in `.env` file for word `example` to be replaced with actual domain
+  name. `APP_URL` has to be set correctly for bookstack to work.
+* If after update you cant see edit tools. Clear cookies.
 
 # Update
 
@@ -153,7 +156,7 @@ Manual image update:
 * if there was a major version jump, and bookstack does not work,
   exec in to the app container and run `php artisan migrate`</br>
   `docker container exec -it bookstack /bin/bash`</br>
-  `cd /var/www/html/`</br>
+  `cd /app/www`</br>
   `php artisan migrate`
 
 # Backup and restore
@@ -224,7 +227,7 @@ Assuming clean start, first restore the database before running the app containe
 * start the containers: `docker-compose up -d`
 * if there was a major version jump, exec in to the app container and run `php artisan migrate`</br>
   `docker container exec -it bookstack /bin/bash`</br>
-  `cd /var/www/html/`</br>
+  `cd /app/www`</br>
   `php artisan migrate`
 
 Again, the above steps are based on the 
