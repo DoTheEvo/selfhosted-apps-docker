@@ -27,21 +27,20 @@ which uses nginx as a web server.
 └── ~/
     └── docker/
         └── bookstack/
-            ├── bookstack_data/
-            ├── bookstack_db_data/
-            ├── .env
-            ├── docker-compose.yml
-            └── bookstack-backup-script.sh
+            ├── 🗁 bookstack_data/
+            ├── 🗁 bookstack_db_data/
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            └── 🗋 bookstack-backup-script.sh
 ```
 
-* `bookstack_data/` - a directory with bookstacks web app data
-* `bookstack_db_data/` - a directory with database data
+* `bookstack_data/` - bookstacks web app data
+* `bookstack_db_data/` - database data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
-* `bookstack-backup-script.sh` - a backup script if you want it
+* `bookstack-backup-script.sh` - a backup script, to be run daily
 
-You only need to provide the files.</br>
-The directories are created on the first run.
+You only need to provide the files. The directories are created on the first run.
 
 # docker-compose
 
@@ -111,7 +110,7 @@ MAIL_HOST=smtp-relay.sendinblue.com
 MAIL_PORT=587
 MAIL_FROM=book@example.com
 MAIL_USERNAME=<registration-email@gmail.com>
-SMTP_PASSWORD=<sendinblue-smtp-key-goes-here>
+MAIL_PASSWORD=<sendinblue-smtp-key-goes-here>
 ```
 
 **All containers must be on the same network**.</br>
@@ -143,7 +142,13 @@ Default login: `admin@admin.com` // `password`
 * It did not start.<br>
   Ctrl+f in `.env` file for word `example` to be replaced with actual domain
   name. `APP_URL` has to be set correctly for bookstack to work.
-* If after update you cant see edit tools. Clear cookies.
+* After update cant see edit tools.<br>
+  Clear browsers cookies/cache.
+* The test email button in preferences throws error.<br>
+  Exec in to the container and `printenv` to see.
+  Check [mail.php](https://github.com/BookStackApp/BookStack/blob/development/app/Config/mail.php)
+  to see exact `MAIL_` env variables names and default values.
+  Test in thunderbird your smtp server working or not.
 
 # Update
 
@@ -181,12 +186,12 @@ Users data daily export using the
 For bookstack it means database dump and backing up several directories
 containing user uploaded files.
 
-Daily kopia or borg backup run takes care of backing up the directories.
-So only database dump is needed.</br>
-The created backup sqlite3 file is overwritten on every run of the script,
+Daily kopia/borg backup run takes care of backing up the directories.
+So only database dump is needed and done with the script.</br>
+The created backup sql file is overwritten on every run of the script,
 but that's ok since kopia/borg are keeping daily snapshots.
 
-#### Create a backup script
+#### Backup script
 
 Placed inside `bookstack` directory on the host
 
@@ -200,9 +205,9 @@ docker container exec bookstack-db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PA
 
 the script must be **executable** - `chmod +x bookstack-backup-script.sh`
 
-#### Cronjob
+#### Cronjob - scheduled backup
 
-Running on the host, so that the script will be periodically run.
+Running on the host
 
 * `su` - switch to root
 * `crontab -e` - add new cron job</br>
@@ -212,7 +217,9 @@ Running on the host, so that the script will be periodically run.
 
 # Restore the user data
 
-Assuming clean start, first restore the database before running the app container.
+Assuming clean start and latest images.<br>
+Will need `BACKUP.bookstack.database.sql` and content of `bookstack_data/www/`<br>
+Note that database restore must happen before bookstack app is first run.
 
 * start only the database container: `docker-compose up -d bookstack-db`
 * copy `BACKUP.bookstack.database.sql` in `bookstack/bookstack_db_data/`
