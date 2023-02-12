@@ -34,13 +34,13 @@ which uses nginx as a web server.
             └── 🗋 bookstack-backup-script.sh
 ```
 
-* `bookstack_data/` - bookstacks web app data
-* `bookstack_db_data/` - database data
+* `bookstack_data/` - a directory with bookstacks web app data
+* `bookstack_db_data/` - a directory with database data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `bookstack-backup-script.sh` - a backup script, to be run daily
 
-You only need to provide the files. The directories are created on the first run.
+Only the files are required. The directories are created on the first run.
 
 # docker-compose
 
@@ -125,7 +125,7 @@ Caddy v2 is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
 `Caddyfile`
-```
+```php
 book.{$MY_DOMAIN} {
     reverse_proxy bookstack:80
 }
