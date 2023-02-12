@@ -203,6 +203,12 @@ TZ=Europe/Bratislava
 GF_SECURITY_ADMIN_USER=admin
 GF_SECURITY_ADMIN_PASSWORD=admin
 GF_USERS_ALLOW_SIGN_UP=false
+# GRAFANA EMAIL
+GF_SMTP_ENABLED=true
+GF_SMTP_HOST=smtp-relay.sendinblue.com:587
+GF_SMTP_USER=example@gmail.com
+GF_SMTP_PASSWORD=xzu0dfFhn3eqa
+
 ```
 
 **All containers must be on the same network**.</br>
@@ -713,17 +719,82 @@ Including pushing information from windows powershell.
   ```
   </details>
 
+
+### Logs in grafana
+
+  ![logo](https://i.imgur.com/MHYmxPi.png)
   
-Now with driver installed, files in place, compose edited,..
+Now with the driver installed, config files in place, compose edited,..
 
 * In grafana, loki needs to be added as a datasource.<br>
-  If everything works as it should, there should be no red notice, down left side
-  only gree:<br>
-  `Data source connected and labels found.`
-* In `Explore` section, if the input is set to `Builder`, picking from dropdown
+  If everything works as it should, there should be no red notice, down left side,
+  only green: `Data source connected and labels found.`
+* In `Explore` section, input set to `Builder`, picking from dropdown
   filter menu container_name = minecraft, and hitting run query.. 
-  this should result in seeing minecraft logs. 
-* In Alert grafana section, 
+  this should result in seeing minecraft logs and their volume/time graph.
+* To recreat this Explore view as a dashboard, as a practice...
+  - new dashboard, panel
+  - datasource - Loki
+  - query - `count_over_time({compose_service="minecraft"} |= `` [1m])`<br>
+    switch from `builder` to `code` is needed to paste it
+  - `Query options` - Min interval=1m
+  - `transformation` - Rename by regex - `(.*)` - `Logs`
+  - time series graph
+  - Title - Logs volume
+  - transparent background
+  - legend off
+  - graph styles - bar
+  - graph styles - bar - point size = 10
+  - stack series - normal
+  - color scheme - single color
+
+### Alerts for Loki
+
+* Alerts section in grafana
+* Alert rules, new alert
+  - 1. Set a query and alert condition
+    - **A**
+    - now-5min to now
+    - container_name=minecraft
+    - line contains=joined the game
+    - **B**
+    - Reduce - because alerts can only work with single number
+    - Function=Last
+    - Input=A
+    - Mode=Strict
+    - **C** - the actual condition for alert
+    - Input=B
+    - is above 0
+    - click - Make this the alert condition
+  - 2. Alert evaluation behavior
+    - evaluate every 5m for 0s
+    - Configure no data and error handling
+    - Alert state if no data or all values are null=OK
+  - 3. Add details for your alert
+    - Rule name=Minecraft-player-joined
+    - Folder, add new, "Alerts"
+    - Group, add new, "Docker"
+  - 4. Notifications
+    - nothing
+  - Save and exit
+* **Contact points**
+  - New contact point
+  - Name = ntfy
+  - Contact point type = Webhook
+  - URL = https://ntfy.example.com/grafana
+  - Test; Save
+* Notification policies
+  - edit default
+  - Default contact point = ntfy
+
+
+
+
+
+
+
+
+
 
 
 

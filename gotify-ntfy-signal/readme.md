@@ -18,7 +18,7 @@ Instant notifications if email feels old timey and crowded
 
 * **gotify** - great for single person use, but the moment theres more people
   they need to share single account and so lack the ability to choose
-  what to get and what not to get
+  what to get and what not to get.
 * **ntfy** - simple original approach to just subscribing to "topics" without
   authentification. Very simple single line push notification.
   Support for multiple user, supports ios.

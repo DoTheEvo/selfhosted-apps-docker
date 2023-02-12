@@ -95,8 +95,8 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`

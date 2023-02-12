@@ -17,4 +17,4 @@ Most of the stuff around here is about deployment, how to deploy others people w
 
 # Basics 
 
-
+tag - not just version number, tags are not even present on local docker..

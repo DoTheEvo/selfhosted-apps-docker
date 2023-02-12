@@ -9,7 +9,7 @@
 ---
 
 * [caddy_v2](caddy_v2/) - reverse proxy
-* [bitwarden_rs](bitwarden_rs/) - password manager
+* [vaultwarden](vaultwarden/) - password manager
 * [bookstack](bookstack/) - notes and documentation
 * [borg_backup](borg_backup/) - backup utility
 * [ddclient](ddclient/) - automatic DNS update
@@ -49,6 +49,8 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
   just documentation.<br>
 - For persistent storage bind mount `./whatever_data` is used.
   No volumes, nor static path somewhere... just relative path next to compose file.
+- no version is declared in compose, as the practice was
+  [deprecated](https://nickjanetakis.com/blog/docker-tip-51-which-docker-compose-api-version-should-you-use)
 
 # Requirements 
 
@@ -105,7 +107,9 @@ the variables directly in the compose file only under containers that want them.
 Most of the time the images are without any tag,
 which defaults to `latest` tag being used.</br>
 This is [frowned upon](https://vsupalov.com/docker-latest-tag/),
-but feel free to put there the current version to lower the chance of a fuckup.
+and you should put there the current tags once things are going.
+It will make updates easier when you know you can go back to a working version
+with backups and knowing image version.<br>
 
 ---
 
@@ -160,15 +164,19 @@ or enable freshly discovered feature for all deployments.
 
 ---
 
-### SendGrid and Sendinblue
+### Sendinblue
 
-Services often need ability to send emails, for registration, password recset and such...
+Services often need ability to send emails, for registration, password reset and such...
 
-I got free sendgrid account which provides 100 free emails a day.
-But I heard complains that is not as easy as it was to register on SendGrid.
+Sendinblue offers 300 mails a day and is easy to setup.
 
-I also use Sendinblue, I guess it was easy cuz I dont remember anything about it.
-It works and got 300 mails a day
+```
+EMAIL_HOST=smtp-relay.sendinblue.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=<registration_email@gmail.com>
+EMAIL_HOST_PASSWORD=xs...... S1Rzp
+EMAIL_USE_TLS=1
+```
 
 ---
 
