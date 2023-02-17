@@ -34,20 +34,20 @@ and for [memory file caching](https://docs.nextcloud.com/server/latest/admin_man
 └── ~/
     └── docker/
         └── nextcloud/
-            ├── nextcloud-data/
-            ├── nextcloud-db-data/
-            ├── .env
-            ├── docker-compose.yml
-            ├── nginx.conf
-            └── nextcloud-backup-script.sh
+            ├── 🗁 nextcloud-data/
+            ├── 🗁 nextcloud-db-data/
+            ├── 🗋 .env
+            ├── 🗋 docker-compose.yml
+            ├── 🗋 nginx.conf
+            └── 🗋 nextcloud-backup-script.sh
 ```
 
-* `nextcloud-data/` - a directory where nextcloud will store users data and web app data
-* `nextcloud-db-data/` - a directory where nextcloud will store its database data
+* `nextcloud-data/` - users data and web app data
+* `nextcloud-db-data/` - database data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `nginx.conf` - nginx web server configuration file
-* `nextcloud-backup-script.sh` - a backup script if you want it
+* `nextcloud-backup-script.sh` - a backup script, to be run daily
 
 You only need to provide the files.</br>
 The directories are created by docker compose on the first run.
@@ -79,10 +79,10 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - ./nextcloud-data-db:/var/lib/mysql
+      - ./nextcloud_data_db:/var/lib/mysql
 
   nextcloud-redis:
-    image: redis:5.0.9-alpine
+    image: redis:alpine
     container_name: nextcloud-redis
     hostname: nextcloud-redis
     restart: unless-stopped
@@ -97,7 +97,7 @@ services:
       - nextcloud-db
       - nextcloud-redis
     volumes:
-      - ./nextcloud-data/:/var/www/html
+      - ./nextcloud_data/:/var/www/html
 
   nextcloud-web:
     image: nginx:alpine
@@ -105,8 +105,10 @@ services:
     hostname: nextcloud-web
     restart: unless-stopped
     volumes:
-      - ./nextcloud-data/:/var/www/html:ro
+      - ./nextcloud_data/:/var/www/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    expose:
+      - 80:80
 
   nextcloud-cron:
     image: nextcloud:fpm-alpine
@@ -114,7 +116,7 @@ services:
     hostname: nextcloud-cron
     restart: unless-stopped
     volumes:
-      - ./nextcloud-data/:/var/www/html
+      - ./nextcloud_data/:/var/www/html
     entrypoint: /cron.sh
     depends_on:
       - nextcloud-db
@@ -122,42 +124,45 @@ services:
 
 networks:
   default:
-    external:
-      name: $DOCKER_MY_NETWORK
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # NEXTCLOUD-MARIADB
 MYSQL_ROOT_PASSWORD=nextcloud
+MARIADB_AUTO_UPGRADE=1
+MARIADB_DISABLE_UPGRADE_BACKUP=1
 MYSQL_PASSWORD=nextcloud
 MYSQL_DATABASE=nextcloud
 MYSQL_USER=nextcloud
 
-# NEXTCLOUD
+# NEXTCLOUD-APP
 MYSQL_HOST=nextcloud-db
 REDIS_HOST=nextcloud-redis
+OVERWRITEPROTOCOL=https
+TRUSTED_PROXIES=caddy
+NC_default_phone_region=SK   # CHANGE TO YOUR COUNTRY CODE
 
-# USING SENDGRID FOR SENDING EMAILS
+# USING SENDINBLUE FOR SENDING EMAILS
 MAIL_DOMAIN=example.com
 MAIL_FROM_ADDRESS=nextcloud
-SMTP_SECURE=ssl
-SMTP_HOST=smtp.sendgrid.net
-SMTP_PORT=465
-SMTP_NAME=apikey
-SMTP_PASSWORD=<sendgrid-api-key-goes-here>
+SMTP_SECURE=tls
+SMTP_HOST=smtp-relay.sendinblue.com
+SMTP_PORT=587
+SMTP_NAME=<registration-email@gmail.com>
+SMTP_PASSWORD=<smtp-key-goes-here>
 ```
 
 `nginx.conf`
 ```
-I wont be pasting it here
-in full text,
-but it is included in this github repo.
+Not be pasted here, too long.
+It is included in this github repo.
 ```
 
 [nginx.conf](https://raw.githubusercontent.com/DoTheEvo/selfhosted-apps-docker/master/nextcloud/nginx.conf)
@@ -181,12 +186,6 @@ upstream php-handler {
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
-# notice
-
-current issue, [redis version 6.0](https://github.com/nextcloud/server/issues/21913)
-
-Therefore `image: redis:5.0.9-alpine` is used instead of `image: redis` like with the rest.
-
 # Reverse proxy
 
 [Nextcloud official documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/reverse_proxy_configuration.html)
@@ -197,12 +196,14 @@ Caddy v2 is used, details
 There are few extra directives here to fix some nextcloud warnings.
 
 `Caddyfile`
-```
+```php
 nextcloud.{$MY_DOMAIN} {
-    reverse_proxy nextcloud-web:80
     header Strict-Transport-Security max-age=31536000;
     redir /.well-known/carddav /remote.php/carddav 301
     redir /.well-known/caldav /remote.php/caldav 301
+    redir /.well-known/webfinger /index.php/.well-known/webfinger 301
+    redir /.well-known/nodeinfo /index.php/.well-known/nodeinfo 301
+    reverse_proxy nextcloud-web:80
 }
 ```
 
@@ -210,15 +211,15 @@ nextcloud.{$MY_DOMAIN} {
 
 Nextcloud needs few moments to start, then there is the initial configuration,
 creating admin account.</br>
-If database env variables were not passed in to nextcloud-app
-then also the database info would be required here.
+If database env variables were not used then also the database info
+would be required here.
 
 ![first-run-pic](https://i.imgur.com/lv1x9GF.png)
 
 The domain or IP you access nextcloud on this first run is added
 to `trusted_domains` in `config.php`. 
 Changing the domain later on will throw *"Access through untrusted domain"* error.</br>
-Editing `nextcloud-data/config/config.php` and adding the new domain will fix it.
+Editing `nextcloud_data/config/config.php` and adding the new domain will fix it.
 
 # Security & setup warnings
 
@@ -256,7 +257,7 @@ If there is a problem accesing nextcloud from a mobile app,
 *"Please log in before granting access"*,
 and being stuck after logging in with the circle animation:
 
-Edit `nextcloud-data/config/config.php`</br>
+Edit `nextcloud_data/config/config.php`</br>
 adding as the last line: `'overwriteprotocol' => 'https',`
 
 # Extra info
@@ -337,7 +338,7 @@ The script must be **executable** - `chmod +x nextcloud-backup-script.sh`
 
 Test run the script `sudo ./nextcloud-backup-script.sh`</br>
 The resulting database dump is in 
-`nextcloud/nextcloud-data-db/BACKUP.nextcloud.database.sql`
+`nextcloud/nextcloud_data_db/BACKUP.nextcloud.database.sql`
 
 #### Cronjob
 
@@ -357,11 +358,11 @@ Assuming clean start.
   let them run so they create the file structure
 * down the containers: `docker-compose down`
 * delete the directories `config`, `data`, `themes` in the freshly created
-  `nextcloud/nextcloud-data/`
+  `nextcloud/nextcloud_data/`
 * from the backup of `/nextcloud/nextcloud-data/`, copy the directories
   `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud-data/`
-* from the backup of `/nextcloud/nextcloud-data-db/`, copy the backup database
-  named `BACKUP.nextcloud.database.sql` in to the new `/nextcloud/nextcloud-data-db/`
+* from the backup of `/nextcloud/nextcloud_data_db/`, copy the backup database
+  named `BACKUP.nextcloud.database.sql` in to the new `/nextcloud/nextcloud_data_db/`
 * start the containers: `docker-compose up -d`
 * set the correct user ownership of the directories copied:</br>
   `docker exec --workdir /var/www/html nextcloud-app chown -R www-data:www-data config data themes`
