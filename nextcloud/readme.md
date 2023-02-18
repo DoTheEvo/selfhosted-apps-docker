@@ -12,13 +12,13 @@ File share & sync.
 * [Github](https://github.com/nextcloud/server)
 * [DockerHub](https://hub.docker.com/_/nextcloud/)
 
-Nextcloud is an open source suite of client-server software for creating
-and using file hosting services with wide cross platform support.
+Nextcloud is an open source software for sharing files, calendar,
+and general office collaboration stuff. Most people know it and use it
+as an alternative to onedrive/google drive.
 
 The Nextcloud server is written in PHP and JavaScript.
 For remote access it employs sabre/dav, an open-source WebDAV server.
-It is designed to work with several database management systems,
-including SQLite, MariaDB, MySQL, PostgreSQL.
+It is designed to work with most of the databases.
 
 There are many ways to deploy Nextcloud, this setup is going with the most goodies.</br>
 Using [PHP-FPM](https://www.cloudways.com/blog/php-fpm-on-cloud/)
@@ -34,16 +34,16 @@ and for [memory file caching](https://docs.nextcloud.com/server/latest/admin_man
 └── ~/
     └── docker/
         └── nextcloud/
-            ├── 🗁 nextcloud-data/
-            ├── 🗁 nextcloud-db-data/
+            ├── 🗁 nextcloud_data/
+            ├── 🗁 nextcloud_db_data/
             ├── 🗋 .env
             ├── 🗋 docker-compose.yml
             ├── 🗋 nginx.conf
             └── 🗋 nextcloud-backup-script.sh
 ```
 
-* `nextcloud-data/` - users data and web app data
-* `nextcloud-db-data/` - database data
+* `nextcloud_data/` - users actual data and web app data
+* `nextcloud_db_data/` - database data - users and files metadata, configuration
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 * `nginx.conf` - nginx web server configuration file
@@ -59,11 +59,11 @@ Official examples [here](https://github.com/nextcloud/docker/tree/master/.exampl
 Five containers to spin up
 
 * **nextcloud-app** - nextcloud backend app that stores the files and facilitate 
-  the sync and runs the apps
-* **nextcloud-db** - mariadb database where files-metadata and users-metadata are stored
+  the sync and runs the apps(calendar, notes, phonetrack,...)
+* **nextcloud-db** - mariadb database storing files-metadata and users-metadata
 * **nextcloud-web** - nginx web server with fastCGI PHP-FPM support
-* **nextcloud-redis** - in memory file caching
-  and more reliable transactional file locking
+* **nextcloud-redis** - in memory file caching and more reliable transactional
+  file locking
 * **nextcloud-cron** - for periodic maintenance in the background
 
 `docker-compose.yml`
@@ -165,13 +165,11 @@ Not be pasted here, too long.
 It is included in this github repo.
 ```
 
-[nginx.conf](https://raw.githubusercontent.com/DoTheEvo/selfhosted-apps-docker/master/nextcloud/nginx.conf)
-
+[nginx.conf](https://raw.githubusercontent.com/DoTheEvo/selfhosted-apps-docker/master/nextcloud/nginx.conf)<br>
 This is nginx web server configuration file, specifically setup
-to support fastCGI PHP-FPM.
-
-Taken from [this official nextcloud example
-setup](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose/insecure/mariadb-cron-redis/fpm/web)
+to support fastCGI PHP-FPM.<br>
+From [this official nextcloud example
+setup](https://github.com/nextcloud/docker/tree/master/.examples/docker-compose/insecure/mariadb/fpm/web)
 and has one thing changed in it - the upstream hostname from `app` to `nextcloud-app`
 
 ```
@@ -224,48 +222,26 @@ Editing `nextcloud_data/config/config.php` and adding the new domain will fix it
 # Security & setup warnings
 
 Nextcloud has a status check in *Settings > Administration > Overview*</br>
-There are likely several warnings on a freshly spun containers.
+There could be some warnings there, but if following this guide, it should be 
+all good. As `Caddyfile` and `.env` file should take care of it.
 
-##### The database is missing some indexes
+[Here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/a86c8498dc8ebc59546660701a54b839bf417516/nextcloud#security--setup-warnings)
+is a link to an older commit that talks in more detail on possible stuff here.<br>
+But fuck writing on that noise when nextcloud is now doing phone number area
+code notification there.
 
-On the docker host execute:</br>
-`docker exec --user www-data --workdir /var/www/html nextcloud-app php occ db:add-missing-indices`
-
-##### Some columns in the database are missing a conversion to big int
-
-On the docker host execute:</br>
-`docker exec --user www-data --workdir /var/www/html nextcloud-app php occ db:convert-filecache-bigint`
-
-##### The "Strict-Transport-Security" HTTP header is not set to at least "15552000" seconds.
-
-Helps to know what is [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw).</br>
-This warning is already fixed in the reverse proxy section in the caddy config,</br>
-the line: `header Strict-Transport-Security max-age=31536000;`
-
-##### Your web server is not properly set up to resolve "/.well-known/caldav" and Your web server is not properly set up to resolve "/.well-known/carddav".
-
-This warning is already fixed in the reverse proxy section in the caddy config,</br>
-The lines:</br>
-`redir /.well-known/carddav /remote.php/carddav 301`</br>
-`redir /.well-known/caldav /remote.php/caldav 301`
-
-![status-pic](https://i.imgur.com/wjjd5CJ.png)
+![status-pic](https://i.imgur.com/0nltwrn.png)
 
 # Troubleshooting
 
-If there is a problem accesing nextcloud from a mobile app,
-*"Please log in before granting access"*,
-and being stuck after logging in with the circle animation:
-
-Edit `nextcloud_data/config/config.php`</br>
-adding as the last line: `'overwriteprotocol' => 'https',`
+* *old stuff that was here is not applicable anymore*
 
 # Extra info
 
 #### check if redis container works
 
 At `https://<nexcloud url>/ocs/v2.php/apps/serverinfo/api/v1/info`</br>
-ctrl+f for `redis`, should be in memcache.distributed and memcache.locking
+ctrl+f for `redis`, if it's present it means nexcloud is set to use it.
 
 You can also exec in to redis container:
 - `docker exec -it nextcloud-redis /bin/sh`
@@ -282,9 +258,6 @@ You can also exec in to redis container:
 
 # Update
 
-[Watchtower](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/watchtower)
-updates the image automatically.
-
 Manual image update:
 
 - `docker-compose pull`</br>
@@ -295,30 +268,30 @@ Manual image update:
 
 #### Backup
 
-Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory.
+Using [kopia](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/kopia_backup)
+or [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
+to make daily snapshot of the entire docker directory.
   
 #### Restore
 
-* down the nextcloud containers `docker-compose down`</br>
-* delete the entire nextcloud directory</br>
-* from the backup copy back the nextcloud directory</br>
+* down the containers `docker-compose down`</br>
+* delete/move/rename the entire project directory</br>
+* from the backups copy back the entire project directory</br>
 * start the containers `docker-compose up -d`
 
 # Backup of just user data
 
-User data daily export using the
+User's data daily export going by the
 [official procedure.](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html)</br>
 For nextcloud it means entering the maintenance mode, doing a database dump
 and backing up several directories containing data, configs, themes.</br>
 
-For the script it just means database dump as borg backup and its deduplication
-will deal with the directories, especially useful in the case of nextcloud where 
-hundreds gigabytes can be stored.
+Daily kopia/borg backup run takes care of backing up the directories.
+So only database dump is needed and done with the script.</br>
 
 #### Create a backup script
 
-Placed inside `~/docker/nextcloud/` directory on the host.
+Placed inside `nextcloud` directory on the host.
 
 `nextcloud-backup-script.sh`
 ```bash
@@ -352,6 +325,8 @@ Running on the host, so that the script will be periodically run.
 
 # Restore the user data
 
+[The official docs.](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/restore.html)
+
 Assuming clean start.
 
 * start the containers: `docker-compose up -d`</br>
@@ -359,8 +334,8 @@ Assuming clean start.
 * down the containers: `docker-compose down`
 * delete the directories `config`, `data`, `themes` in the freshly created
   `nextcloud/nextcloud_data/`
-* from the backup of `/nextcloud/nextcloud-data/`, copy the directories
-  `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud-data/`
+* from the backup of `/nextcloud/nextcloud_data/`, copy the directories
+  `configs`, `data`, `themes` in to the new `/nextcloud/nextcloud_data/`
 * from the backup of `/nextcloud/nextcloud_data_db/`, copy the backup database
   named `BACKUP.nextcloud.database.sql` in to the new `/nextcloud/nextcloud_data_db/`
 * start the containers: `docker-compose up -d`
