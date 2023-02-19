@@ -12,9 +12,9 @@ File share & sync.
 * [Github](https://github.com/nextcloud/server)
 * [DockerHub](https://hub.docker.com/_/nextcloud/)
 
-Nextcloud is an open source software for sharing files, calendar,
-and general office collaboration stuff. Most people know it and use it
-as an alternative to onedrive/google drive.
+Nextcloud is an open source software for sharing files, calendar, general office
+collaboration stuff. Most people know it and use it as an alternative
+to onedrive/google drive.
 
 The Nextcloud server is written in PHP and JavaScript.
 For remote access it employs sabre/dav, an open-source WebDAV server.
@@ -65,6 +65,8 @@ Five containers to spin up
 * **nextcloud-redis** - in memory file caching and more reliable transactional
   file locking
 * **nextcloud-cron** - for periodic maintenance in the background
+
+Note that `nextcloud_data` is mounted in 3 containers.
 
 `docker-compose.yml`
 ```yml
@@ -150,7 +152,7 @@ TRUSTED_PROXIES=caddy
 NC_default_phone_region=SK   # CHANGE TO YOUR COUNTRY CODE
 
 # USING SENDINBLUE FOR SENDING EMAILS
-MAIL_DOMAIN=example.com
+MAIL_DOMAIN=nextcloud
 MAIL_FROM_ADDRESS=nextcloud
 SMTP_SECURE=tls
 SMTP_HOST=smtp-relay.sendinblue.com
@@ -234,7 +236,8 @@ code notification there.
 
 # Troubleshooting
 
-* *old stuff that was here is not applicable anymore*
+* moving between docker hosts, might need to take ownership of directories<br>
+  exec in to `nextcloud-app`; `/var/www/html`; `chown www-data:www-data *`
 
 # Extra info
 
@@ -263,6 +266,10 @@ Manual image update:
 - `docker-compose pull`</br>
 - `docker-compose up -d`</br>
 - `docker image prune`
+
+Updates tend to be problematic with Nexcloud. Inestigating what went wrong 
+in between major version updates...  have backups before doing update.
+And have the god damn tags on docker images.
 
 # Backup and restore
 
