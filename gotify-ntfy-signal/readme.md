@@ -44,8 +44,8 @@ services:
     command:
       - serve
     volumes:
-      - ./ntfy-cache:/var/cache/ntfy
-      - ./ntfy-etc:/etc/ntfy
+      - ./ntfy_cache:/var/cache/ntfy
+      - ./ntfy_etc:/etc/ntfy
 
 networks:
   default:
@@ -56,7 +56,6 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 ```
@@ -75,26 +74,33 @@ ntfy.{$MY_DOMAIN} {
 
 # The usage
 
-[Documentations](https://docs.ntfy.sh/publish/)
+[Documentation](https://docs.ntfy.sh/publish/)
+
+ntfy uses "topics" for categorization, which creates a very handy disconnect from
+sender and receiver.<br>
+Lets say there's a minecraft server and there are notifications when someone 
+joins. These notifications are send to a `minecraft` topic, not to a specific users.
+This gives great flexibility and is the main reason why ntfy wins
+over other solutions.
 
 #### Linux
 
-`curl -d "blablablaaa" https://ntfy.example.com/whatevers`
+`curl -d "a player joined" https://ntfy.example.com/minecraft`
 
 #### Windows
 
 * win10+
 
-  `Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/whatevers -Body "blablablaaa" -UseBasicParsing`
+  `Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/minecraft -Body "a player joined" -UseBasicParsing`
 
 * win8.1 and older need bit extra for https to work<br>
 
   ```
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/whatevers -Body "blablablaaa" -UseBasicParsing
+  Invoke-RestMethod -Method 'Post' -Uri https://ntfy.example.com/minecraft -Body "a player joined" -UseBasicParsing
   ```
 
-#### Linux systemd unit file service
+#### systemd unit file service
 
 To allows use of ntfy `OnFailure` and `OnSuccess` inside systemd unit files.
 
