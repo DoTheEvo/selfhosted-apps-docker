@@ -4,12 +4,14 @@
 
 ![logo](https://i.imgur.com/xmSY5qu.png)
 
-[update with this in mind](https://www.reddit.com/r/selfhosted/comments/10r9o4d/reverse_proxies_with_nginx_proxy_manager/)
-
 1. [Purpose & Overview](#Purpose--Overview)
 2. [Caddy as a reverse proxy in docker](#Caddy-as-a-reverse-proxy-in-docker)
 3. [Caddy more info and various configurations](#Caddy-more-info-and-various-configurations)
 4. [Caddy DNS challenge](#Caddy-DNS-challenge)
+5. [Other guides](#Other-guides)
+
+*[Older version](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/d973916d56e23bb5564bd9b68e06ec884cfc6af1/caddy_v2)
+of this guide - more detailed and handholding for docker noobs.*
 
 # Purpose & Overview
 
@@ -22,23 +24,23 @@ while `jellyfin.example.com` points to the media server on the network.
 * [Forum](https://caddy.community/)
 * [Github](https://github.com/caddyserver/caddy)
 
-Caddy is a pretty damn good web server with automatic HTTPS. Written in Go.<br>
+Caddy is a pretty damn good web server with automatic HTTPS. Written in Go.
+
 Web servers are build to deal with http traffic, so they are an obvious choice
-for the function of reverse proxy.<br>
-In this setup Caddy is used mostly as
+for the function of reverse proxy. In this setup Caddy is used mostly as
 [a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no). 
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
 and send to a correct webserver based on the settings in `Caddyfile`.
 
-Caddy with its build-in https and and simple config approach
-allows even most trivial configs to just work:
-    
+Caddy with its build-in automatic https allows configs to be clean and simple
+and to just work.
+
 ```
-nextcloud.{$MY_DOMAIN} {
+nextcloud.example.com {
   reverse_proxy nextcloud-web:80
 }
 
-jellyfin.{$MY_DOMAIN} {
+jellyfin.example.com {
   reverse_proxy 192.168.1.20:80
 }
 ```
@@ -57,18 +59,6 @@ and only some special casess with extra functionality need extra work.
 Caddy will be running as a docker container and will route traffic to other containers,
 or machines on the network.
 
-[gurucomputing caddy guide](https://blog.gurucomputing.com.au/reverse-proxies-with-caddy/)
-
-### - Requirements
-
-* have some basic linux knowledge, create folders, create files, edit files, run scripts,...
-* have a docker host and some vague docker knowledge
-* have port 80 and 443 forwarded on the router/firewall to the docker host
-* have a domain, `example.com`, you can buy one for 2€ annually on namecheap
-* have correctly set type-A DNS records pointing at your public IP address,
-  [switching to Cloudflare](https://youtu.be/XQKkb84EjNQ) for DNS managment is recommended
-
-
 ### - Files and directory structure
 
 ```
@@ -76,11 +66,11 @@ or machines on the network.
 └── ~/
     └── docker/
         └── caddy/
-            ├── config/
-            ├── data/
-            ├── .env
-            ├── Caddyfile
-            └── docker-compose.yml
+            ├── 🗁 config/
+            ├── 🗁 data/
+            ├── 🗋 .env
+            ├── 🗋 Caddyfile
+            └── 🗋 docker-compose.yml
 ```
 
 * `config/` - a directory containing configs that Caddy generates,
@@ -98,37 +88,14 @@ the content of these is visible only as root of the docker host.
 
 `docker network create caddy_net`
   
-All the containers and Caddy must be on the same network.
+All the future containers and Caddy must be on the same network,
+ping-able by their hostnames.
 
-### - Create .env file
+### - Create docker-compose.yml and .env file
 
-You want to change `example.com` to your domain.
-
-`.env`
-```bash
-MY_DOMAIN=example.com
-DOCKER_MY_NETWORK=caddy_net
-```
-    
-Domain names, api keys, email settings, ip addresses, database credentials, ... 
-whatever is specific for one deployment and different for another,
-all of that ideally goes in to the `.env` file.
-
-If `.env` file is present in the directory with the compose file,
-it is automatically loaded and these variables will be available
-for docker-compose when building the container with `docker-compose up`.
-This allows compose files to be moved from system to system more freely
-and changes are done to the `.env` file.
-
-Often variable should be available also inside the running container.
-For that it must be declared in the `environment` section of the compose file,
-as can be seen next in Caddie's `docker-compose.yml`
-
-*extra info:*<br>
-`docker-compose config` shows how compose will look
-with the variables filled in.
-
-### - Create docker-compose.yml
+Basic simple docker compose.<br>
+Official caddy image is used. Ports 80 and 443 are pusblished/mapped
+on to docker host as Caddy is the one in charge of any traffic coming there.<br>
 
 `docker-compose.yml`
 ```yml
@@ -139,11 +106,10 @@ services:
     container_name: caddy
     hostname: caddy
     restart: unless-stopped
+    env_file: .env
     ports:
       - "80:80"
       - "443:443"
-    environment:
-      - MY_DOMAIN
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./data:/data
@@ -155,12 +121,14 @@ networks:
     external: true
 ```
 
-* port 80 and 443 are pusblished for http and https
-* MY_DOMAIN variable is passed in to the container so that it can be used
-  in `Caddyfile`
-* the `Caddyfile` is bind-mounted from the docker host
-* directories `data` and `config` are bind mounted so that their content persists
-* the same network is joined as for all other containers
+`.env`
+```php
+MY_DOMAIN=example.com
+DOCKER_MY_NETWORK=caddy_net
+```
+
+You obviously want to change `example.com` to your domain.
+
 
 ### - Create Caddyfile
 
@@ -179,28 +147,30 @@ b.{$MY_DOMAIN} {
 }
 ```
 
-`a` and `b` are the subdomains `a.example.com` and `b.example.com`,
-can be named whatever.
-For them to work they must have type-A DNS record
-pointing at your public ip set on Cloudflare, or wherever the domains DNS is managed.<br>
+`a` and `b` are the subdomains, can be named whatever.<br>
+For them to work they **must have type-A DNS record set**, that points
+at your public ip set on Cloudflare, or wherever the domains DNS is managed.<br>
 
-The value of `{$MY_DOMAIN}` is provided by the compose and the `.env` file.<br>
+Can test if correctly set with online dns lookup tools,
+[like this one.](https://mxtoolbox.com/DNSLookup.aspx)
+
+The value of `{$MY_DOMAIN}` is provided by the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
-So every docker container you spin should have hostname definied.<br>
-Commented out is the staging url for let's encrypt.
+So every docker container you spin should have hostname definied and be on 
+`caddy_net`, or some other named custom network, as the default bridge docker network
+[does not provide](https://docs.docker.com/network/bridge/)
+automatic DNS resolution between containers.<br>
+Commented out is the staging url for let's encrypt, used for testing.
 
-### - Setup some docker containers
+<details>
+<summary><h3>Setup some docker containers</h3></summary>
 
-Something light and easy to setup to route to.<br>
-Assuming for this testing these compose files are in the same directory with Caddy,
-so they make use of the same `.env` file and so be on the same network.
+Something light to setup to route to that has a webpage to show.<br>
+Not bothering with an `.env` file here.
 
 Note the lack of published/mapped ports in the compose,
 as they will be accessed only through Caddy, which has it's ports published.<br>
-And since the containers and Caddy are all on the same bridge docker network,
-they can access each other on any port.<br>
-Exposed ports are just documentation,
-[don't confuse expose and publish](https://maximorlov.com/exposing-a-port-in-docker-what-does-it-do/).
+Containers on the same bridge docker network can access each other on any port.<br>
 
 *extra info:*<br>
 To know which ports containers have exposed - `docker ps`, or
@@ -208,7 +178,6 @@ To know which ports containers have exposed - `docker ps`, or
 
 `whoami-compose.yml`
 ```yaml
-version: "3.7"
 services:
 
   whoami:
@@ -218,13 +187,12 @@ services:
 
 networks:
   default:
-    name: $DOCKER_MY_NETWORK
+    name: caddy_net
     external: true
 ```
 
 `nginx-compose.yml`
 ```yaml
-version: "3.7"
 services:
 
   nginx:
@@ -234,18 +202,24 @@ services:
 
 networks:
   default:
-    name: $DOCKER_MY_NETWORK
+    name: caddy_net
     external: true
 ```
-### - editing hosts file
 
-You are on your local network and you are likely running the docker host
-inside the same network.<br>
-If that's the case then shit will not work without editing the hosts file.<br> 
-Reason being that when you write that `a.example.com` in to your browser,
-you are asking google's DNS for `a.example.com` IP address.
-It will give you your own public IP, and most routers/firewalls wont allow
-this loopback, where your requests should go out and then right back.
+</details>
+
+---
+---
+
+<details>
+<summary><h3>Editing hosts file</h3></summary>
+
+If the docker host is with you on your local network then you need to deal
+with bit of an issue.
+When you write that `a.example.com` in to your browser, you are asking 
+internet DNS server for IP address of `a.example.com`.
+DNS servers will reply with your own public IP, and most consumer routers
+wont allow this loopback, where your requests should go out and then right back.
 
 So just [edit](https://support.rackspace.com/how-to/modify-your-hosts-file/)
 `hosts` as root/administrator,
@@ -256,24 +230,28 @@ adding whatever is the local IP of the docker host and the hostname:
 192.168.1.222     b.{$MY_DOMAIN}
 ```
 
+You can test what are the replies for DNS requests with the command
+`nslookup a.example.com`, works in linux and windows.
+
 If it is just quick testing one can use Opera browser
 and enable the build in VPN.<br>
 
-One can also run a dns/dhcp server on the network, to solve this for all
-devices.<br>
-Here's a [guide-by-example for dnsmasq](
-https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq).
+This edit of a host file affects only that one machine on the network.
+To solve it for all devices theres need to to run dns server on the network,
+or running a tier higher firewall/router.  
+* [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
+  a guide-by-example for dnsmasq.
+* [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/opnsense)
+  a guide-by-example for opnsense firewall
+
+</details>
+
+---
+---
 
 ### - Run it all
 
-Caddy
-
-* `docker-compose up -d`
-
-Services
-
-* `docker-compose -f whoami-compose.yml up -d`
-* `docker-compose -f nginx-compose.yml up -d`
+Run all the containers.
 
 Give it time to get certificates, checking `docker logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
@@ -740,3 +718,9 @@ dick with the Caddyfile this much. Just one global line declaration.
 But the effort went sideways.<br>
 So I myself do not even bother with wildcard when the config ends up looking
 complex and ugly.
+
+
+# Other guides
+
+* [gurucomputing caddy guide](https://blog.gurucomputing.com.au/reverse-proxies-with-caddy/)
+* 
