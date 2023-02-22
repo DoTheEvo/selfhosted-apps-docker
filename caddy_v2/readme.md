@@ -93,9 +93,9 @@ ping-able by their hostnames.
 
 ### - Create docker-compose.yml and .env file
 
-Basic simple docker compose.<br>
-Official caddy image is used. Ports 80 and 443 are pusblished/mapped
-on to docker host as Caddy is the one in charge of any traffic coming there.<br>
+Basic simple docker compose, using the official caddy image.<br>
+Ports 80 and 443 are pusblished/mapped on to docker host as Caddy
+is the one in charge of any traffic coming there.<br>
 
 `docker-compose.yml`
 ```yml
@@ -123,8 +123,10 @@ networks:
 
 `.env`
 ```php
-MY_DOMAIN=example.com
+# GENERAL
+TZ=Europe/Bratislava
 DOCKER_MY_NETWORK=caddy_net
+MY_DOMAIN=example.com
 ```
 
 You obviously want to change `example.com` to your domain.
@@ -134,10 +136,6 @@ You obviously want to change `example.com` to your domain.
 
 `Caddyfile`
 ```
-{
-    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-}
-
 a.{$MY_DOMAIN} {
     reverse_proxy whoami:80
 }
@@ -160,7 +158,6 @@ So every docker container you spin should have hostname definied and be on
 `caddy_net`, or some other named custom network, as the default bridge docker network
 [does not provide](https://docs.docker.com/network/bridge/)
 automatic DNS resolution between containers.<br>
-Commented out is the staging url for let's encrypt, used for testing.
 
 <details>
 <summary><h3>Setup some docker containers</h3></summary>
@@ -226,19 +223,19 @@ So just [edit](https://support.rackspace.com/how-to/modify-your-hosts-file/)
 adding whatever is the local IP of the docker host and the hostname:
 
 ```
-192.168.1.222     a.{$MY_DOMAIN}
-192.168.1.222     b.{$MY_DOMAIN}
+192.168.1.222     a.example.com
+192.168.1.222     b.example.com
 ```
 
 You can test what are the replies for DNS requests with the command
 `nslookup a.example.com`, works in linux and windows.
 
 If it is just quick testing one can use Opera browser
-and enable the build in VPN.<br>
+and enable its build in VPN.<br>
 
-This edit of a host file affects only that one machine on the network.
+This edit of a host file works only on that one machine.
 To solve it for all devices theres need to to run dns server on the network,
-or running a tier higher firewall/router.  
+or running a higher tier firewall/router.  
 * [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
   a guide-by-example for dnsmasq.
 * [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/opnsense)
@@ -253,7 +250,7 @@ or running a tier higher firewall/router.
 
 Run all the containers.
 
-Give it time to get certificates, checking `docker logs caddy` as it goes,
+Give Caddy time to get certificates, checking `docker logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
 
 If something is fucky use `docker logs caddy` to see what is happening.<br>
@@ -262,7 +259,8 @@ Or investigate inside `docker exec -it caddy /bin/sh`.
 For example trying to ping hosts that are suppose to be reachable,
 `ping nginx` should work.
 
-There's also other possible issues, like bad port forwarding towards docker host.
+There's also other possible issues, like bad port forwarding towards docker host,
+or ISP not providing you with publicly reachable IP.
 
 *extra info:*<br>
 `docker exec -w /etc/caddy caddy caddy reload` reloads config
@@ -305,56 +303,6 @@ violet.{$MY_DOMAIN} {
   reverse_proxy 192.168.1.100:80
 }
 ```
-
-### Reverse proxy without domain and https
-
-You can always just use localhost, which will translates in to docker hosts IP address.
-
-```
-localhost:55414 {
-  reverse_proxy urbackup:55414
-}
-
-:9090 {
-  reverse_proxy prometheus:9090
-}
-```
-
-Prometheus entry uses short-hand notation.<br>
-TLS is automatically disabled in localhost use.
-
-But for this to work Caddy's compose file needs to have those ports **published** too.
-
-`docker-compose.yml`
-```yml
-services:
-
-  caddy:
-    image: caddy
-    container_name: caddy
-    hostname: caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "55414:55414"
-      - "9090:9090"
-    environment:
-      - MY_DOMAIN
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./data:/data
-      - ./config:/config
-
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
-```
-
-With this setup, and assuming docker host at: `192.168.1.222`,
-writing `192.168.1.222:55414` in to browser will go to to urbackup,
-and `192.168.1.222:9090` gets to prometheus.
 
 ### Named matchers and IP filtering
 
@@ -480,8 +428,8 @@ nextcloud.{$MY_DOMAIN} {
 
 ### Headers and gzip
 
-This example is with bitwarden_rs password manager, which comes with its reverse proxy
-[recommendations](https://github.com/dani-garcia/bitwarden_rs/wiki/Proxy-examples).
+This example is with vaultwarden password manager, which comes with its reverse proxy
+[recommendations](https://github.com/dani-garcia/vaultwarden/wiki/Proxy-examples).
 
 `encode gzip` enables compression.<br>
 This lowers the bandwith use and speeds up loading of the sites.
@@ -494,11 +442,11 @@ By default, Caddy passes through Host header and adds X-Forwarded-For
 for the client IP. This means that 90% of the time a simple config
 is all that is needed but sometimes some extra headers might be desired.
 
-Here we see bitwarden make use of some extra headers.<br>
+Here we see vaultwarden make use of some extra headers.<br>
 We can also see its use of websocket protocol for notifications at port 3012.
 
 ```
-bitwarden.{$MY_DOMAIN} {
+vault.{$MY_DOMAIN} {
     encode gzip
 
     header {
@@ -513,10 +461,10 @@ bitwarden.{$MY_DOMAIN} {
     }
 
     # Notifications redirected to the websockets server
-    reverse_proxy /notifications/hub bitwarden:3012
+    reverse_proxy /notifications/hub vaultwarden:3012
 
     # Proxy the Root directory to Rocket
-    reverse_proxy bitwarden:80
+    reverse_proxy vaultwarden:80
 }
 ```
 
