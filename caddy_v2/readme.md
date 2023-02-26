@@ -680,8 +680,9 @@ googling
 
 * https://community.home-assistant.io/t/home-assistant-add-on-promtail/293732
 * https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/
+* https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md
 
-Required some knowledge from [Prometheus and Grafana](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana)
+Requires - [Prometheus and Grafana](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana)
 
 ![caddy_grafana_dashboard](https://i.imgur.com/NmOpGZX.png)
 
@@ -738,18 +739,20 @@ gets hit.. let alone some access info and IPs. So time for logs and Loki I guess
 
 ### Logs 
 
-* have Prometheus, Grafana, Loki working
-* edit Caddy compose<br>
-  - create directory and bind mount it /var/log/caddy:/var/log/caddy<br>
-  - add promtail container with bind mount of its config file,
-    that will scrape logs and push them to loki
+* Have Prometheus, Grafana, Loki working
+* Create `/var/log/caddy` directory on the docker host
+* Edit Caddy compose, bind mount `/var/log/caddy` in to caddy container.<br>
+  Also add Promtail container, that has same bind mount of `/var/log/caddy`
+  directory, along with bind mount of its config file.<br>
+  Promtail will scrape logs and push them to Loki.
 * create promtail-config.yml
 * edit Caddyfile and enable logging at some subdomain<br>
   seems global logging might be done by using port 443 as a block, not tested yet
-* at this points logs should be visible in grafana 
-* ?? edit promtail-config.yml to get desired values ??
-* ?? enable somehow geo ip on promtail ??
-* ?? make dashboard from logs ??
+* at this points logs should be visible and explorable in grafana 
+* to-do
+* *?? edit promtail-config.yml to get desired values ??*
+* *?? enable somehow geo ip on promtail ??*
+* *?? make dashboard from logs ??*
 
 
 <details>
