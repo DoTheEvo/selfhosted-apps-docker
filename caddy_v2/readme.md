@@ -110,6 +110,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./data:/data
@@ -666,6 +667,179 @@ dick with the Caddyfile this much. Just one global line declaration.
 But the effort went sideways.<br>
 So I myself do not even bother with wildcard when the config ends up looking
 complex and ugly.
+
+# Monitoring
+
+*work in progress*<br>
+*work in progress*<br>
+*work in progress*
+
+The endgame - [something like this](https://www.reddit.com/r/selfhosted/comments/w8iex6/is_there_a_way_to_see_traffic_statistics_with_the/)
+
+googling 
+
+* https://community.home-assistant.io/t/home-assistant-add-on-promtail/293732
+* https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/
+
+Required some knowledge from [Prometheus and Grafana](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana)
+
+![caddy_grafana_dashboard](https://i.imgur.com/NmOpGZX.png)
+
+### Metrics 
+
+Caddy has build in exporter of prometheus metrics, so whats needed:
+
+* Edit Caddyfile to [enable metrics.](https://caddyserver.com/docs/metrics)
+* Edit compose to publish 2019 port.<br>
+  Likely not be necessary if Caddy and Prometheus are on the same docker network,
+  but its nice to check the metrics at `<docker-host-ip>:2019/metrics`
+* Edit prometheus.yml to add caddy scraping point
+* In grafana import [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
+  or make your own, `caddy_reverse_proxy_upstreams_healthy` shows reverse proxy
+  upstreams, but thats all.
+
+<details>
+<summary>Caddyfile</summary>
+
+```php
+{
+    servers {
+        metrics
+    }
+
+    admin 0.0.0.0:2019
+}
+
+
+a.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+}
+```
+</details>
+
+<details>
+<summary>prometheus.yml</summary>
+
+```yml
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'caddy'
+    static_configs:
+      - targets: ['caddy:2019']
+```
+
+</details>
+
+But metrics feel kinda not enough, they dont even tell how much which subdomain
+gets hit.. let alone some access info and IPs. So time for logs and Loki I guess.
+
+### Logs 
+
+* have Prometheus, Grafana, Loki working
+* edit Caddy compose<br>
+  - create directory and bind mount it /var/log/caddy:/var/log/caddy<br>
+  - add promtail container with bind mount of its config file,
+    that will scrape logs and push them to loki
+* create promtail-config.yml
+* edit Caddyfile and enable logging at some subdomain<br>
+  seems global logging might be done by using port 443 as a block, not tested yet
+* at this points logs should be visible in grafana 
+* ?? edit promtail-config.yml to get desired values ??
+* ?? enable somehow geo ip on promtail ??
+* ?? make dashboard from logs ??
+
+
+<details>
+<summary>docker-compose.yml</summary>
+
+```yml
+services:
+
+  caddy:
+    image: caddy
+    container_name: caddy
+    hostname: caddy
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+      - "2019:2019"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data:/data
+      - ./config:/config
+      - /var/log/caddy:/var/log/caddy
+
+  # LOG AGENT PUSHING LOGS TO LOKI
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    hostname: promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail-config.yml:/etc/promtail-config.yml
+      - /var/log/caddy:/var/log/caddy:ro
+    command:
+      - '-config.file=/etc/promtail-config.yml'
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
+```
+
+</details>
+
+<details>
+<summary>promtail-config.yml</summary>
+
+```yml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: caddy
+    pipeline_stages:
+      - json:
+          expressions:
+            stream: level
+            status_code: status
+            host: request.host
+            time: ts
+      - labels:
+          stream:
+          status_code:
+          host:
+      - timestamp:
+          source: time
+          format: Unix
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: caddy
+          __path__: /var//log/caddy/*.log
+```
+
+</details>
+
+<details>
+<summary>Caddyfile</summary>
+
+```php
+a.{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+    log {
+        output file /var/log/caddy/a_example_com_access.log
+    }
+}
+```
+</details>
 
 
 # Other guides
