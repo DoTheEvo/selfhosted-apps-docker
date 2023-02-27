@@ -66,16 +66,16 @@ or machines on the network.
 └── ~/
     └── docker/
         └── caddy/
-            ├── 🗁 config/
-            ├── 🗁 data/
+            ├── 🗁 caddy_config/
+            ├── 🗁 caddy_data/
             ├── 🗋 .env
             ├── 🗋 Caddyfile
             └── 🗋 docker-compose.yml
 ```
 
-* `config/` - a directory containing configs that Caddy generates,
+* `caddy_config/` - a directory containing configs that Caddy generates,
   most notably `autosave.json` which is a backup of the last loaded config
-* `data/` - a directory storing TLS certificates
+* `caddy_data/` - a directory storing TLS certificates
 * `.env` - a file containing environment variables for docker compose
 * `Caddyfile` - the Caddy configuration file
 * `docker-compose.yml` - a docker compose file, telling docker how to run containers
@@ -113,8 +113,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./data:/data
-      - ./config:/config
+      - ./caddy_config:/data
+      - ./caddy_data:/config
 
 networks:
   default:
@@ -305,6 +305,51 @@ violet.{$MY_DOMAIN} {
 }
 ```
 
+### Redirect
+
+Here is an example of a redirect for the common case of switching anyone that
+comes to `www.example.com` to the naked domain `example.com`.
+
+```php
+www.{$MY_DOMAIN} {
+    redir https://{$MY_DOMAIN}{uri}
+}
+```
+
+Or what if theres a need for a short url for something often used, but selfhosted
+url-shorterners seem bloate... looking at you Shlink and Kutt.
+
+```php
+down.{$MY_DOMAIN} {
+    redir https://nextcloud.example.com/s/CqJyOijYeezESQT/download
+}
+```
+
+or if prefering doing path instead of subdomain
+
+```php
+{$MY_DOMAIN} {
+    reverse_proxy whoami:80
+    redir /down https://nextcloud.example.com/s/CqJyOijYeezESQT/download
+}
+```
+
+Another example is running NextCloud behind proxy,
+which likely shows few warning on its status page.
+These require some redirects for service discovery to work and would like 
+if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw)
+[2](https://www.youtube.com/watch?v=-MWqSD2_37E) would be set.<br> 
+Like so:
+
+```php
+nextcloud.{$MY_DOMAIN} {
+    reverse_proxy nextcloud:80
+    header Strict-Transport-Security max-age=31536000;
+    redir /.well-known/carddav /remote.php/carddav 301
+    redir /.well-known/caldav /remote.php/caldav 301
+}
+```
+
 ### Named matchers and IP filtering
 
 Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)
@@ -397,33 +442,6 @@ whatever.{$MY_DOMAIN} {
             tls_insecure_skip_verify
         }
     }
-}
-```
-
-### HSTS and redirects
-
-Here is an example of a redirect when wanting the common case of
-switching anyone that comes to a `www` subdomain to the naked domain.
-
-```
-www.{$MY_DOMAIN} {
-    redir https://{$MY_DOMAIN}{uri}
-}
-```
-
-Another example is running NextCloud behind proxy,
-which likely shows few warning on its status page.
-It requires some redirects for service discovery to work and would like 
-if [HSTS](https://www.youtube.com/watch?v=kYhMnw4aJTw)
-[2](https://www.youtube.com/watch?v=-MWqSD2_37E) would be set.<br> 
-Like so:
-
-```
-nextcloud.{$MY_DOMAIN} {
-    reverse_proxy nextcloud:80
-    header Strict-Transport-Security max-age=31536000;
-    redir /.well-known/carddav /remote.php/carddav 301
-    redir /.well-known/caldav /remote.php/caldav 301
 }
 ```
 
@@ -593,8 +611,8 @@ services:
       - CLOUDFLARE_API_TOKEN
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./data:/data
-      - ./config:/config
+      - ./caddy_data:/data
+      - ./caddy_config:/config
 
 networks:
   default:
@@ -748,7 +766,8 @@ gets hit.. let alone some access info and IPs. So time for logs and Loki I guess
 * create promtail-config.yml
 * edit Caddyfile and enable logging at some subdomain<br>
   seems global logging might be done by using port 443 as a block, not tested yet
-* at this points logs should be visible and explorable in grafana 
+* at this points logs should be visible and explorable in grafana<br>
+  Explore > `{job="caddy_access_log"} |= `` | json`
 * to-do
 * *?? edit promtail-config.yml to get desired values ??*
 * *?? enable somehow geo ip on promtail ??*
@@ -774,8 +793,8 @@ services:
       - "2019:2019"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./data:/data
-      - ./config:/config
+      - ./caddy_data:/data
+      - ./caddy_config:/config
       - /var/log/caddy:/var/log/caddy
 
   # LOG AGENT PUSHING LOGS TO LOKI
@@ -807,28 +826,65 @@ clients:
 
 scrape_configs:
   - job_name: caddy
-    pipeline_stages:
-      - json:
-          expressions:
-            stream: level
-            status_code: status
-            host: request.host
-            time: ts
-      - labels:
-          stream:
-          status_code:
-          host:
-      - timestamp:
-          source: time
-          format: Unix
     static_configs:
       - targets:
           - localhost
         labels:
-          job: caddy
+          job: caddy_logs
           __path__: /var//log/caddy/*.log
 ```
+</details>
 
+<details>
+<summary>promtail-config-custom-picked-info.yml</summary>
+
+```yml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: caddy_access_log
+    static_configs:
+    - targets: # tells promtail to look for the logs on the current machine/host
+        - localhost
+      labels:
+        job: caddy_access_log
+        __path__: /var//log/caddy/*.log
+    pipeline_stages:
+      # Extract all the fields I care about from the
+      # message:
+      - json:
+          expressions:
+            "level": "level"
+            "timestamp": "ts"
+            "duration": "duration"
+            "response_status": "status"
+            "request_path": "request.uri"
+            "request_method": "request.method"
+            "request_host": "request.host"
+            "request_useragent": "request.headers.\"User-Agent\""
+            "request_remote_ip": "request.remote_ip"
+
+      # Promote the level into an actual label:
+      - labels:
+          level:
+
+      # Regenerate the message as all the fields listed
+      # above:
+      - template:
+          # This is a field that doesn't exist yet, so it will be created
+          source: "output"
+          template: |
+                        {{toJson (unset (unset (unset . "Entry") "timestamp") "filename")}}
+      - output:
+          source: output
+
+      # Set the timestamp of the log entry to what's in the
+      # timestamp field.
+      - timestamp:
+          source: "timestamp"
+          format: "Unix"
+```
 </details>
 
 <details>
