@@ -352,14 +352,18 @@ nextcloud.{$MY_DOMAIN} {
 
 ### Named matchers and IP filtering
 
-Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)
-which allow you to define how to deal with incoming requests.<br>
-`reverse_proxy server-blue:80` is a matcher that matches all requests
-and sends them somewhere.<br>
+Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)<br>
+
+* `*` to match all requests (wildcard; default).
+* `/path` start with a forward slash to match a request path.
+* `@name` to specify a named matcher.
+
+In `reverse_proxy server-blue:80` matcher is ommited and in that case
+the default - `*` applies meaning all traffic.
 But if more control is desired, path matchers and named matchers come to play.
 
-What if you want to block all traffic coming from the outside world,
-but local network be allowed through?<br>
+What if all traffic coming from the outside world should be blocked, but local
+network be allowed through?<br>
 Well, the [remote_ip](https://caddyserver.com/docs/caddyfile/matchers#remote-ip)
 matcher comes to play, which enables you to filter requests by their IP.<br>
 
