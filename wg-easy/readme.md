@@ -45,23 +45,30 @@ services:
       - ./wireguard_data:/etc/wireguard
     ports:
       - "51820:51820/udp"  # vpn traffic
-      - "51821:51821/tcp"  # web interface
+    expose:
+      - "51821"            # web interface
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
 ```
 
 `.env`
 ```bash
 # GENERAL
+DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 #WG-EASY
 WG_HOST=vpn.example.com
-PASSWORD=kontajnerslepehokocKonosa@19
+PASSWORD=supersecretpassword
 WG_PORT=51820
 WG_DEFAULT_ADDRESS=10.221.221.x
 WG_ALLOWED_IPS=192.168.1.0/24
@@ -78,11 +85,16 @@ Caddy v2 is used, details
 `Caddyfile`
 ```php
 vpn.{$MY_DOMAIN} {
-    reverse_proxy localhost:51821
+    reverse_proxy wg-easy:51821
 }
 ```
 
 # First run
+
+![loginpic](https://i.imgur.com/V30cDwq.png)
+
+Login with the password from the .env file.<br>
+Add user, download config, use it.
 
 # Trouble shooting
 
