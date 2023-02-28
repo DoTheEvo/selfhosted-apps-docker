@@ -17,7 +17,7 @@ Monitoring of the host and the running cointaners.
 
 Monitoring in this case means gathering and showing information on how services
 or machines or containers are running. Can be cpu, io, ram, disk use... 
-can be number of http requests,or results of backups.<br>
+can be number of http requests, errors, or results of backups.<br>
 Prometheus deals with metrics. Loki deals with logs. Grafana is there to show
 the data on a dashboard.
 
@@ -91,7 +91,7 @@ The directories are created by docker compose on the first run.
 # docker-compose
 
 * **Prometheus** - The official image used. Few extra commands passing configuration.
-  Of note is 500 hours (\~20days) retention policy.
+  Of note is 480 hours(20days) retention policy.
 * **Grafana** - The official image used. Bind mounted directory
   for persistent data storage. User sets as root, as it solves issues I am
   lazy to investigate.
@@ -125,7 +125,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=500h'
+      - '--storage.tsdb.retention.time=480h'
       - '--web.enable-lifecycle'
     volumes:
       - ./prometheus_data:/prometheus
@@ -520,6 +520,8 @@ has more detailed section on alerting worth checking out.
 
 # Loki
 
+![loki_arch](https://i.imgur.com/aoMPrVV.png)
+
 Loki is made by the grafana team. It's called a Prometheus for logs.<br>
 It is a **push** type monitoring, where most of the time an agent - **promtail**
 pushes logs on to a Loki instance.
@@ -544,9 +546,11 @@ But first to add Loki to the current grafana, prometheus stack:
   that should be monitored.<br>
   
 <details>
-<summary>example compose with logging enabled</summary>
+<summary>**example compose with logging enabled through loki driver**</summary>
+
 ```yml
 services:
+
   whoami:
     image: "containous/whoami"
     container_name: "whoami"
@@ -559,107 +563,10 @@ services:
 </details>
 
 <details>
-  <summary>docker-compose.yml</summary>
+  <summary>**loki container to be added to grafana/prometheus stack**</summary>
 
 ```yml
 services:
-
-  # MONITORING SYSTEM AND THE METRICS DATABASE
-  prometheus:
-    image: prom/prometheus:v2.42.0
-    container_name: prometheus
-    hostname: prometheus
-    user: root
-    restart: unless-stopped
-    depends_on:
-      - cadvisor
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=500h'
-      - '--web.enable-lifecycle'
-    volumes:
-      - ./prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./alert.rules:/etc/prometheus/rules/alert.rules
-    expose:
-      - "9090"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # WEB BASED UI VISUALISATION OF METRICS
-  grafana:
-    image: grafana/grafana:9.3.6
-    container_name: grafana
-    hostname: grafana
-    user: root
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ./grafana_data:/var/lib/grafana
-    expose:
-      - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # HOST LINUX MACHINE METRICS EXPORTER
-  nodeexporter:
-    image: prom/node-exporter:v1.5.0
-    container_name: nodeexporter
-    hostname: nodeexporter
-    restart: unless-stopped
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    expose:
-      - "9100"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # DOCKER CONTAINERS METRICS EXPORTER
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.1
-    container_name: cadvisor
-    hostname: cadvisor
-    restart: unless-stopped
-    privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    expose:
-      - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # ALERT MANAGMENT BY PROMETHEUS
-  alertmanager:
-    image: prom/alertmanager:v0.25.0
-    container_name: alertmanager
-    hostname: alertmanager
-    restart: unless-stopped
-    volumes:
-      - ./alertmanager.yml:/etc/alertmanager.yml
-      - ./alertmanager_data:/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-    expose:
-      - "9093"
-    labels:
-      org.label-schema.group: "monitoring"
 
   # LOG MANAGMENT WITH LOKI
   loki:
@@ -674,7 +581,7 @@ services:
     command:
       - '-config.file=/etc/loki-docker-config.yml'
     ports:
-      - 3100:3100
+      - "3100:3100"
     labels:
       org.label-schema.group: "monitoring"
 
@@ -686,7 +593,7 @@ networks:
 </details>
 
 <details>
-  <summary>loki-docker-config.yml</summary>
+  <summary>**loki-docker-config.yml**</summary>
 
 ```yml
 auth_enabled: false
@@ -705,6 +612,13 @@ common:
     kvstore:
       store: inmemory
 
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 480
+
 schema_config:
   configs:
     - from: 2020-10-24
@@ -720,29 +634,27 @@ ruler:
 
 analytics:
   reporting_enabled: false
+
 ```
 </details>
 
-![logo](https://i.imgur.com/MHYmxPi.png)
+![logo](https://i.imgur.com/M1k0Dn4.png)
 
 ### Minecraft example
 
-Minecraft example will set out to monitor logs of a
-[minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)
-Make some dashboards showing logs volume and sending a notification when a player joins.<br>
-It's just a proof of concept, as there are prometheus exporters for minecraft,
-so digging through logs is usually not necessary.
-
+Loki will be used to monitor logs of a [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)<br>
+A dashboard will be created, showing logs volume.<br>
+Alert will be set to send a notification when a player joins.<br>
   
-Now with the driver installed, config files in place, compose edited,..
+**Requirements** - grafana, loki, loki-docker-driver, minecraft with logging
+set to use loki-docker-driver
 
-* In grafana, loki needs to be added as a datasource.<br>
-  If everything works as it should, there should be no red notice, down left side,
-  only green: `Data source connected and labels found.`
-* In `Explore` section, input set to `Builder`, picking from dropdown
-  filter menu container_name = minecraft, and hitting run query.. 
+**Dashboard**
+
+* In grafana, loki needs to be added as a datasource
+* In `Explore` section, filter, container_name = minecraft, query... 
   this should result in seeing minecraft logs and their volume/time graph.
-* To recreat this Explore view as a dashboard, as a practice...
+* To recreat this view as a dashboard
   - new dashboard, panel
   - datasource - Loki
   - query - `count_over_time({compose_service="minecraft"} |= `` [1m])`<br>
@@ -754,14 +666,23 @@ Now with the driver installed, config files in place, compose edited,..
   - transparent background
   - legend off
   - graph styles - bar
-  - graph styles - bar - point size = 10
   - stack series - normal
   - color scheme - single color
+* add another pane to the dashboard
+  - switch graph type to `Logs`
+  - datasource - Loki
+  - Label filters = compose_service="minecraft"
+  - Title - *empty*
+
+This should create a similar dashboard to the one in the picture above.<br>
+It's json file is also in this repo in dashboards.
 
 [performance tips](https://www.youtube.com/watch?v=YED8XIm0YPs)
 for grafana loki queries 
 
-### Alerts for Loki
+### Alerts in Grafana for Loki
+
+Loki can also use external alertmanager, but grafana has one build in.
 
 * Alerting > Alert rules > New alert rule
 - **1 Set a query and alert condition**
