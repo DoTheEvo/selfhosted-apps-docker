@@ -281,7 +281,6 @@ the default time interval is set to 1h instead of 15m
   except the ones labeled as `monitoring` in the compose file
 * **monitoring_services.json** - dashboar showing docker containers metrics
   of containers that are labeled `monitoring`
-* **minecraft_logs.json** - comes to play with Loki later
 
 ![interface-pic](https://i.imgur.com/wzwgBkp.png)
 
@@ -585,6 +584,7 @@ To add Loki to the current stack:
 
   <details>
   <summary>docker-compose.yml</summary>
+  
   ```yml
   services:
 
@@ -620,6 +620,7 @@ To add Loki to the current stack:
 
   <details>
   <summary>loki-docker-config.yml</summary>
+
   ```yml
   auth_enabled: false
 
@@ -672,6 +673,7 @@ To add Loki to the current stack:
 
   <details>
   <summary>docker-compose.yml</summary>
+
   ```yml
   services:
 
