@@ -131,7 +131,7 @@ services:
       - ./prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     expose:
-      - 9090
+      - "9090"
     labels:
       org.label-schema.group: "monitoring"
 
@@ -292,50 +292,50 @@ the default time interval is set to 1h instead of 15m
 
 Gives freedom to push information in to prometheus from anywhere.
 
-To add pushgateway functionality to the current stack.
+## The setup
 
-- New container `alertmanager` added to the compose file.<br>
+To add pushgateway functionality to the current stack:
+
+* New container `pushgateway` added to the compose file.
+
   <details>
-    <summary>docker-compose.yml</summary>
-
+  <summary>docker-compose.yml</summary>
   ```yml
   services:
 
-    # PUSHGATEWAY FOR PROMETHEUS
-    pushgateway:
-      image: prom/pushgateway:v1.5.1
-      container_name: pushgateway
-      hostname: pushgateway
-      restart: unless-stopped
-      command:
-        - '--web.enable-admin-api'    
-      expose:
-        - "9091"
+  # PUSHGATEWAY FOR PROMETHEUS
+  pushgateway:
+    image: prom/pushgateway:v1.5.1
+    container_name: pushgateway
+    hostname: pushgateway
+    restart: unless-stopped
+    command:
+      - '--web.enable-admin-api'    
+    expose:
+      - "9091"
 
   networks:
-    default:
-      name: $DOCKER_MY_NETWORK
-      external: true
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
   ```
   </details>
 
-- Adding pushgateway to the Caddyfile of the reverse proxy so that it can
-  be reached at `https://push.example.com`<br>
-  <details>
-    <summary>.env</summary>
+* Adding pushgateway to the Caddyfile of the reverse proxy so that it can be reached at `https://push.example.com`<br>
 
-  `Caddyfile`
+  <details>
+  <summary>Caddyfile</summary>
   ```php
   push.{$MY_DOMAIN} {
-    reverse_proxy pushgateway:9091
+      reverse_proxy pushgateway:9091
   }
   ```
   </details>  
 
-- Adding pushgateway's scrape point to `prometheus.yml`<br>
-  <details>
-    <summary>prometheus.yml</summary>
+* Adding pushgateway's scrape point to `prometheus.yml`<br>
 
+  <details>
+  <summary>prometheus.yml</summary>
   ```yml
   global:
     scrape_interval:     15s
@@ -343,28 +343,29 @@ To add pushgateway functionality to the current stack.
 
   scrape_configs:
     - job_name: 'pushgateway-scrape'
-      scrape_interval: 60s
       honor_labels: true
       static_configs:
         - targets: ['pushgateway:9091']
   ```
   </details>
 
+## The basics
+
 ![veeam-dash](https://i.imgur.com/TOuv9bM.png)
 
 To **test pushing** some metric, execute in linux:<br>
 `echo "some_metric 3.14" | curl --data-binary @- https://push.example.com/metrics/job/blabla/instance/whatever`
 
-You see **labels** being applied to the pushed metric in the path after metrics.<br>
+You see **labels** being set to the pushed metric in the path.<br>
 Label `job` is required, but after that it's whatever you want,
 though use of `instance` label is customary.<br>
 Now in grafana, in **Explore** section you should see some results
 when quering for `some_metric`.
 
-The metrics sit on the pushgateway **forever** unless overwritten/deleted/shutdown
-of the container. And if the values are there, prometheus will consider
-it the true value for every scrape of the pushgateway, not just
-at the moment it was first scraped.
+The metrics sit on the pushgateway **forever**, unless deleted or container
+shuts down. Prometheus will not remove the metrics from it after scraping,
+it will keep scraping the pushgateway and store the value there with the time of
+scraping.
 
 To wipe the pushgateway clean<br>
 `curl -X PUT https://push.example.com/api/v1/admin/wipe`
@@ -380,140 +381,192 @@ along with pushing metrics from windows in powershell -
 
 # Alertmanager
 
-Several changes are needed:
+To send a notification about some metric breaching some preset condition.<br>
+Notifications chanels set here will be email and
+[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
 
-- New container - `alertmanager` added to the compose file.
-- New file - `alertmanager.yml` bind mounted in the alertmanager container.<br>
-  This file contains configuration about where and how to deliver alerts.<br>
-  A selfhosted
-  [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-  webhook is used that sends alerts to a phone app.
-- New file - `alert.rules` mounted in to prometheus container<br>
-  This files defines when value of some metric becomes an alert event.
-- Changed file - `prometheus.yml` added `alerting` section
-  and the path to the `rule_files`
+![alert](https://i.imgur.com/b4hchSu.png)
 
-<details>
-  <summary>docker-compose.yml</summary>
+## The setup
 
-```yml
-services:
+To add alertmanager to the current stack:
 
-  # ALERT MANAGMENT FOR PROMETHEUS
-  alertmanager:
-    image: prom/alertmanager:v0.25.0
-    container_name: alertmanager
-    hostname: alertmanager
-    restart: unless-stopped
-    volumes:
-      - ./alertmanager.yml:/etc/alertmanager.yml
-      - ./alertmanager_data:/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-    expose:
-      - "9093"
-    labels:
-      org.label-schema.group: "monitoring"
+* New file - `alertmanager.yml` will be bind mounted in alertmanager container.<br>
+  This file contains configuration on how and where to deliver alerts.<br>
 
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
-```
-</details>
-
-<details>
+  <details>
   <summary>alertmanager.yml</summary>
+  ```yml
+  route:
+    receiver: 'email'
 
-```yml
-route:
-  receiver: 'email'
+  receivers:
+    - name: 'ntfy'
+      webhook_configs:
+      - url: 'https://ntfy.example.com/alertmanager'
+        send_resolved: true
+        
+    - name: 'email'
+      email_configs:
+      - to: 'whoever@example.com'
+        from: 'alertmanager@example.com'
+        smarthost: smtp-relay.sendinblue.com:587
+        auth_username: '<registration_email@gmail.com>'
+        auth_identity: '<registration_email@gmail.com>'
+        auth_password: '<long ass generated SMTP key>'
+  ```
+  </details>
 
-receivers:
-  - name: "ntfy"
-    webhook_configs:
-    - url: 'https://ntfy.example.com/alertmanager'
-      send_resolved: true
-      
-  - name: 'email'
-    email_configs:
-    - to: 'whoever@example.com'
-      from: 'alertmanager@example.com'
-      smarthost: smtp-relay.sendinblue.com:587
-      auth_username: '<registration_email@gmail.com>'
-      auth_identity: '<registration_email@gmail.com>'
-      auth_password: '<long ass generated SMTP key>'
-```
-</details>
+* New file - `alert.rules` will be mounted in to prometheus container<br>
+  This file defines which value of some metric becomes an alert event.
 
-<details>
-<summary>alert.rules</summary>
+  <details>
+  <summary>alert.rules</summary>
+  ```yml
+  groups:
+    - name: host
+      rules:
+        - alert: DiskSpaceLow
+          expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 19
+          for: 10s
+          labels:
+            severity: critical
+          annotations:
+            description: "Diskspace is low!"
+  ```
+  </details>
 
-```yml
-groups:
-  - name: host
-    rules:
-      - alert: DiskSpaceLow
-        expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 19
-        for: 10s
-        labels:
-          severity: critical
-        annotations:
-          description: "Diskspace is low!"
-```
-</details>
+* Changed `prometheus.yml`. Added `alerting` section that points to alertmanager
+  container, and also set is a path to a `rules` file.
 
-<details>
-  <summary>prometheus.yml</summary>
+  <details>
+    <summary>prometheus.yml</summary>
+  ```yml
+  global:
+    scrape_interval:     15s
+    evaluation_interval: 15s
 
-```yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
+  scrape_configs:
+    - job_name: 'nodeexporter'
+      static_configs:
+        - targets: ['nodeexporter:9100']
 
-scrape_configs:
-  - job_name: 'nodeexporter'
-    static_configs:
-      - targets: ['nodeexporter:9100']
+    - job_name: 'cadvisor'
+      static_configs:
+        - targets: ['cadvisor:8080']
 
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
+    - job_name: 'prometheus'
+      static_configs:
+        - targets: ['localhost:9090']
 
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
+  alerting:
+    alertmanagers:
+    - scheme: http
+      static_configs:
+      - targets: 
+        - 'alertmanager:9093'
 
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets: 
-      - 'alertmanager:9093'
+  rule_files:
+    - '/etc/prometheus/rules/alert.rules'
+  ```
+  </details>
 
-rule_files:
-  - '/etc/prometheus/rules/alert.rules'
-```
-</details>
+* New container - `alertmanager` added to the compose file and prometheus
+  container has bind mount rules file added.
+
+  <details>
+    <summary>docker-compose.yml</summary>
+
+  ```yml
+  services:
+
+    # MONITORING SYSTEM AND THE METRICS DATABASE
+    prometheus:
+      image: prom/prometheus:v2.42.0
+      container_name: prometheus
+      hostname: prometheus
+      restart: unless-stopped
+      user: root
+      depends_on:
+        - cadvisor
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--web.console.libraries=/etc/prometheus/console_libraries'
+        - '--web.console.templates=/etc/prometheus/consoles'
+        - '--storage.tsdb.retention.time=240h'
+        - '--web.enable-lifecycle'
+      volumes:
+        - ./prometheus_data:/prometheus
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./alert.rules:/etc/prometheus/rules/alert.rules
+      expose:
+        - "9090"
+      labels:
+        org.label-schema.group: "monitoring"
+
+    # ALERT MANAGMENT FOR PROMETHEUS
+    alertmanager:
+      image: prom/alertmanager:v0.25.0
+      container_name: alertmanager
+      hostname: alertmanager
+      restart: unless-stopped
+      volumes:
+        - ./alertmanager.yml:/etc/alertmanager.yml
+        - ./alertmanager_data:/alertmanager
+      command:
+        - '--config.file=/etc/alertmanager.yml'
+        - '--storage.path=/alertmanager'
+      expose:
+        - "9093"
+      labels:
+        org.label-schema.group: "monitoring"
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
+* Adding alertmanager to the Caddyfile of the reverse proxy so that it can be reached
+  at `https://alert.example.com`. Not really necessary, but useful as it allows
+  to send alerts from anywhere, not just from prometheus.
+
+  <details>
+  <summary>Caddyfile</summary>
+  ```php
+  alert.{$MY_DOMAIN} {
+      reverse_proxy alertmanager:9093
+  }
+  ```
+  </details>  
+
+## The basics
+
+![alert](https://i.imgur.com/C7g0xJt.png)
 
 
-[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom#define-alerts)
-has more detailed section on alerting worth checking out.
+Once above setup is done an alert about low disk space should fire and notification
+email should come.<br>
+In `alertmanager.yml` switch from email to ntfy can be done.
 
-*Useful commands*
+*Useful*
 
-* test alert:<br>
+* alert from anywhere using curl:<br>
   `curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
 * reload rules:<br>
-  `curl -X POST http://admin:admin@<host-ip>:9090/-/reload`
+  `curl -X POST https://prom.example.com/-/reload`
+
+[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom#define-alerts)
+has more detailed section on alerting worth checking out.    
 
 # Loki
 
 ![loki_arch](https://i.imgur.com/aoMPrVV.png)
 
 Loki is made by the grafana team. It's often refered as a Prometheus for logs.<br>
-It is a **push** type monitoring, where most of the time an agent - **promtail**
+It is a **push** type monitoring, where an agent - **promtail**
 pushes logs on to a Loki instance.<br>
 For docker containers theres also an option to install **loki-docker-driver**
 on a docker host and log pushing is set either globally in /etc/docker/daemon.json
@@ -522,198 +575,226 @@ or per container in compose files.
 There will be **two examples**.<br>
 A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
-But first to add Loki to the current grafana, prometheus stack:
+## The setup
 
-* New container - `loki` added to the compose file. Loki stores logs and makes
-  them available for grafana to visualize.
+To add Loki to the current stack:
+
+* New container - `loki` added to the compose file.<br>
+  Note the port 3100 is actually mapped to the host,
+  allowing `localhost:3100` from driver to work.
+
+  <details>
+  <summary>docker-compose.yml</summary>
+  ```yml
+  services:
+
+    # LOG MANAGMENT WITH LOKI
+    loki:
+      image: grafana/loki:2.7.3
+      container_name: loki
+      hostname: loki
+      user: root
+      restart: unless-stopped
+      volumes:
+        - ./loki_data:/loki
+        - ./loki-docker-config.yml:/etc/loki-docker-config.yml
+      command:
+        - '-config.file=/etc/loki-docker-config.yml'
+      ports:
+        - "3100:3100"
+      labels:
+        org.label-schema.group: "monitoring"
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
 * New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
-  The file here comes from
+  The file comes from
   [the official example](https://github.com/grafana/loki/tree/main/cmd/loki),
-  but url is changed, and compactor section is added to allow for data retention.
-* install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
-  `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
-  check if it's installed: `docker plugin ls`
-* adding logging section to compose files of a containers 
-  that should be monitored.<br>
-  
-<details>
-<summary>example compose with logging enabled through loki driver</summary>
+  but url is changed, and compactor section is added, to have control over
+  [data retention.](https://grafana.com/docs/loki/latest/operations/storage/retention/)
 
-```yml
-services:
-
-  whoami:
-    image: "containous/whoami"
-    container_name: "whoami"
-    hostname: "whoami"
-    logging:
-      driver: "loki"
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
-```
-</details>
-
-<details>
-  <summary>loki container to be added to grafana/prometheus stack</summary>
-
-```yml
-services:
-
-  # LOG MANAGMENT WITH LOKI
-  loki:
-    image: grafana/loki:2.7.3
-    container_name: loki
-    hostname: loki
-    user: root
-    restart: unless-stopped
-    volumes:
-      - ./loki_data:/loki
-      - ./loki-docker-config.yml:/etc/loki-docker-config.yml
-    command:
-      - '-config.file=/etc/loki-docker-config.yml'
-    ports:
-      - "3100:3100"
-    labels:
-      org.label-schema.group: "monitoring"
-
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
-```
-</details>
-
-<details>
+  <details>
   <summary>loki-docker-config.yml</summary>
+  ```yml
+  auth_enabled: false
 
-```yml
-auth_enabled: false
+  server:
+    http_listen_port: 3100
 
-server:
-  http_listen_port: 3100
+  common:
+    path_prefix: /loki
+    storage:
+      filesystem:
+        chunks_directory: /loki/chunks
+        rules_directory: /loki/rules
+    replication_factor: 1
+    ring:
+      kvstore:
+        store: inmemory
 
-common:
-  path_prefix: /loki
-  storage:
-    filesystem:
-      chunks_directory: /loki/chunks
-      rules_directory: /loki/rules
-  replication_factor: 1
-  ring:
-    kvstore:
-      store: inmemory
+  compactor:
+    working_directory: /loki/compactor
+    compaction_interval: 10m
+    retention_enabled: true
+    retention_delete_delay: 2h
+    retention_delete_worker_count: 150
 
-compactor:
-  working_directory: /loki/compactor
-  compaction_interval: 10m
-  retention_enabled: true
-  retention_delete_delay: 2h
-  retention_delete_worker_count: 150
+  limits_config:
+    retention_period: 240h
 
-limits_config:
-  retention_period: 240h
+  schema_config:
+    configs:
+      - from: 2020-10-24
+        store: boltdb-shipper
+        object_store: filesystem
+        schema: v11
+        index:
+          prefix: index_
+          period: 24h
 
-schema_config:
-  configs:
-    - from: 2020-10-24
-      store: boltdb-shipper
-      object_store: filesystem
-      schema: v11
-      index:
-        prefix: index_
-        period: 24h
+  ruler:
+    alertmanager_url: http://alertmanager:9093
 
-ruler:
-  alertmanager_url: http://alertmanager:9093
+  analytics:
+    reporting_enabled: false
+  ```
+  </details>
 
-analytics:
-  reporting_enabled: false
-```
-</details>
+* Install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
+  `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
+  To check if it's installed and enabled: `docker plugin ls`
+* Containers that should be monitored need `logging` section in their compose.<br>
 
-![logo](https://i.imgur.com/M1k0Dn4.png)
+  <details>
+  <summary>docker-compose.yml</summary>
+  ```yml
+  services:
 
-### Minecraft example
+    whoami:
+      image: "containous/whoami"
+      container_name: "whoami"
+      hostname: "whoami"
+      logging:
+        driver: "loki"
+        options:
+          loki-url: "http://localhost:3100/loki/api/v1/push"
+  ```
+  </details>
+
+## Minecraft example
 
 Loki will be used to monitor logs of a [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)<br>
 A dashboard will be created, showing logs volume in time.<br>
 Alert will be set to send a notification when a player joins.<br>
   
 **Requirements** - grafana, loki, loki-docker-driver, minecraft with logging
-set to use loki-docker-driver
+set in compose
 
-**Dashboard**
+![logo](https://i.imgur.com/M1k0Dn4.png)
 
-* In grafana, loki needs to be added as a datasource
+### First steps
+
+* In grafana, loki needs to be added as a datasource, `http://loki:3100`
 * In `Explore` section, filter, container_name = minecraft, query... 
   this should result in seeing minecraft logs and their volume/time graph.
-* To recreat this view as a dashboard
-  - new dashboard, panel
-  - datasource - Loki
-  - query - `count_over_time({compose_service="minecraft"} |= `` [1m])`<br>
-    switch from `builder` to `code` is needed to paste it
-  - `Query options` - Min interval=1m
-  - `transformation` - Rename by regex - `(.*)` - `Logs`
-  - time series graph
-  - Title - Logs volume
-  - transparent background
-  - legend off
-  - graph styles - bar
-  - stack series - normal
-  - color scheme - single color
-* add another pane to the dashboard
-  - switch graph type to `Logs`
-  - datasource - Loki
-  - Label filters = compose_service="minecraft"
-  - Title - *empty*
+
+This Explore view will be recreated as a dashboard.
+
+### Dashboard minecraft_logs
+
+* New dashboard, new panel
+  * Data source - Loki
+  * Switch from `builder` to `code`<br>
+  * query - `count_over_time({container_name="minecraft"} |= `` [1m])`<br>
+  * Transform - Rename by regex - `(.*)` - `Logs`
+  * Graph type - `Time series`
+  * Title - Logs volume
+  * Transparent background
+  * Legend off
+  * Graph styles - bar
+  * Fill opacity - 50
+  * Color scheme - single color
+  * `Query options` - Min interval=1m
+  * Save
+* Add another pane to the dashboard
+  * Graph type - `Logs`
+  * Data source - Loki
+  * Switch from `builder` to `code`<br>
+    query - `{container_name="minecraft"} |= ""`<br>
+  * Title - *empty*
+  * Deduplication - Signature
+  * Save
 
 This should create a similar dashboard to the one in the picture above.<br>
-It's json file is also in this repo in dashboards.
 
-[performance tips](https://www.youtube.com/watch?v=YED8XIm0YPs)
+[Performance tips](https://www.youtube.com/watch?v=YED8XIm0YPs)
 for grafana loki queries 
 
 ### Alerts in Grafana for Loki
 
-Loki can also use external alertmanager, but grafana has one build in.
+When a player joins minecraft server a log appears *"Bastard joined the game"*<br>
+Alert will be set to look for string *"joined the game"* and send notification
+when it occurs.
 
-* Alerting > Alert rules > New alert rule
-- **1 Set a query and alert condition**
-  - **A**; Loki; now-5min to now
-  - container_name=minecraft
-  - line contains=joined the game
-  - **B**
-  - Reduce - because alerts can only work with single number
-  - Function=Last
-  - Input=A
-  - Mode=Strict
-  - **C** - the actual condition for alert
-  - Input=B
-  - is above 0
-  - click - Make this the alert condition
-- **2 Alert evaluation behavior**
-  - evaluate every 5m for 0s
+Grafana rules are based around a `Query` and `Expressions` and each 
+and every one has to result in a a simple number or a true or false condition.
+
+#### Create alert rule
+
+- **1 Set an alert rule name**
+  - Rule name = Minecraft-player-joined-alert
+- **2 Set a query and alert condition**
+  - **A** - Loki; Last 5 minutes
+    - switch from builder to code
+    - `count_over_time({compose_service="minecraft"} |= "joined the game" [5m])`
+  - **B** - Reduce
+    - Function = Last
+    - Input = A
+    - Mode = Strict
+  - **C** - Treshold
+    - Input = B
+    - is above 0
+    - Make this the alert condition
+- **3 Alert evaluation behavior**
+  - Folder = "Alerts"
+  - Evaluation group (interval) = "five-min"<br>
+  - Evaluation interval = 5m
+  - For 0s
   - Configure no data and error handling
-  - Alert state if no data or all values are null=OK
-- **3 Add details for your alert**
-  - Rule name=Minecraft-player-joined
-  - Folder, add new, "Alerts"
-  - Group, add new, "Docker"
-- **4 Notifications**
+    - Alert state if no data or all values are null = OK
+- **4 Add details for your alert rule**
+  - Can pass values from logs to alerts, by targeting A/B/C/.. expressions
+    from step2.
+  - Summary = `Number of players: {{ $values.B }}`<br>
+- **5 Notifications**
   - nothing
 - Save and exit
-* **Contact points**
+
+#### Contact points
+
   - New contact point
   - Name = ntfy
-  - Contact point type = Webhook
+  - Integration = Webhook
   - URL = https://ntfy.example.com/grafana
-  - Test; Save
-* Notification policies
-  - edit default
+  - Disable resolved message = check
+  - Test
+  - Save
+
+#### Notification policies
+
+  - Edit default
   - Default contact point = ntfy
+  - Save
 
+After all this, there should be notification coming when a player joins.
 
-
+`.*:\s(?P<player>.*)\sjoined the game$` - if ever I find out how to extract
+string from a log like and pass it on to an alert.
 
 # Caddy monitoring
 
