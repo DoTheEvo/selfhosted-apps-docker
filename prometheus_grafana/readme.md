@@ -299,6 +299,7 @@ To add pushgateway functionality to the current stack:
 
   <details>
   <summary>docker-compose.yml</summary>
+  
   ```yml
   services:
 
@@ -324,6 +325,7 @@ To add pushgateway functionality to the current stack:
 
   <details>
   <summary>Caddyfile</summary>
+
   ```php
   push.{$MY_DOMAIN} {
       reverse_proxy pushgateway:9091
@@ -335,6 +337,7 @@ To add pushgateway functionality to the current stack:
 
   <details>
   <summary>prometheus.yml</summary>
+
   ```yml
   global:
     scrape_interval:     15s
@@ -395,6 +398,7 @@ To add alertmanager to the current stack:
 
   <details>
   <summary>alertmanager.yml</summary>
+
   ```yml
   route:
     receiver: 'email'
@@ -421,6 +425,7 @@ To add alertmanager to the current stack:
 
   <details>
   <summary>alert.rules</summary>
+
   ```yml
   groups:
     - name: host
@@ -439,7 +444,8 @@ To add alertmanager to the current stack:
   container, and also set is a path to a `rules` file.
 
   <details>
-    <summary>prometheus.yml</summary>
+  <summary>prometheus.yml</summary>
+
   ```yml
   global:
     scrape_interval:     15s
@@ -534,6 +540,7 @@ To add alertmanager to the current stack:
 
   <details>
   <summary>Caddyfile</summary>
+
   ```php
   alert.{$MY_DOMAIN} {
       reverse_proxy alertmanager:9093
@@ -584,7 +591,7 @@ To add Loki to the current stack:
 
   <details>
   <summary>docker-compose.yml</summary>
-  
+
   ```yml
   services:
 
