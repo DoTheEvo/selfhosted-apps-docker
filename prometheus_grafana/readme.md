@@ -290,14 +290,88 @@ the default time interval is set to 1h instead of 15m
 
 # Pushgateway
 
-Gives freedom to push information in to prometheus from anywhere. No need
-to be on the same network.
-Just a html post request to pushgateway url.<br>
+Gives freedom to push information in to prometheus from anywhere.
 
-The setup and the real world use of pushgateway, along with small steps 
-when learning it are in the repo - 
-[Veeam Prometheus Grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)<br>
-Including pushing information from windows powershell.
+To add pushgateway functionality to the current stack.
+
+- New container `alertmanager` added to the compose file.<br>
+  <details>
+    <summary>docker-compose.yml</summary>
+
+  ```yml
+  services:
+
+    # PUSHGATEWAY FOR PROMETHEUS
+    pushgateway:
+      image: prom/pushgateway:v1.5.1
+      container_name: pushgateway
+      hostname: pushgateway
+      restart: unless-stopped
+      command:
+        - '--web.enable-admin-api'    
+      expose:
+        - "9091"
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
+- Adding pushgateway to the Caddyfile of the reverse proxy so that it can
+  be reached at `https://push.example.com`<br>
+  <details>
+    <summary>.env</summary>
+
+  `Caddyfile`
+  ```php
+  push.{$MY_DOMAIN} {
+    reverse_proxy pushgateway:9091
+  }
+  ```
+  </details>  
+
+- Adding pushgateway's scrape point to `prometheus.yml`<br>
+  <details>
+    <summary>prometheus.yml</summary>
+
+  ```yml
+  global:
+    scrape_interval:     15s
+    evaluation_interval: 15s
+
+  scrape_configs:
+    - job_name: 'pushgateway-scrape'
+      scrape_interval: 60s
+      honor_labels: true
+      static_configs:
+        - targets: ['pushgateway:9091']
+  ```
+  </details>
+
+![veeam-dash](https://i.imgur.com/TOuv9bM.png)
+
+To **test pushing** some metric, execute in linux:<br>
+`echo "some_metric 3.14" | curl --data-binary @- https://push.example.com/metrics/job/blabla/instance/whatever`
+
+You see **labels** being applied to the pushed metric in the path after metrics.<br>
+Label `job` is required, but after that it's whatever you want,
+though use of `instance` label is customary.<br>
+Now in grafana, in **Explore** section you should see some results
+when quering for `some_metric`.
+
+The metrics sit on the pushgateway **forever** unless overwritten/deleted/shutdown
+of the container. And if the values are there, prometheus will consider
+it the true value for every scrape of the pushgateway, not just
+at the moment it was first scraped.
+
+To wipe the pushgateway clean<br>
+`curl -X PUT https://push.example.com/api/v1/admin/wipe`
+
+More on pushgateway setup, with the real world use to monitor backups,
+along with pushing metrics from windows in powershell - 
+[**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana)<br>
 
 ![veeam-dash](https://i.imgur.com/dUyzuyl.png)
 
@@ -325,87 +399,7 @@ Several changes are needed:
 ```yml
 services:
 
-  # MONITORING SYSTEM AND THE METRICS DATABASE
-  prometheus:
-    image: prom/prometheus:v2.42.0
-    container_name: prometheus
-    hostname: prometheus
-    user: root
-    restart: unless-stopped
-    depends_on:
-      - cadvisor
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=240h'
-      - '--web.enable-lifecycle'
-    volumes:
-      - ./prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./alert.rules:/etc/prometheus/rules/alert.rules
-    expose:
-      - "9090"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # WEB BASED UI VISUALISATION OF METRICS
-  grafana:
-    image: grafana/grafana:9.4.3
-    container_name: grafana
-    hostname: grafana
-    user: root
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ./grafana_data:/var/lib/grafana
-    expose:
-      - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # HOST LINUX MACHINE METRICS EXPORTER
-  nodeexporter:
-    image: prom/node-exporter:v1.5.0
-    container_name: nodeexporter
-    hostname: nodeexporter
-    restart: unless-stopped
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    expose:
-      - "9100"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # DOCKER CONTAINERS METRICS EXPORTER
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.1
-    container_name: cadvisor
-    hostname: cadvisor
-    restart: unless-stopped
-    privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    expose:
-      - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
-
-  # ALERT MANAGMENT BY PROMETHEUS
+  # ALERT MANAGMENT FOR PROMETHEUS
   alertmanager:
     image: prom/alertmanager:v0.25.0
     container_name: alertmanager
@@ -538,11 +532,12 @@ But first to add Loki to the current grafana, prometheus stack:
   but url is changed, and compactor section is added to allow for data retention.
 * install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
   `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
+  check if it's installed: `docker plugin ls`
 * adding logging section to compose files of a containers 
   that should be monitored.<br>
   
 <details>
-<summary>**example compose with logging enabled through loki driver**</summary>
+<summary>example compose with logging enabled through loki driver</summary>
 
 ```yml
 services:
@@ -559,7 +554,7 @@ services:
 </details>
 
 <details>
-  <summary>**loki container to be added to grafana/prometheus stack**</summary>
+  <summary>loki container to be added to grafana/prometheus stack</summary>
 
 ```yml
 services:
@@ -589,7 +584,7 @@ networks:
 </details>
 
 <details>
-  <summary>**loki-docker-config.yml**</summary>
+  <summary>loki-docker-config.yml</summary>
 
 ```yml
 auth_enabled: false
