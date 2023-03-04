@@ -91,7 +91,7 @@ The directories are created by docker compose on the first run.
 # docker-compose
 
 * **Prometheus** - The official image used. Few extra commands passing configuration.
-  Of note is 480 hours(20days) retention policy.
+  Of note is 240 hours(10days) retention policy.
 * **Grafana** - The official image used. Bind mounted directory
   for persistent data storage. User sets as root, as it solves issues I am
   lazy to investigate.
@@ -125,7 +125,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=480h'
+      - '--storage.tsdb.retention.time=240h'
       - '--web.enable-lifecycle'
     volumes:
       - ./prometheus_data:/prometheus
@@ -137,7 +137,7 @@ services:
 
   # WEB BASED UI VISUALISATION OF METRICS
   grafana:
-    image: grafana/grafana:9.3.6
+    image: grafana/grafana:9.4.3
     container_name: grafana
     hostname: grafana
     user: root
@@ -212,7 +212,6 @@ GF_SMTP_ENABLED=true
 GF_SMTP_HOST=smtp-relay.sendinblue.com:587
 GF_SMTP_USER=example@gmail.com
 GF_SMTP_PASSWORD=xzu0dfFhn3eqa
-
 ```
 
 **All containers must be on the same network**.</br>
@@ -223,10 +222,7 @@ If one does not exist yet: `docker network create caddy_net`
 
 [Official documentation.](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 
-Contains the bare minimum setup of targets from where metrics are to be pulled.<br>
-Stefanprodan [gives](https://github.com/stefanprodan/dockprom/blob/master/prometheus/prometheus.yml)
-a custom shorter scrape intervals, but I thats not really
-[necessary](https://www.robustperception.io/keep-it-simple-scrape_interval-id/).
+Contains the bare minimum setup of targets from where metrics are to be pulled.
 
 `prometheus.yml`
 ```yml
@@ -276,16 +272,16 @@ These dashboards are the preconfigured ones from
 with few changes.<br>
 `docker_host.json` did not show free disk space for me, had to change `fstype`
 from `aufs` to `ext4`.
-Also [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
-for host network monitoring not showing traffick. And in all of them
-the default time interval is set to show last 1h instead of last 15m
+Also included is [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
+for host network monitoring not showing traffick. In all of them
+the default time interval is set to 1h instead of 15m
 
 * **docker_host.json** - dashboard showing linux host machine metrics
 * **docker_containers.json** - dashboard showing docker containers metrics,
   except the ones labeled as `monitoring` in the compose file
 * **monitoring_services.json** - dashboar showing docker containers metrics
   of containers that are labeled `monitoring`
-* **minecraft_logs.json** - comes to play with Loki later.
+* **minecraft_logs.json** - comes to play with Loki later
 
 ![interface-pic](https://i.imgur.com/wzwgBkp.png)
 
@@ -294,11 +290,11 @@ the default time interval is set to show last 1h instead of last 15m
 
 # Pushgateway
 
-It gives freedom to push information in to prometheus from anywhere. No need
-to be on the same newtork or doing VPN. Just a html post request
-to pushgateway url.
+Gives freedom to push information in to prometheus from anywhere. No need
+to be on the same network.
+Just a html post request to pushgateway url.<br>
 
-The setup and real world use of pushgateway, along with small steps 
+The setup and the real world use of pushgateway, along with small steps 
 when learning it are in the repo - 
 [Veeam Prometheus Grafana](https://github.com/DoTheEvo/veeam-prometheus-grafana)<br>
 Including pushing information from windows powershell.
@@ -343,7 +339,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=500h'
+      - '--storage.tsdb.retention.time=240h'
       - '--web.enable-lifecycle'
     volumes:
       - ./prometheus_data:/prometheus
@@ -356,7 +352,7 @@ services:
 
   # WEB BASED UI VISUALISATION OF METRICS
   grafana:
-    image: grafana/grafana:9.3.6
+    image: grafana/grafana:9.4.3
     container_name: grafana
     hostname: grafana
     user: root
@@ -522,14 +518,14 @@ has more detailed section on alerting worth checking out.
 
 ![loki_arch](https://i.imgur.com/aoMPrVV.png)
 
-Loki is made by the grafana team. It's called a Prometheus for logs.<br>
+Loki is made by the grafana team. It's often refered as a Prometheus for logs.<br>
 It is a **push** type monitoring, where most of the time an agent - **promtail**
-pushes logs on to a Loki instance.
-For docker containers theres also an option to to install **loki-docker-driver**
+pushes logs on to a Loki instance.<br>
+For docker containers theres also an option to install **loki-docker-driver**
 on a docker host and log pushing is set either globally in /etc/docker/daemon.json
 or per container in compose files.
 
-There will be **two examples** of Loki usage.
+There will be **two examples**.<br>
 A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
 But first to add Loki to the current grafana, prometheus stack:
@@ -537,9 +533,9 @@ But first to add Loki to the current grafana, prometheus stack:
 * New container - `loki` added to the compose file. Loki stores logs and makes
   them available for grafana to visualize.
 * New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
-  The file is all default from the 
-  [official example](https://github.com/grafana/loki/tree/main/cmd/loki),
-  except for alertmanager url.
+  The file here comes from
+  [the official example](https://github.com/grafana/loki/tree/main/cmd/loki),
+  but url is changed, and compactor section is added to allow for data retention.
 * install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
   `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
 * adding logging section to compose files of a containers 
@@ -617,7 +613,10 @@ compactor:
   compaction_interval: 10m
   retention_enabled: true
   retention_delete_delay: 2h
-  retention_delete_worker_count: 480
+  retention_delete_worker_count: 150
+
+limits_config:
+  retention_period: 240h
 
 schema_config:
   configs:
@@ -634,7 +633,6 @@ ruler:
 
 analytics:
   reporting_enabled: false
-
 ```
 </details>
 
@@ -643,7 +641,7 @@ analytics:
 ### Minecraft example
 
 Loki will be used to monitor logs of a [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)<br>
-A dashboard will be created, showing logs volume.<br>
+A dashboard will be created, showing logs volume in time.<br>
 Alert will be set to send a notification when a player joins.<br>
   
 **Requirements** - grafana, loki, loki-docker-driver, minecraft with logging
