@@ -746,7 +746,7 @@ This should create a similar dashboard to the one in the picture above.<br>
 [Performance tips](https://www.youtube.com/watch?v=YED8XIm0YPs)
 for grafana loki queries 
 
-### Alerts in Grafana for Loki
+## Alerts in Grafana for Loki
 
 When a player joins minecraft server a log appears *"Bastard joined the game"*<br>
 Alert will be set to look for string *"joined the game"* and send notification
@@ -755,14 +755,14 @@ when it occurs.
 Grafana rules are based around a `Query` and `Expressions` and each 
 and every one has to result in a a simple number or a true or false condition.
 
-#### Create alert rule
+### Create alert rule
 
 - **1 Set an alert rule name**
   - Rule name = Minecraft-player-joined-alert
 - **2 Set a query and alert condition**
-  - **A** - Loki; Last 5 minutes
+  - **A** - Switch to Loki; set Last 5 minutes
     - switch from builder to code
-    - `count_over_time({compose_service="minecraft"} |= "joined the game" [5m])`
+    - `count_over_time({container_name="minecraft"} |= "joined the game" [5m])`
   - **B** - Reduce
     - Function = Last
     - Input = A
@@ -781,12 +781,17 @@ and every one has to result in a a simple number or a true or false condition.
 - **4 Add details for your alert rule**
   - Can pass values from logs to alerts, by targeting A/B/C/.. expressions
     from step2.
-  - Summary = `Number of players: {{ $values.B }}`<br>
+  - Summary = `Number of players joined: {{ $values.B }}`<br>
+  - Maybe one day I figure out how to pull player's name from the log
+    and pass it to alert, so far I got [this](https://regex101.com/r/pBAaEl/2) 
+    `.*:\s(?P<player>.*)\sjoined the game$` and [a full query](https://pastebin.com/Ep6PUwV2)
+    but dunno how to reference the named regex group in alert 4th section.<br>
+    And grafana forum is kinda big black hole of unanswared questions.
 - **5 Notifications**
   - nothing
 - Save and exit
 
-#### Contact points
+### Contact points
 
   - New contact point
   - Name = ntfy
@@ -796,7 +801,7 @@ and every one has to result in a a simple number or a true or false condition.
   - Test
   - Save
 
-#### Notification policies
+### Notification policies
 
   - Edit default
   - Default contact point = ntfy
@@ -804,13 +809,307 @@ and every one has to result in a a simple number or a true or false condition.
 
 After all this, there should be notification coming when a player joins.
 
-`.*:\s(?P<player>.*)\sjoined the game$` - if ever I find out how to extract
-string from a log like and pass it on to an alert.
-
 # Caddy monitoring
 
-Described in
-[the caddy guide](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2)
+Reverse proxy is kinda linchpin of a selfhosted setup, since it's in charge
+of all the http/https traffic that goes in. So focus on monitoring this
+keystone makes sense.
+
+Will be using Prometheus for monitoring metrics and Loki for log files monitoring.
+
+**Requirements** - grafana, prometheus, loki, caddy container
+
+## Metrics 
+
+![logo](https://i.imgur.com/6QdZuVR.png)
+
+Caddy has build in exporter of metrics for prometheus, so all that is needed
+is enabling it, scrape it by prometheus, and import a dashboard.
+
+* Edit Caddyfile to [enable metrics.](https://caddyserver.com/docs/metrics)
+
+  <details>
+  <summary>Caddyfile</summary>
+
+  ```php
+  {
+      servers {
+          metrics
+      }
+
+      admin 0.0.0.0:2019
+  }
+
+
+  a.{$MY_DOMAIN} {
+      reverse_proxy whoami:80
+  }
+  ```
+  </details>
+
+* Edit compose to publish 2019 port.<br>
+  Likely not necessary if Caddy and Prometheus are on the same docker network,
+  but its nice to check if the metrics export works at `<docker-host-ip>:2019/metrics`
+
+  <details>
+  <summary>docker-compose.yml</summary>
+
+  ```yml
+  services:
+
+    caddy:
+      image: caddy
+      container_name: caddy
+      hostname: caddy
+      restart: unless-stopped
+      env_file: .env
+      ports:
+        - "80:80"
+        - "443:443"
+        - "443:443/udp"
+        - "2019:2019"
+      volumes:
+        - ./Caddyfile:/etc/caddy/Caddyfile
+        - ./caddy_config:/data
+        - ./caddy_data:/config
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
+* Edit prometheus.yml to add caddy scraping point
+
+  <details>
+  <summary>prometheus.yml</summary>
+
+  ```yml
+  global:
+    scrape_interval:     15s
+    evaluation_interval: 15s
+
+  scrape_configs:
+    - job_name: 'caddy'
+      static_configs:
+        - targets: ['caddy:2019']
+  ```
+  </details>
+
+* In grafana import [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
+  or make your own, `caddy_reverse_proxy_upstreams_healthy` shows reverse proxy
+  upstreams, but thats all.
+
+But these metrics are more about performance and load put on Caddy,
+which in selfhosted enviroment will likely be minmal and not interesting.<br>
+To get more intriguing info of who, when, from where, connects to what service,.. 
+for that acces logs monitoring is needed.
+
+## Logs 
+
+Loki will be used for logs monitoring.<br>
+Loki itself just stores them, to get logs a promtail container will be used
+that will have access to caddy's logs, and its job is to scrape them regularly
+and push them to Loki. Once there, a basic grafana dashboard can be made.
+
+![logs_dash](https://i.imgur.com/lWToTMd.png)
+
+* Have Grafana, Loki, Caddy working
+* Edit Caddy compose, bind mount `/var/log/caddy`.<br>
+  Add Promtail container, that also has same bind mount, along with bind mount
+  of its config file.<br>
+  Promtail will scrape logs to which it now has access and pushes them to Loki.
+  
+  <details>
+  <summary>docker-compose.yml</summary>
+
+  ```yml
+  services:
+
+    caddy:
+      image: caddy
+      container_name: caddy
+      hostname: caddy
+      restart: unless-stopped
+      env_file: .env
+      ports:
+        - "80:80"
+        - "443:443"
+        - "443:443/udp"
+        - "2019:2019"
+      volumes:
+        - ./Caddyfile:/etc/caddy/Caddyfile
+        - ./caddy_data:/data
+        - ./caddy_config:/config
+        - /var/log/caddy:/var/log/caddy
+
+    # LOG AGENT PUSHING LOGS TO LOKI
+    promtail:
+      image: grafana/promtail
+      container_name: caddy-promtail
+      hostname: caddy-promtail
+      restart: unless-stopped
+      volumes:
+        - ./promtail-config.yml:/etc/promtail-config.yml
+        - /var/log/caddy:/var/log/caddy:ro
+      command:
+        - '-config.file=/etc/promtail-config.yml'
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+  </details>
+
+  <details>
+  <summary>promtail-config.yml</summary>
+
+  ```yml
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+  scrape_configs:
+    - job_name: caddy
+      static_configs:
+        - targets:
+            - localhost
+          labels:
+            job: caddy_access_log
+            __path__: /var/log/caddy/*.log
+  ```
+  </details>
+
+  <details>
+  <summary>promtail-config.yml customizing fields</summary>
+
+  ```yml
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+  scrape_configs:
+    - job_name: caddy_access_log
+      static_configs:
+      - targets: # tells promtail to look for the logs on the current machine/host
+          - localhost
+        labels:
+          job: caddy_access_log
+          __path__: /var/log/caddy/*.log
+      pipeline_stages:
+        # Extract all the fields I care about from the
+        # message:
+        - json:
+            expressions:
+              "level": "level"
+              "timestamp": "ts"
+              "duration": "duration"
+              "response_status": "status"
+              "request_path": "request.uri"
+              "request_method": "request.method"
+              "request_host": "request.host"
+              "request_useragent": "request.headers.\"User-Agent\""
+              "request_remote_ip": "request.remote_ip"
+
+        # Promote the level into an actual label:
+        - labels:
+            level:
+
+        # Regenerate the message as all the fields listed
+        # above:
+        - template:
+            # This is a field that doesn't exist yet, so it will be created
+            source: "output"
+            template: |
+                          {{toJson (unset (unset (unset . "Entry") "timestamp") "filename")}}
+        - output:
+            source: output
+
+        # Set the timestamp of the log entry to what's in the
+        # timestamp field.
+        - timestamp:
+            source: "timestamp"
+            format: "Unix"
+  ```
+  </details>
+
+
+* Edit `Caddyfile` to enable [access logs](https://caddyserver.com/docs/caddyfile/directives/log).
+  Unfortunetly this can't be globally enabled, so the easiest way seems to be 
+  to create a logging [snippet](https://caddyserver.com/docs/caddyfile/concepts#snippets)
+  and copy paste import line in to every site block.
+
+  <details>
+  <summary>Caddyfile</summary>
+
+  ```yml
+  (log_common) {
+    log {
+      output file /var/log/caddy/caddy_access.log
+    }
+  }
+
+  ntfy.example.com {
+    import log_common
+    reverse_proxy ntfy:80
+  }
+
+  mealie.{$MY_DOMAIN} {
+    import log_common
+    reverse_proxy mealie:80
+  }
+  ```
+  </details>
+  
+* at this points logs should be visible and explorable in grafana<br>
+  Explore > `{job="caddy_access_log"} |= "" | json`
+
+## dashboard
+
+* new pane, will be time series graph showing logs volume in time
+
+  * Data source = Loki
+  * switch from builder to code<br>
+    `sum(count_over_time({job="caddy_access_log"} |= "" | json [1m])) by (request_host)`
+  * Transform > Rename by regex > Match = `\{request_host="(.*)"\}`; Replace = $1
+  * Query options > Min interval = 1m
+  * Graph type = Time series
+  * Title = "Access timeline"
+  * Transparent
+  * Tooltip mode = All
+  * Tooltip values sort order = Descending
+  * Legen Placement = Right
+  * Value = Total
+  * Graph style = Bars
+  * Fill opacity = 50
+
+* Add another pane, will be a pie chart, showing subdomains divide
+
+  * Data source = Loki
+  * switch from builder to code<br>
+    `sum(count_over_time({job="caddy_access_log"} |= "" | json [$__range])) by (request_host)`
+  * Transform > Rename by regex > Match = `\{request_host="(.*)"\}`; Replace = $1
+  * Graph type = Pie chart
+  * Title = "Subdomains divide"
+  * Transparent
+  * Legen Placement = Right
+  * Value = Total
+  * Graph style = Bars
+
+  
+* Add another pane, this will be actual log view
+
+  * Graph type - Logs
+  * Data source - Loki
+  * Switch from builder to code
+  * query - `{job="caddy_access_log"} |= "" | json`
+  * Title - empty
+  * Deduplication - Signature
+  * Save
+
+## Geoip
+
+to-do
 
 # Update
 
