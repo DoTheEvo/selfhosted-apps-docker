@@ -30,12 +30,12 @@ This setup is written in september 2022 with 1.19.2 being the latest build.
 └── ~/
     └── docker/
         └── minecraft/
-            ├── minecraft-data/
-            ├── .env
-            └── docker-compose.yml
+            ├── 🗁 minecraft_data/
+            ├── 🗋 .env
+            └── 🗋 docker-compose.yml
 ```
 
-* `minecraft-data/` - a directory where minecraft stores its data
+* `minecraft_data/` - a directory where minecraft stores its data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a compose file, telling docker how to build containers
 
@@ -61,7 +61,7 @@ services:
       - 8100:8100       # bluemap
       - 8123:8123       # dynmap
     volumes:
-      - ./minecraft-data:/data
+      - ./minecraft_data:/data
     logging:
       driver: "json-file"
       options:
@@ -175,7 +175,7 @@ but also remember the position in the worlds when entering portals?<br>
 Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.
 
 **Plugins installation** - place the downloaded jar files in to 
-  `~/docker/minecraft/minecraft-data/plugins`<br>
+  `~/docker/minecraft/minecraft_data/plugins`<br>
 restart the server
 
 # The setup
@@ -256,6 +256,9 @@ and needs restart. Not just container, but entire VM. Will maybe investigate.
 /update, it was likely caused by using m.2 ssd for storing esxi VMs,
 switch to sata ssd seems to prevent any more occurancies of this high disk usage
 
+/update2, well since it started happening again, now it seems to be solved
+by setting up 6GB swapfile, which I.. err.. didnt think it needed.
+
 * [Dynmap](https://www.spigotmc.org/resources/dynmap%C2%AE.274/) - map 
   of the world in web gui, real time. Default port 8123
 * [Chunky](https://www.spigotmc.org/resources/chunky.81534/) - pre-generates chunks
@@ -276,7 +279,7 @@ switch to sata ssd seems to prevent any more occurancies of this high disk usage
 # Comamnds & settings
 
 * `/gamerule playersSleepingPercentage 1` - use bed whenever, sleep not dependant on other players
-* to import a map, download, extract, copy the directory to minecraft-data<br>
+* to import a map, download, extract, copy the directory to minecraft_data<br>
   `mv import <directory-name> normal`, there should be no spaces in the name
 * `/mv setspawn` sets spawn point in the current world
 
