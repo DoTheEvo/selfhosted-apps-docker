@@ -43,9 +43,9 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 
 - `docker-compose.yml` do not need any editing to get started,
    changes are to be done in the `.env` file.
-- Not using `ports` directive if theres only web traffic in a container.<br>
+- Not using `ports` directive if theres only web traffic for a container.<br>
   Theres an expectation of running a reverse proxy which makes mapping ports
-  on docker host unnecessary. Instead `expose` is used which is basically
+  to a docker host unnecessary. Instead `expose` is used which is basically
   just documentation.<br>
 - For persistent storage bind mount `./whatever_data` is used.
   No volumes, nor static path somewhere... just relative path next to compose file.
@@ -60,13 +60,31 @@ your first time running a docker container.
 
 # Some extra info
 
+### Caddy
+
 Kinda the core of the setup is Caddy reverse proxy.</br>
 It's described in most details, it's really amazingly simple but robust software.
 
-### Compose
+All guides have reverse proxy section with Caddyfile config for them.
 
-When making changes use `docker-compose down` and `docker-compose up -d`,
-not just restart or stop/start.
+---
+
+### Docker network
+
+You really want to create a custom docker bridge network and use it.
+
+`docker network create caddy_net`
+
+It can be named whatever, but what it does over default is that it provides
+[automatic DNS resolution](https://docs.docker.com/network/bridge/)
+between containers. Meaning one can exec in to caddy container and ping another
+container on that custom docker network by its hostname.
+
+So config files can just use hostnames and they will work.
+
+---
+
+### .env
 
 Often the `.env` file is used as `env_file`,
 which can be a bit difficult concept at a first glance.
@@ -138,8 +156,25 @@ It is absofuckinglutely amazing in how simple yet effective it is.
 * detailed info on a container, it's IP, published and exposed ports, when it was created,..
 * quick management, quick exec in to a container, check logs, stop it,...
 
-Written in Go, so its super fast and installation is trivial when it is a single binary,
-as likely your distro does not have it in repos. If you use arch, like I do, its on AUR.
+Written in Go, so its super fast and installation is trivial when it is a single binary.<br>
+download `linux-amd64` version; make it executable with chmod +x; move it to `/usr/bin/`;
+now you can ctop anywhere.
+
+---
+
+### Sendinblue
+
+Services often need ability to send emails, for notification, registration,
+password reset and such... Sendinblue is free, offers 300 mails a day
+and is easy to setup.
+
+```
+EMAIL_HOST=smtp-relay.sendinblue.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=whoever_example@gmail.com>
+EMAIL_HOST_PASSWORD=xcmpwik-c31d9eykwewf2342df2fwfj04-FKLzpHgMjGqP23
+EMAIL_USE_TLS=1
+```
 
 ---
 
@@ -160,30 +195,41 @@ so it might be worth the time to check out the concept to setup own ansible scri
 
 The best aspect of having such repo is that it is a dedicated place where 
 one can write solution to issues encountered, 
-or enable freshly discovered feature for all deployments.
+or enable freshly discovered feature for all future deployments.
 
 ---
 
-### Sendinblue
-
-Services often need ability to send emails, for registration, password reset and such...
-
-Sendinblue offers 300 mails a day and is easy to setup.
-
-```
-EMAIL_HOST=smtp-relay.sendinblue.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=<registration_email@gmail.com>
-EMAIL_HOST_PASSWORD=xs...... S1Rzp
-EMAIL_USE_TLS=1
-```
-
----
-
-### other guides
+### Other guides
 
 * [StarWhiz/docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes)
     - got inspired and wrote in similar way setup for various services
 * [BaptisteBdn/docker-selfhosted-apps](https://github.com/BaptisteBdn/docker-selfhosted-apps)
    - many services using traefik for reverse proxy
+* [Awesome Docker Compose Examples](https://github.com/Haxxnet/Compose-Examples)
 
+---
+
+### For docker noobs
+
+First, docker is easy. Like really.<br>
+
+Second, there are two main uses.
+
+* A developer who daily works on an app and docker eases everything about it, from testing to deployment
+* A self-hosting / devops approach, where you just want to get a service running
+
+This whole repo is obviously about the second use. So be careful that you wont
+spend time on resources used to educate the developers. I mean if you get through
+that you will know docker better. But theres always danger that after sinking
+4 hours in to learning it, one cant even get nginx web server up and working.
+And my personal preference in learning is getting something up as fast as possible
+and then tinker with it and try to understand it.
+
+So to solve this, when googling for guides, look for *docker compose*
+rather than just docker tutorials and notice if they are talking fundamentals or
+deployment.
+
+* [This](https://youtu.be/DM65_JyGxCo) one is pretty good. That entire channel
+has good stuff worth looking. 
+
+Will add stuff as I encounter it.

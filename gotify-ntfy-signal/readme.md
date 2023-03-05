@@ -24,9 +24,10 @@ Instant notifications if email feels old timey and crowded
   Support for multiple user, supports ios.
 * **signal-cli-rest-api** - no gui, need a sim card phone number registred,
   notification are just send to phone numbers.
-  The wider spread of it might make it a winner since no need for another app.
+  Signal wide spread might make it a winner, since you are not asking people
+  to install an another app.
 
-Afte few weeks of tinkering with these... ntfy is the winner for me, for now.<br>
+Afte few weeks of tinkering with these... **ntfy is the winner for me**, for now.<br>
 Compose files for the other two are at the end.
 
 # docker-compose for ntfy
@@ -139,6 +140,47 @@ OnSuccess=ntfy@success-%p.service
 [Service]
 Type=simple
 ExecStart=/opt/borg_backup.sh
+```
+
+# Grafana to ntfy
+
+Alerting in grafana to ntfy [works](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana#alertmanager),
+but its ugly with just json shown.
+
+To solve this 
+
+* deploy container [grafana-to-ntfy](https://github.com/kittyandrew/grafana-to-ntfy).
+  Should be on the same network with grafana.
+  Set in `.env` ntfy url of your ntfy server and specific topic
+* in grafana set contact point webhook aimed at `http://grafana-to-ntfy:8080`,
+  with credentials from the `.env`
+
+`docker-compose.yml`
+```yml
+services:
+  grafana-to-ntfy:
+    container_name: grafana-to-ntfy
+    hostname: grafana-to-ntfy
+    image: kittyandrew/grafana-to-ntfy
+    restart: unless-stopped
+    env_file:
+      - .env
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
+```
+
+`.env`
+```php
+# GENERAL
+DOCKER_MY_NETWORK=caddy_net
+TZ=Europe/Bratislava
+
+NTFY_URL=https://ntfy.example.com/grafana
+BAUTH_USER=admin
+BAUTH_PASS=test
 ```
 
 <details>

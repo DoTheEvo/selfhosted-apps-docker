@@ -276,7 +276,9 @@ switch to sata ssd seems to prevent any more occurancies of this high disk usage
 # Comamnds & settings
 
 * `/gamerule playersSleepingPercentage 1` - use bed whenever, sleep not dependant on other players
-
+* to import a map, download, extract, copy the directory to minecraft-data<br>
+  `mv import <directory-name> normal`, there should be no spaces in the name
+* `/mv setspawn` sets spawn point in the current world
 
 # Update
 

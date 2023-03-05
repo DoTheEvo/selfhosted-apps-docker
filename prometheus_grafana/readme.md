@@ -32,6 +32,8 @@ Lot of the prometheus stuff here is based off the magnificent
 * **[Loki](#Loki)** - all of the above but for log files
 * **[Caddy monitoring](#Caddy_monitoring)** - monitoring a reverse proxy
 
+![dashboards_pic](https://i.imgur.com/ac9Qj1F.png)
+
 # Overview
 
 [Good youtube overview](https://youtu.be/h4Sl21AKiDg) of Prometheus.</br>

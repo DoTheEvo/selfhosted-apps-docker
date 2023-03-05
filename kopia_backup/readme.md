@@ -26,8 +26,10 @@ but general use and concepts are universal.</br>
 
 # Some aspects of Kopia
 
+* Kopia configuraiton uses term policies to apply to various 
+  - global policy, from which repos inherit settings
+  - repos policy created on repo creation
 * Backup configuration is stored in a repository where backups are stored.<br>
-  This includes global policy, that is global in sense of a repo, not all of kopia.
 * You connect to a repository before using it, and disconnect afterwards.<br>
   Only one repository can be connected at the time(at least for cli version).
 * Currently to ignore a folder - `CACHEDIR.TAG` file can be placed inside,
@@ -104,9 +106,9 @@ use of sudo so that kopia has access everywhere<br>
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
-export KOPIA_PASSWORD='aaa'
+KOPIA_PASSWORD='aaa'
 
-kopia repository connect filesystem --path $REPOSITORY_PATH
+kopia repository connect filesystem --path $REPOSITORY_PATH --password $KOPIA_PASSWORD
 kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 ```
@@ -200,5 +202,28 @@ WantedBy=multi-user.target
 
 # Remote backup
 
-...
+...  some day ...
 
+# Kopia in Windows
+
+While GUI version seems like a way to go.. well its not there yet.
+The schedule it uses is running only under a user, theres no certainty it will run.
+
+So here goes cli version
+
+* [download](https://github.com/kopia/kopia/releases/) latest named  kopia-X.XX.X-windows-x64.zip
+, \~11MB
+* extract, move to `C:\kopia`
+* download `win_vss_before.ps1` and `win_vss_after.ps1` from this repo,
+  or crete them from
+  [here](https://kopia.io/docs/advanced/actions/#windows-shadow-copy)
+* kopia-backup-home-etc.sh
+
+* powershell as as administrator
+* --enable-actions
+* in tray, right click on the icon - `Launch At Startup`<br>
+  this creates registry entry - *HKCU\Software\Microsoft\Windows\CurrentVersion\Run\KopiaUI*
+* 
+
+kopia policy set <target_dir> --before-folder-action "powershell -WindowStyle Hidden <path_to_script>\before.ps1"
+kopia policy set <target_dir> --after-folder-action  "powershell -WindowStyle Hidden <path_to_script>\after.ps1"

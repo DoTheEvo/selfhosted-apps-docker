@@ -18,3 +18,5 @@ Most of the stuff around here is about deployment, how to deploy others people w
 # Basics 
 
 tag - not just version number, tags are not even present on local docker..
+
+ports quotes - always in quotes because in low number it might try to interpret ports as base 60
