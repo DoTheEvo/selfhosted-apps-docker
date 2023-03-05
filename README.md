@@ -226,9 +226,9 @@ Second, there are two main uses.
 * A self-hosting / devops approach, where you just want to get a service running
 
 This whole repo is obviously about the second use. So be careful that you wont
-spend time on resources used to educate the developers. I mean if you get through
-that you will know docker better. But theres always danger that after sinking
-4 hours in to learning it, one cant even get nginx web server up and working.
+spend time on resources used to educate developers. I mean if you get through
+that you will know docker better. But theres always the danger that after sinking
+4 hours learning, one still cant get plain nginx web server up and working.
 And my personal preference in learning is getting something up as fast as possible
 and then tinker with it and try to understand it.
 
