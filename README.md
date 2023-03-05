@@ -52,35 +52,42 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 - no version is declared in compose, as the practice was
   [deprecated](https://nickjanetakis.com/blog/docker-tip-51-which-docker-compose-api-version-should-you-use)
 
-# Requirements 
+---
+
+### Requirements 
 
 **Basic linux and basic docker-compose knowledge.**
 The shit here is pretty hand holding and detailed, but it still should not be
 your first time running a docker container.
 
-# Some extra info
+---
 
-### Caddy
+### Caddy reverse proxy
 
-Kinda the core of the setup is Caddy reverse proxy.</br>
-It's described in most details, it's really amazingly simple but robust software.
+Kinda the heart of the setup is [Caddy reverse proxy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+It's described in most details and all guides have reverse proxy section
+with Caddyfile config specific for them.</br>
+Caddy is really great at simplifying the mess of https certificates, where
+you don't really have to deal with anything, while having a one simple,
+readable config file.
 
-All guides have reverse proxy section with Caddyfile config for them.
+But no big issue if using [traefik](https://github.com/DoTheEvo/Traefik-v2-examples)
+or nginx proxy manager. You just have to deal with reverse settings,
+and 90% of the time its just sending traffic to port 80 and nothing else.
 
 ---
 
 ### Docker network
 
-You really want to create a custom docker bridge network and use it.
+You really want to create a custom named docker network and use it.
 
 `docker network create caddy_net`
 
 It can be named whatever, but what it does over default is that it provides
 [automatic DNS resolution](https://docs.docker.com/network/bridge/)
-between containers. Meaning one can exec in to caddy container and ping another
-container on that custom docker network by its hostname.
-
-So config files can just use hostnames and they will work.
+between containers. Meaning one can exec in to a container and ping another
+container by its hostname.<br>
+This makes config files simpler and cleaner.
 
 ---
 
@@ -225,9 +232,9 @@ that you will know docker better. But theres always danger that after sinking
 And my personal preference in learning is getting something up as fast as possible
 and then tinker with it and try to understand it.
 
-So to solve this, when googling for guides, look for *docker compose*
-rather than just docker tutorials and notice if they are talking fundamentals or
-deployment.
+So to solve this, when googling for guides, look for **docker compose**
+rather than just **docker** tutorials and notice if they are talking
+fundamentals or deployment.
 
 * [This](https://youtu.be/DM65_JyGxCo) one is pretty good. That entire channel
 has good stuff worth looking. 
