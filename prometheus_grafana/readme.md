@@ -368,7 +368,7 @@ when quering for `some_metric`.
 
 The metrics sit on the pushgateway **forever**, unless deleted or container
 shuts down. Prometheus will not remove the metrics from it after scraping,
-it will keep scraping the pushgateway and store the value there with the time of
+it will keep scraping the pushgateway and store the value with the time of
 scraping.
 
 To wipe the pushgateway clean<br>
@@ -1109,7 +1109,7 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
 
 ## Geoip
 
-to-do
+[to-do](https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md)
 
 # Update
 
