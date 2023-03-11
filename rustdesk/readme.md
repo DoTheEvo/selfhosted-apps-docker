@@ -53,8 +53,9 @@ The directory is created by docker compose on the first run.
 
 Using [S6-overlay](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)
 based image.<br>
-It's a simpler, single container approach. The complexity of hbbs/hbbr hidden.
-It also has health check implemented.
+It's a simpler, single container approach. The 
+[complexity](https://github.com/rustdesk/rustdesk-server#classic-image)
+of rustdesk's `hbbs` server and `hbbr` relay hidden.
 
 No network section since no http traffic that would need reverse proxy, yet.<br>
 So just mapped ports on to docker host to do their thing.
@@ -139,19 +140,32 @@ up the container and try with the new keys.
 # Extra info
 
 * You really really **really want to be using domain and not your public IP**
-  when installing clients and setting ID server. That domain can be changed
-  to different IP any time you want. Hard set IP not.
-* `tcpdump -n udp port 21116` to **see heartbeat** udp traffic, seems machines 
-  report-in every \~13 seconds.
+  when installing clients and setting ID server. That `rust.example.com`
+  can be changed to point at a different IP any time you want. Hard set IP not.
+* Can do `tcpdump -n udp port 21116` on docker host to **see heartbeat** udp traffic.
+  Seems machines report-in every \~13 seconds.
 * on **windows** machine a **service** named `rustdesk` is enabled.
-  Disable it if want machine accessible only on demand,
-  when someone first runs rustdesk.<br>
+  Disable it if the machine should be accessible only on demand,
+  when someone first runs rustdesk manually.<br>
   In powershell - `Set-Service rustdesk -StartupType Disabled`
-* You wont get much response on github if questions is around selfhosting. 
+* One can relatively easily
+  **hardcode server url and pub key in to an executable** using
+  [github actions.](https://rustdesk.com/docs/en/self-host/hardcode-settings/)<br>
+  Tested it and it works. But seems you can only do workflow run of nightly build,
+  meaning higher chance of bugs when its not a an actual release.<br>
+  Make sure you do step *"Enable upload permissions for workflows"*, 
+  before you run the workflow.
+* Questions about issues with selfhosting are **not answered** on github. 
   [#763](https://github.com/rustdesk/rustdesk/discussions/763),
   maybe trying [their discord.](https://discord.com/invite/nDceKgxnkV)
+* [FAQ](https://github.com/rustdesk/rustdesk/wiki/FAQ)
+* How does [rustdesk work?](https://github.com/rustdesk/rustdesk/wiki/How-does-RustDesk-work%3F)
+
+![logo](https://i.imgur.com/ptfVMtJ.png)
 
 # Trouble shooting
+
+---
 
 #### If just one machine is having issues.
 
@@ -188,6 +202,8 @@ that port forwarding works.<br>
 Also useful command can be `tcpdump -n udp port 21116`<br>
 When port forwarding works, one should see heartbeat chatter,
 as machines with installed rustdesk are announcing themselves every \~13 seconds.
+
+---
 
 # Manual image update:
 
