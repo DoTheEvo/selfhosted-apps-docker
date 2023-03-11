@@ -6,30 +6,26 @@
 
 # Purpose & Overview
 
-Remote desktop application. 
+Remote desktop access. 
 
 * [Official site](https://rustdesk.com/)
 * [Github](https://github.com/rustdesk/rustdesk)
-* [DockerHub](https://hub.docker.com/r/rustdesk/rustdesk-server)
+* [DockerHub for S6](https://hub.docker.com/r/rustdesk/rustdesk-server-s6)
 
-Rustdesk is a young opensource replacement for TeamViewer or Anydesk.<br>
-The major aspects is that it does NAT punching, 
-and lets you host all the infrastructure for it to function.
-
+Rustdesk is a new opensource replacement for TeamViewer or Anydesk.<br>
+The major aspects are that it does NAT punching, 
+and lets you host all the infrastructure for it to function.<br>
 Written in rust(gasp), with Dart and Flutter framework for client side.</br>
 
-The architecture is relatively simple.<br>
+The idea is:
 
-* run server reachable online
-* install clients on PCs you want to connect from/to
-
-Server sits online and clients register with it when installed/run.
-Thanks to keeping communication with the server open, they are able to punch
-a hole in NAT and so a connection can be initialized from the outside
-without the need for opening of ports.
-
+* run a rustdesk server reachable online
+* install clients on machines you want to connect from / to
+* the clients application keeps a regular heartbeat communication
+  with the server, this punches hole in the NAT and so allows connection
+  initialized from the outside without doing port forwarding
+ 
 ---
-
 
 ![interface-pic](https://i.imgur.com/ekA7Hms.png)
 
@@ -40,12 +36,12 @@ without the need for opening of ports.
 └── ~/
     └── docker/
         └── rustdesk/
-            ├── data/
-            ├── .env
-            └── docker-compose.yml
+            ├── 🗁 rustdesk_data/
+            ├── 🗋 .env
+            └── 🗋 docker-compose.yml
 ```
 
-* `data/` - persistent data, contains sqlite database and the api key
+* `rustdesk_data/` - persistent data, contains sqlite database and the keys
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -55,42 +51,50 @@ The directory is created by docker compose on the first run.
 # docker-compose
 
 Using an edited version of [S6-overlay based compose.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
-It's a simpler, single container approach, without the noise of hbbs/hbbr.
+It's a simpler, single container approach. The complexity of hbbs/hbbr hidden.
 It also has health check implemented.
 
-There is no network section since its fine to run this completely isolated.
+There is no network section since no working http traffic yet. So just mapped
+ports on to docker host do their thing.
 
 `docker-compose.yml`
 ```yml
 services:
   rustdesk:
-    image: rustdesk/rustdesk-server-s6:latest
+    image: rustdesk/rustdesk-server-s6:1.1.7-1
     container_name: rustdesk
     hostname: rustdesk
     restart: unless-stopped
     env_file: .env
     ports:
-      - 21115:21115
-      - 21116:21116
-      - 21116:21116/udp
-      - 21117:21117
-      - 21118:21118
-      - 21119:21119
+      - "21116:21116"
+      - "21115:21115"
+      - "21116:21116/udp"
+      - "21117:21117"
+      - "21118:21118"
+      - "21119:21119"
     volumes:
-      - ./data:/data
+      - ./rustdesk_data:/data
 ```
 
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
-DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # RUSTDESK
 RELAY=rust.example.com:21117
-ENCRYPTED_ONLY=0
+ENCRYPTED_ONLY=1
+# KEY_PRIV=<put here content of ./rustdesk_data/id_ed25519>
+# KEY_PUB=<put here content of ./rustdesk_data/id_ed25519.pub>
 ```
+
+In the `.env` file encryption only is enabled, so that only clients that have
+correct public key will be allowed access to the rustdesk server.<br>
+The keys are generated on the first run of the compose and can be found in
+`rustdesk_data` directory. Once generated they should be added to the `.env` file
+for easier migration. The public key will need to be distributed with
+the clients apps install.
 
 # Port forwarding
 
@@ -111,53 +115,82 @@ and 21118 and 21119 are used to support web clients.
 
 ![interface-pic](https://i.imgur.com/CK6pRyq.png)
 
-# The usage on clients
-
+# The installation on clients
 
 * download and install the client apps from [the official site](https://rustdesk.com/)
-* three dots near ID > ID/Relay Server > ID Server: rust.example.com > OK
-* the green dot at the bottom should stay green saying "ready"
+* three dots near ID > ID/Relay Server 
+  * ID Server: rust.example.com
+  * Key: *\<content of id_ed25519.pub\>*
+* the green dot at the bottom should be green saying "ready"
 * done
-* in the docker server logs you should see machines public IP and ID code it was given
 
-# Encrypted use
+![settings-pic](https://i.imgur.com/lX6egMH.png)
 
-![settings-pic](https://i.imgur.com/6mKkSuh.png)
-
-For encrypted communication and to prevent undesirables access to the server
-
-* the encryption public key is on the docker host:<br>
-  `~/docker/rustdesk/data/id_ed25519.pub`
-* you can manually add it to any client application<br>
-  three dots near ID > ID/Relay Server > Key: 3AVva64bn1ea2vsDuOuQH3i8+2M=
-* to only allow clients with the key on server:<br>
-  in the env_file set `ENCRYPTED_ONLY=1` and down/up the compose.
-
-[On windows](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
-one can deploy client with these settings pre-set by renaming
-the installation file to: `rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
+**On windows** one [can](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
+deploy client with **pre-set settings** by renaming the installation file to:
+`rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
 
 example: `rustdesk-host=rust.example.com,key=3AVva64bn1ea2vsDuOuQH3i8+2M=.exe`
 
 If by chance the public key contains symbols not usable in windows filenames,
 down the container, delete the files `id_ed25519` and `id_ed25519.pub`,
-up the container
+up the container and try with the new keys.
+
+# Extra info
+
+* You really really **really want to be using domain and not your public IP**
+  when instaling clients and setting ID server. That domain can be changed
+  to different IP any time you want. IP not.
+* You wont get much response on github if questions is around selfhosting. 
+  [#763](https://github.com/rustdesk/rustdesk/discussions/763),
+  maybe trying [their discord.](https://discord.com/invite/nDceKgxnkV)
+* `tcpdump -n udp port 21116` to **see heartbeat** udp traffic, seems machines 
+  report-in every \~13 seconds.
+* on **windows** machine a **service** named `rustdesk` is enabled.
+  Disable it if want machine accessible only on demand,
+  when someone first runs rustdesk.<br>
+  In powershell - `Set-Service rustdesk -StartupType Disabled`
 
 # Trouble shooting
 
-From what I read, most client side issues come from two differently set rustdesk
-client applications running on the same machine.<br>
+#### If just one machine is having issues.
 
-Uninstall/remove all, plus delete:
+uninstall, plus delete:
 
 * `C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\RustDesk`
 * `%AppData%\RustDesk`
 
-restart and do fresh client install
+Restart. Reinstall.<br>
+Do not use the installer you used berfore, **download** from the site latest.
 
-# Update
+---
 
-Manual image update:
+#### Error - Failed to connect to relay server
+
+* I had wrongly set env variable `RELAY`
+* generally issue might be with port 21117 if green dot is green
+
+---
+
+#### Investigate port forwarding
+
+Install netcat and tcpdump on the docker host.
+
+* docker compose down rustdesk container so that ports are free to use
+* start small netcat server listening on whichever port we test<br>
+  `sudo nc -u -vv -l -p 21116`
+* on a machine somewhere else in the world, not on the same network, try 
+  `nc -u <public-ip> 21116`
+
+If you start writing something, it should appear on the other machine, confirming
+that port forwarding works.<br>
+The -u flag for netcat command is for udp port testing, without it its for tcp.
+
+Also useful command can be `tcpdump -n udp port 21116`<br>
+When port forwarding works, one should see heartbeat chatter,
+as machines with installed rustdesk are announcing themselves every \~13 seconds.
+
+# Manual image update:
 
 - `docker-compose pull`</br>
 - `docker-compose up -d`</br>
