@@ -12,18 +12,19 @@ Remote desktop access.
 * [Github](https://github.com/rustdesk/rustdesk)
 * [DockerHub for S6](https://hub.docker.com/r/rustdesk/rustdesk-server-s6)
 
-Rustdesk is a new opensource replacement for TeamViewer or Anydesk.<br>
+Rustdesk is a new fully opensource alternative for TeamViewer or Anydesk.<br>
 The major aspects are that it does NAT punching, 
 and lets you host all the infrastructure for it to function.<br>
 Written in rust(gasp), with Dart and Flutter framework for client side.</br>
 
 The idea is:
 
-* run a rustdesk server reachable online
-* install clients on machines you want to connect from / to
-* the clients application keeps a regular heartbeat communication
-  with the server, this punches hole in the NAT and so allows connection
-  initialized from the outside without doing port forwarding
+* Run a rustdesk server reachable online.
+* Install clients on machines you want to connect from / to.
+* The clients application keeps a regular heartbeat communication
+  with the server, in a way to [punch a hole](https://youtu.be/S7Ifw5XsypQ)
+  in the NAT and so allows connection initialized from the outside,
+  without doing port forwarding.
  
 ---
 
@@ -50,12 +51,13 @@ The directory is created by docker compose on the first run.
 
 # docker-compose
 
-Using an edited version of [S6-overlay based compose.](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)<br>
+Using [S6-overlay](https://github.com/rustdesk/rustdesk-server#s6-overlay-based-images)
+based image.<br>
 It's a simpler, single container approach. The complexity of hbbs/hbbr hidden.
 It also has health check implemented.
 
-There is no network section since no working http traffic yet. So just mapped
-ports on to docker host do their thing.
+No network section since no http traffic that would need reverse proxy, yet.<br>
+So just mapped ports on to docker host to do their thing.
 
 `docker-compose.yml`
 ```yml
@@ -101,14 +103,13 @@ the clients apps install.
 as can be seen in the compose
 
 * **21115 - 21119** TCP need to be forwarded to docker host<br>
-* **21116** is TCP and UDP 
+* **21116** is TCP **and UDP**
 
 21115 is used for the NAT type test,
 21116/UDP is used for the ID registration and heartbeat service,
 21116/TCP is used for TCP hole punching and connection service,
 21117 is used for the Relay services,
-and 21118 and 21119 are used to support web clients. 
-
+and 21118 and 21119 are used to support web clients.<br>
 [source](https://rustdesk.com/docs/en/self-host/install/)
 
 ---
@@ -117,17 +118,16 @@ and 21118 and 21119 are used to support web clients.
 
 # The installation on clients
 
-* download and install the client apps from [the official site](https://rustdesk.com/)
-* three dots near ID > ID/Relay Server 
-  * ID Server: rust.example.com
-  * Key: *\<content of id_ed25519.pub\>*
-* the green dot at the bottom should be green saying "ready"
-* done
+* Download and install the client apps from [the official site](https://rustdesk.com/).
+* Three dots > `ID/Relay Server`. 
+  * `ID Server`: rust.example.com
+  * `Key`: *\<content of id_ed25519.pub\>*
+* The green dot at the bottom should be green saying "ready".
 
 ![settings-pic](https://i.imgur.com/lX6egMH.png)
 
 **On windows** one [can](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
-deploy client with **pre-set settings** by renaming the installation file to:
+deploy client with **pre-sets** by renaming the installation file to:
 `rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
 
 example: `rustdesk-host=rust.example.com,key=3AVva64bn1ea2vsDuOuQH3i8+2M=.exe`
@@ -139,17 +139,17 @@ up the container and try with the new keys.
 # Extra info
 
 * You really really **really want to be using domain and not your public IP**
-  when instaling clients and setting ID server. That domain can be changed
-  to different IP any time you want. IP not.
-* You wont get much response on github if questions is around selfhosting. 
-  [#763](https://github.com/rustdesk/rustdesk/discussions/763),
-  maybe trying [their discord.](https://discord.com/invite/nDceKgxnkV)
+  when installing clients and setting ID server. That domain can be changed
+  to different IP any time you want. Hard set IP not.
 * `tcpdump -n udp port 21116` to **see heartbeat** udp traffic, seems machines 
   report-in every \~13 seconds.
 * on **windows** machine a **service** named `rustdesk` is enabled.
   Disable it if want machine accessible only on demand,
   when someone first runs rustdesk.<br>
   In powershell - `Set-Service rustdesk -StartupType Disabled`
+* You wont get much response on github if questions is around selfhosting. 
+  [#763](https://github.com/rustdesk/rustdesk/discussions/763),
+  maybe trying [their discord.](https://discord.com/invite/nDceKgxnkV)
 
 # Trouble shooting
 
@@ -161,14 +161,14 @@ uninstall, plus delete:
 * `%AppData%\RustDesk`
 
 Restart. Reinstall.<br>
-Do not use the installer you used berfore, **download** from the site latest.
+Do not use the installer you used before, **download** from the site latest.
 
 ---
 
 #### Error - Failed to connect to relay server
 
-* I had wrongly set env variable `RELAY`
-* generally issue might be with port 21117 if green dot is green
+* I had wrongly set in `.env` variable `RELAY`
+* generally issue might be with port 21117
 
 ---
 
@@ -178,14 +178,13 @@ Install netcat and tcpdump on the docker host.
 
 * docker compose down rustdesk container so that ports are free to use
 * start small netcat server listening on whichever port we test<br>
-  `sudo nc -u -vv -l -p 21116`
+  `sudo nc -u -vv -l -p 21116`<br>
+  the `-u` means udp traffic, delete to do tcp
 * on a machine somewhere else in the world, not on the same network, try 
   `nc -u <public-ip> 21116`
 
 If you start writing something, it should appear on the other machine, confirming
 that port forwarding works.<br>
-The -u flag for netcat command is for udp port testing, without it its for tcp.
-
 Also useful command can be `tcpdump -n udp port 21116`<br>
 When port forwarding works, one should see heartbeat chatter,
 as machines with installed rustdesk are announcing themselves every \~13 seconds.
