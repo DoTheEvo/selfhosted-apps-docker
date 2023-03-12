@@ -92,12 +92,12 @@ ENCRYPTED_ONLY=1
 # KEY_PUB=<put here content of ./rustdesk_data/id_ed25519.pub>
 ```
 
-In the `.env` file encryption only is enabled, so that only clients that have
+In the `.env` file encryption is enabled, so that only clients that have
 correct public key will be allowed access to the rustdesk server.<br>
 The keys are generated on the first run of the compose and can be found in
-`rustdesk_data` directory. Once generated they should be added to the `.env` file
-for easier migration. The public key will need to be distributed with
-the clients apps install.
+the `rustdesk_data` directory.
+Once generated they should be added to the `.env` file for easier migration.
+The public key needs to be distributed with the clients apps installation.
 
 # Port forwarding
 
@@ -120,15 +120,16 @@ and 21118 and 21119 are used to support web clients.<br>
 # The installation on clients
 
 * Download and install the client apps from [the official site](https://rustdesk.com/).
-* Three dots > `ID/Relay Server`. 
+* Three dots > ID/Relay Server
   * `ID Server`: rust.example.com
   * `Key`: *\<content of id_ed25519.pub\>*
 * The green dot at the bottom should be green saying "ready".
 
 ![settings-pic](https://i.imgur.com/lX6egMH.png)
 
-**On windows** one [can](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
-deploy client with **pre-sets** by renaming the installation file to:
+**On windows** one 
+[can deploy](https://rustdesk.com/docs/en/self-host/install/#put-config-in-rustdeskexe-file-name-windows-only)
+client with **pre-sets** by renaming the installation file to:
 `rustdesk-host=<host-ip-or-name>,key=<public-key-string>.exe`
 
 example: `rustdesk-host=rust.example.com,key=3AVva64bn1ea2vsDuOuQH3i8+2M=.exe`
@@ -142,9 +143,9 @@ up the container and try with the new keys.
 * You really really **really want to be using domain and not your public IP**
   when installing clients and setting ID server. That `rust.example.com`
   can be changed to point at a different IP any time you want. Hard set IP not.
-* Can do `tcpdump -n udp port 21116` on docker host to **see heartbeat** udp traffic.
+* Can do `tcpdump -n udp port 21116` on a docker host to **see heartbeat** udp traffic.
   Seems machines report-in every \~13 seconds.
-* on **windows** machine a **service** named `rustdesk` is enabled.
+* on **windows** a **service** named `rustdesk` is enabled.
   Disable it if the machine should be accessible only on demand,
   when someone first runs rustdesk manually.<br>
   In powershell - `Set-Service rustdesk -StartupType Disabled`
@@ -152,12 +153,13 @@ up the container and try with the new keys.
   **hardcode server url and pub key in to an executable** using
   [github actions.](https://rustdesk.com/docs/en/self-host/hardcode-settings/)<br>
   Tested it and it works. But seems you can only do workflow run of nightly build,
-  meaning higher chance of bugs when its not a an actual release.<br>
+  meaning all the latest stuff added is included, which means higher chance of bugs.<br>
   Make sure you do step *"Enable upload permissions for workflows"*, 
   before you run the workflow.
-* Questions about issues with selfhosting are **not answered** on github. 
+* Questions about issues with selfhosting are **not answered** on github - 
   [#763](https://github.com/rustdesk/rustdesk/discussions/763),
-  maybe trying [their discord.](https://discord.com/invite/nDceKgxnkV)
+  next to try is their [discord](https://discord.com/invite/nDceKgxnkV) or
+  [subreddit](https://www.reddit.com/r/rustdesk/).
 * [FAQ](https://github.com/rustdesk/rustdesk/wiki/FAQ)
 * How does [rustdesk work?](https://github.com/rustdesk/rustdesk/wiki/How-does-RustDesk-work%3F)
 
@@ -181,8 +183,8 @@ Do not use the installer you used before, **download** from the site latest.
 
 #### Error - Failed to connect to relay server
 
-* I had wrongly set in `.env` variable `RELAY`
-* generally issue might be with port 21117
+* I had wrong url set as `RELAY` in the `.env` 
+* if url is correct I would test if port 21117 tcp forwards
 
 ---
 
@@ -191,13 +193,13 @@ Do not use the installer you used before, **download** from the site latest.
 Install netcat and tcpdump on the docker host.
 
 * docker compose down rustdesk container so that ports are free to use
-* start small netcat server listening on whichever port we test<br>
+* start a small netcat server listening on whichever port we test<br>
   `sudo nc -u -vv -l -p 21116`<br>
   the `-u` means udp traffic, delete to do tcp
 * on a machine somewhere else in the world, not on the same network, try 
   `nc -u <public-ip> 21116`
 
-If you start writing something, it should appear on the other machine, confirming
+If you write something and press enter, it should appear on the other machine, confirming
 that port forwarding works.<br>
 Also useful command can be `tcpdump -n udp port 21116`<br>
 When port forwarding works, one should see heartbeat chatter,
