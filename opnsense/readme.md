@@ -334,9 +334,10 @@ and its an encrypted communication between the browser and the firewall
 <summary><h1>Geoblock</h1></summary>
 
 Lock out the entire world from your network, except for your own country.
-Great security benefits, but if you dont use dns challenge you might have issues
-with https certificates renewal and other stuff that initiates connection
-from the outside.
+Great security benefits, but if you dont use
+[dns challenge](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2#caddy-dns-challenge)
+you might have issues with https certificates renewal and other stuff
+that initiates connection from the outside.
 
 Following [the official documentation](https://docs.opnsense.org/manual/how-tos/maxmind_geo_ip.html)
 
