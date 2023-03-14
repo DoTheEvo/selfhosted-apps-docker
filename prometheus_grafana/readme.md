@@ -289,6 +289,20 @@ the default time interval is set to 1h instead of 15m
 ---
 ---
 
+# PromQL
+
+Some concept, highlights and examples of PromQL.
+
+PromQL returns results as vectors"
+
+* [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/) basics page, quite to the point and short
+* [relatively short video to the point](https://youtu.be/yLPTHinHB6Y)
+* [decent stackoverflow answer](https://stackoverflow.com/questions/68223824/prometheus-instant-vector-vs-range-vector)
+
+
+---
+---
+
 # Pushgateway
 
 Gives freedom to push information in to prometheus from anywhere.
@@ -573,21 +587,27 @@ has more detailed section on alerting worth checking out.
 
 ![loki_arch](https://i.imgur.com/aoMPrVV.png)
 
-Loki is made by the grafana team. It's often refered as a Prometheus for logs.<br>
-It is a **push** type monitoring, where an agent - **promtail**
-pushes logs on to a Loki instance.<br>
-For docker containers theres also an option to install **loki-docker-driver**
-on a docker host and log pushing is set either globally in /etc/docker/daemon.json
-or per container in compose files.
+Loki is made by the grafana team. Sometimes called a Prometheus for logs,
+it's a **push** type monitoring, where an agent - **promtail**
+scrapes logs and then pushes them on to a Loki instance.<br>
 
-There will be **two examples**.<br>
+For docker containers theres also an option to install
+[**loki-docker-driver**](https://grafana.com/docs/loki/latest/clients/docker-driver/)
+on a docker host and log pushing is set either globally in /etc/docker/daemon.json
+or per container in compose files.<br>
+But as it turns out, **promtail** capabilities might be missed,
+like its ability to add labels to logs it scrapes based on some rule.
+Or processing data in some way, like translate IP addresses in to country
+names or cities.<br>
+Still loki-docker-driver is useful for getting containers logs in to loki
+quickly and easily, with less cluttering of compose and less containers runnig.
+
+There will be **two examples** of logs monitoring.<br>
 A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
-## The setup
+## Loki setup
 
-To add Loki to the current stack:
-
-* New container - `loki` added to the compose file.<br>
+* **New container** - `loki` added to the compose file.<br>
   Note the port 3100 is actually mapped to the host,
   allowing `localhost:3100` from driver to work.
 
@@ -621,10 +641,10 @@ To add Loki to the current stack:
   ```
   </details>
 
-* New file - `loki-docker-config.yml` bind mounted in the loki container.<br>
+* **New file** - `loki-docker-config.yml` bind mounted in the loki container.<br>
   The file comes from
   [the official example](https://github.com/grafana/loki/tree/main/cmd/loki),
-  but url is changed, and compactor section is added, to have control over
+  but url is changed, and **compactor** section is added, to have control over
   [data retention.](https://grafana.com/docs/loki/latest/operations/storage/retention/)
 
   <details>
@@ -675,43 +695,247 @@ To add Loki to the current stack:
   ```
   </details>
 
-* Install [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
-  `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
-  To check if it's installed and enabled: `docker plugin ls`
-* Containers that should be monitored need `logging` section in their compose.<br>
+* #### loki-docker-driverdriver
 
-  <details>
-  <summary>docker-compose.yml</summary>
+  * **Install** [loki-docker-driver](https://grafana.com/docs/loki/latest/clients/docker-driver/)<br>
+    `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions`<br>
+    To check if it's installed and enabled: `docker plugin ls`<br>
+  * Containers that should be monitored usind loki-docker-driver need
+   `logging` section in their compose.
 
-  ```yml
-  services:
+    <details>
+    <summary>docker-compose.yml</summary>
 
-    whoami:
-      image: "containous/whoami"
-      container_name: "whoami"
-      hostname: "whoami"
-      logging:
-        driver: "loki"
-        options:
-          loki-url: "http://localhost:3100/loki/api/v1/push"
-  ```
-  </details>
+    ```yml
+    services:
 
-## Minecraft example
+      whoami:
+        image: "containous/whoami"
+        container_name: "whoami"
+        hostname: "whoami"
+        logging:
+          driver: "loki"
+          options:
+            loki-url: "http://localhost:3100/loki/api/v1/push"
+    ```
+    </details>
 
-Loki will be used to monitor logs of a [minecraft server.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft)<br>
-A dashboard will be created, showing logs volume in time.<br>
-Alert will be set to send a notification when a player joins.<br>
-  
-**Requirements** - grafana, loki, loki-docker-driver, minecraft with logging
-set in compose
+* #### promtail
+
+  * Containers that should be monitored with **promtail** need it **added**
+    **to** their **compose** file, and made sure that it has access to the log files.
+
+    <details>
+    <summary>minecraft-docker-compose.yml</summary>
+
+    ```yml
+    services:
+
+      minecraft:
+        image: itzg/minecraft-server
+        container_name: minecraft
+        hostname: minecraft
+        restart: unless-stopped
+        env_file: .env
+        tty: true
+        stdin_open: true
+        ports:
+          - 25565:25565     # minecraft server players connect
+        volumes:
+          - ./minecraft_data:/data
+
+      # LOG AGENT PUSHING LOGS TO LOKI
+      promtail:
+        image: grafana/promtail
+        container_name: minecraft-promtail
+        hostname: minecraft-promtail
+        restart: unless-stopped
+        volumes:
+          - ./minecraft_data/logs:/var/log/minecraft:ro
+          - ./promtail-config.yml:/etc/promtail-config.yml
+        command:
+          - '-config.file=/etc/promtail-config.yml'
+
+    networks:
+      default:
+        name: $DOCKER_MY_NETWORK
+        external: true
+    ```
+    </details>
+
+    <details>
+    <summary>caddy-docker-compose.yml</summary>
+
+    ```yml
+    services:
+
+      caddy:
+        image: caddy
+        container_name: caddy
+        hostname: caddy
+        restart: unless-stopped
+        env_file: .env
+        ports:
+          - "80:80"
+          - "443:443"
+          - "443:443/udp"
+        volumes:
+          - ./Caddyfile:/etc/caddy/Caddyfile
+          - ./caddy_config:/data
+          - ./caddy_data:/config
+          - ./caddy_logs:/var/log/caddy
+
+      # LOG AGENT PUSHING LOGS TO LOKI
+      promtail:
+        image: grafana/promtail
+        container_name: caddy-promtail
+        hostname: caddy-promtail
+        restart: unless-stopped
+        volumes:
+          - ./caddy_logs:/var/log/caddy:ro
+          - ./promtail-config.yml:/etc/promtail-config.yml
+        command:
+          - '-config.file=/etc/promtail-config.yml'
+
+    networks:
+      default:
+        name: $DOCKER_MY_NETWORK
+        external: true
+
+    ```
+    </details>
+
+  * Generic **config file for promtail**, needs to be bind mounted 
+
+    <details>
+    <summary>promtail-config.yml</summary>
+
+    ```yml
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+
+    scrape_configs:
+      - job_name: blablabla
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: blablabla_log
+              __path__: /var/log/blablabla/*.log
+    ```
+    </details>
+
+## Minecraft Loki example
+
+What can be seen in this example:
+
+* How to monitor logs of a docker container,
+  a [minecraft server](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/minecraft).
+* How to visualize the logs in a dashboard.
+* How to set an alert when a specific pattern appears in the logs.
+* How to extract information from log to include it in the alert notification.
+* Basic of grafana alert templates, so that the notification actually looks good,
+  and shows only relevant info.
+
+**Requirements** - grafana, loki, minecraft.
 
 ![logo](https://i.imgur.com/M1k0Dn4.png)
 
-### First steps
+### The Setup
+
+Initially **loki-docker-driver was used** to get logs to Loki, and it was simple
+and worked nicely. But during alert stage
+I **could not** figure out how to extract string from logs and include it in
+an **alert** notification. Specificly to not just say that "a player joined",
+but to have there name of the player that joined.<br>
+The way to solve that was to **switch to promtail** and make use of its 
+[pipeline_stages](https://grafana.com/docs/loki/latest/clients/promtail/pipelines/).
+Which was **suprisingly simple** and elegant.
+
+**Promtail** container is added to minecraft's **compose**, with bind mount
+access to minecraf's logs.<br>
+
+<details>
+<summary>minecraft-docker-compose.yml</summary>
+
+```yml
+services:
+
+  minecraft:
+    image: itzg/minecraft-server
+    container_name: minecraft
+    hostname: minecraft
+    restart: unless-stopped
+    env_file: .env
+    tty: true
+    stdin_open: true
+    ports:
+      - 25565:25565     # minecraft server players connect
+    volumes:
+      - ./minecraft_data:/data
+
+  # LOG AGENT PUSHING LOGS TO LOKI
+  promtail:
+    image: grafana/promtail
+    container_name: minecraft-promtail
+    hostname: minecraft-promtail
+    restart: unless-stopped
+    volumes:
+      - ./minecraft_data/logs:/var/log/minecraft:ro
+      - ./promtail-config.yml:/etc/promtail-config.yml
+    command:
+      - '-config.file=/etc/promtail-config.yml'
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
+```
+</details>
+
+**Promtail's config** is similar to the generic config in the previous section.<br>
+The only addition is a short **pipeline** stage with **regex** that runs against 
+every log line before sending it to Loki. When matched **a label** `player`
+is added to that log line.
+The value of that label comes from the **named capture group** thats part of 
+that regex, the [syntax](https://www.regular-expressions.info/named.html)
+is: `(?P<name>group)`<br>
+This label will be easy to use later in the alert stage.
+
+<details>
+<summary>promtail-config.yml</summary>
+
+```yml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: minecraft
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: minecraft_logs
+          __path__: /var/log/minecraft/*.log
+    pipeline_stages:
+    - regex:
+        expression: '.*:\s(?P<player>.*)\sjoined the game$'
+    - labels:
+        player:
+```
+</details>
+
+[Here's regex101](https://regex101.com/r/5vkOU2/1) of it,
+with some data to show how it works and bit of explanation. 
+[Here](https://stackoverflow.com/questions/74937454/how-to-add-custom-labels-in-promtail-config)
+is stackoverflow answer that is the source for that config.
+
+![logo](https://i.imgur.com/LuUBZFn.png)
+
+### First steps in Grafana
 
 * In grafana, loki needs to be added as a datasource, `http://loki:3100`
-* In `Explore` section, filter, container_name = minecraft, query... 
+* In `Explore` section, filter, job = minecraft_logs, Run query button... 
   this should result in seeing minecraft logs and their volume/time graph.
 
 This Explore view will be recreated as a dashboard.
@@ -752,9 +976,6 @@ When a player joins minecraft server a log appears *"Bastard joined the game"*<b
 Alert will be set to look for string *"joined the game"* and send notification
 when it occurs.
 
-Grafana rules are based around a `Query` and `Expressions` and each 
-and every one has to result in a a simple number or a true or false condition.
-
 ### Create alert rule
 
 - **1 Set an alert rule name**
@@ -762,7 +983,7 @@ and every one has to result in a a simple number or a true or false condition.
 - **2 Set a query and alert condition**
   - **A** - Switch to Loki; set Last 5 minutes
     - switch from builder to code
-    - `count_over_time({container_name="minecraft"} |= "joined the game" [5m])`
+    - `count_over_time({job="minecraft_logs"} |= "joined the game" [5m])`
   - **B** - Reduce
     - Function = Last
     - Input = A
@@ -779,24 +1000,22 @@ and every one has to result in a a simple number or a true or false condition.
   - Configure no data and error handling
     - Alert state if no data or all values are null = OK
 - **4 Add details for your alert rule**
-  - Can pass values from logs to alerts, by targeting A/B/C/.. expressions
-    from step2.
-  - Summary = `Number of players joined: {{ $values.B }}`<br>
-  - Maybe one day I figure out how to pull player's name from the log
-    and pass it to alert, so far I got [this](https://regex101.com/r/pBAaEl/2) 
-    `.*:\s(?P<player>.*)\sjoined the game$` and [a full query](https://pastebin.com/Ep6PUwV2)
-    but dunno how to reference the named regex group in alert 4th section.<br>
-    And grafana forum is kinda big black hole of unanswared questions.
+  - Here is where the label `player` that was set in **promtail** is used<br>
+    Summary = `{{ $labels.player  }} joined the Minecraft server.`
+  - Can also pass values from expressions by targeting A/B/C/.. from step2<br>
+    Description = `Number of players that joined in the last 5 min: {{ $values.B }}`<br>
 - **5 Notifications**
   - nothing
 - Save and exit
 
-### Contact points
+### Contact points 
 
   - New contact point
   - Name = ntfy
   - Integration = Webhook
   - URL = https://ntfy.example.com/grafana
+  - Title = `{{ .CommonAnnotations.summary }}`
+  - Message = I put in [empty space unicode character](https://emptycharacter.com/)
   - Disable resolved message = check
   - Test
   - Save
@@ -808,6 +1027,52 @@ and every one has to result in a a simple number or a true or false condition.
   - Save
 
 After all this, there should be notification coming when a player joins.
+
+### grafana-to-ntfy
+
+For alerts one can use 
+[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
+but on its own the alerts from grafana are just plain text json.<br>
+[Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal#grafana-to-ntfy)
+how to setup grafana-to-ntfy, to make the alerts look good.
+
+![ntfy](https://i.imgur.com/gL81jRg.png)
+
+### Templates
+
+Not really used here, but heres some basics as it took embarasignly long
+to find that `{{ .CommonAnnotations.summary }}` for the title.
+
+<details>
+<summary><h4>Templates basic</h4></summary>
+
+* Testing should be done in contact point when editing,
+  useful Test button that allows you send alerts with custom values.
+* My big mistake when playing with this was missing a dot.
+  In Contact point, in Title/Message input box. 
+  * correct one - `{{ template "test" . }}`
+  * the one I had - `{{ template "test" }}`<br>
+* So yeah, dot is important in here. It represents data and context 
+  passed to a template. It can represent global context or when used inside
+  `{{ range }}` it represents iteration loop value, like `i` in classic for loop.
+* [This](https://pastebin.com/id3264k6) json structure is what an alert looks
+  like. Notice `alerts` being an array and `commonAnnotations` being object.
+  If something is an array, theres need to loop over it to get acces to the
+  values in it. For objects one just needs to target the value.
+* To [iterate over alerts array.](https://i.imgur.com/gdwGhjN.png)
+* To just access a value - `{{ .CommonAnnotations.summary }}`
+
+Templates resources
+
+* [Overview of Grafana Alerting and Message Templating for Slack](https://faun.pub/overview-of-grafana-alerting-and-message-templating-for-slack-6bb740ec44af)
+* [youtube - Unified Alerting Grafana 8 | Prometheus | Victoria | Telegraf | Notifications | Alert Templating](https://youtu.be/UtmmhLraSnE)
+* [Dot notation](https://www.practical-go-lessons.com/chap-32-templates#dot-notation)
+* 
+
+</details>
+
+---
+---
 
 # Caddy monitoring
 
@@ -1106,6 +1371,10 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
   * Title - empty
   * Deduplication - Signature
   * Save
+
+useful resources
+
+* https://www.youtube.com/watch?v=UtmmhLraSnE
 
 ## Geoip
 
