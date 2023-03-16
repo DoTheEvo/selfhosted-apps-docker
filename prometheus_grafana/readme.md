@@ -296,7 +296,9 @@ Some concept, highlights and examples of PromQL.
 PromQL returns results as vectors"
 
 * [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/) basics page, quite to the point and short
+* [Introduction to PromQL](https://blog.knoldus.com/introduction-to-promql/)
 * [relatively short video to the point](https://youtu.be/yLPTHinHB6Y)
+* [Prometheus Cheat Sheet - How to Join Multiple Metrics](https://iximiuz.com/en/posts/prometheus-vector-matching/)
 * [decent stackoverflow answer](https://stackoverflow.com/questions/68223824/prometheus-instant-vector-vs-range-vector)
 
 
@@ -839,7 +841,7 @@ What can be seen in this example:
 
 **Requirements** - grafana, loki, minecraft.
 
-![logo](https://i.imgur.com/M1k0Dn4.png)
+![logo](https://i.imgur.com/VphJTKG.png)
 
 ### The Setup
 
@@ -894,8 +896,8 @@ networks:
 </details>
 
 **Promtail's config** is similar to the generic config in the previous section.<br>
-The only addition is a short **pipeline** stage with **regex** that runs against 
-every log line before sending it to Loki. When matched **a label** `player`
+The only addition is a short **pipeline** stage with a **regex** that runs against 
+every log line before sending it to Loki. When a line matches, **a label** `player`
 is added to that log line.
 The value of that label comes from the **named capture group** thats part of 
 that regex, the [syntax](https://www.regular-expressions.info/named.html)
@@ -926,11 +928,11 @@ scrape_configs:
 </details>
 
 [Here's regex101](https://regex101.com/r/5vkOU2/1) of it,
-with some data to show how it works and bit of explanation. 
-[Here](https://stackoverflow.com/questions/74937454/how-to-add-custom-labels-in-promtail-config)
-is stackoverflow answer that is the source for that config.
+with some data to show how it works and bit of explanation.<br>
+[Here's](https://stackoverflow.com/a/74962269/1383369)
+the stackoverflow answer that is the source for that config.
 
-![logo](https://i.imgur.com/LuUBZFn.png)
+![regex](https://i.imgur.com/bT5XSHn.png)
 
 ### First steps in Grafana
 
@@ -941,6 +943,8 @@ is stackoverflow answer that is the source for that config.
 This Explore view will be recreated as a dashboard.
 
 ### Dashboard minecraft_logs
+
+![dashboard-minecraft](https://i.imgur.com/M1k0Dn4.png)
 
 * New dashboard, new panel
   * Data source - Loki
@@ -972,9 +976,14 @@ for grafana loki queries
 
 ## Alerts in Grafana for Loki
 
+![alert-labels](https://i.imgur.com/LuUBZFn.png)
+
 When a player joins minecraft server a log appears *"Bastard joined the game"*<br>
 Alert will be set to look for string *"joined the game"* and send notification
 when it occurs.
+
+At this point might be good time to brush up on promQL/logQL and the data types
+they return when a query happens. That instant vector and range vector thingie.
 
 ### Create alert rule
 
