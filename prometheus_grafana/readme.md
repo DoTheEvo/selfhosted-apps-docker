@@ -1057,7 +1057,9 @@ to find that `{{ .CommonAnnotations.summary }}` for the title.
 
 * Testing should be done in contact point when editing,
   useful Test button that allows you send alerts with custom values.
-* My big mistake when playing with this was missing a dot.
+* To [define a template.](https://i.imgur.com/ZczwCx2.png)
+* To [call a tempalte.](https://i.imgur.com/0YdWA8Q.png)
+* My big mistake when playing with this was missing a dot.<br>
   In Contact point, in Title/Message input box. 
   * correct one - `{{ template "test" . }}`
   * the one I had - `{{ template "test" }}`<br>
