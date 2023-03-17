@@ -30,6 +30,7 @@
 * [snipeit](snipeit/) - IT inventory management
 * [trueNAS scale](trueNASscale/) - network file sharing
 * [wireguard](wireguard/) - the one and only VPN to ever consider
+* [wg-easy](wg-easy/) - wireguard in docker with web gui
 * [zammad](zammad/) - ticketing system
 * [arch_linux_host_install](arch_linux_host_install)
 
@@ -70,8 +71,8 @@ Caddy is really great at simplifying the mess of https certificates, where
 you don't really have to deal with anything, while having a one simple,
 readable config file.
 
-But no big issue if using [traefik](https://github.com/DoTheEvo/Traefik-v2-examples)
-or nginx proxy manager. You just have to deal with reverse settings,
+But no problem if using [traefik](https://github.com/DoTheEvo/Traefik-v2-examples)
+or nginx proxy manager. You just have to deal with proxy settings on your own,
 and 90% of the time its just sending traffic to port 80 and nothing else.
 
 ---
@@ -121,7 +122,7 @@ variable that is intended for a different container of the stack.
 
 In the setups here it works and is tested, but if you start to use this
 everywhere without understanding it, you can encounter issues.
-So first troubleshooting step should be abandoning `.env` and write out 
+So one of the troubleshooting steps might be abandoning `.env` and write out 
 the variables directly in the compose file only under containers that want them.
 
 ---
