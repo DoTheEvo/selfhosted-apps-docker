@@ -827,7 +827,7 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
     ```
     </details>
 
-## Minecraft Loki example
+# Minecraft Loki example
 
 What can be seen in this example:
 
@@ -841,7 +841,7 @@ What can be seen in this example:
 
 **Requirements** - grafana, loki, minecraft.
 
-![logo](https://i.imgur.com/VphJTKG.png)
+![logo-minecraft](https://i.imgur.com/VphJTKG.png)
 
 ### The Setup
 
@@ -1047,29 +1047,31 @@ how to setup grafana-to-ntfy, to make the alerts look good.
 
 ![ntfy](https://i.imgur.com/gL81jRg.png)
 
+---
+---
+
 ### Templates
 
-Not really used here, but heres some basics as it took embarasignly long
-to find that `{{ .CommonAnnotations.summary }}` for the title.
-
-<details>
-<summary><h4>Templates basic</h4></summary>
+Not really used here, but they are pain in the ass and I got some info
+as it took me embarrassingly long to find that
+`{{ .CommonAnnotations.summary }}` for the title.
 
 * Testing should be done in contact point when editing,
   useful Test button that allows you send alerts with custom values.
 * To [define a template.](https://i.imgur.com/ZczwCx2.png)
-* To [call a tempalte.](https://i.imgur.com/0YdWA8Q.png)
+* To [call a template.](https://i.imgur.com/0YdWA8Q.png)
 * My big mistake when playing with this was missing a dot.<br>
   In Contact point, in Title/Message input box. 
   * correct one - `{{ template "test" . }}`
   * the one I had - `{{ template "test" }}`<br>
 * So yeah, dot is important in here. It represents data and context 
   passed to a template. It can represent global context or when used inside
-  `{{ range }}` it represents iteration loop value, like `i` in classic for loop.
+  `{{ range }}` it represents iteration loop value.
 * [This](https://pastebin.com/id3264k6) json structure is what an alert looks
   like. Notice `alerts` being an array and `commonAnnotations` being object.
-  If something is an array, theres need to loop over it to get acces to the
-  values in it. For objects one just needs to target the value.
+  If something is an array, theres need to loop over it to get access to the
+  values in it. For objects one just needs to target the value
+  from global context.. using dot at the beginning.
 * To [iterate over alerts array.](https://i.imgur.com/gdwGhjN.png)
 * To just access a value - `{{ .CommonAnnotations.summary }}`
 
@@ -1080,22 +1082,31 @@ Templates resources
 * [Dot notation](https://www.practical-go-lessons.com/chap-32-templates#dot-notation)
 * 
 
-</details>
-
 ---
 ---
 
-# Caddy monitoring
+# Caddy reverse proxy monitoring
 
-Reverse proxy is kinda linchpin of a selfhosted setup, since it's in charge
+What can be seen in this example:
+
+* Use of Prometheus to monitor a docker container - 
+  [caddy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy).
+* How to import a dashobard to grafana.
+* Use of Loki to monitor logs of a docker container.
+* How to set promtail to push only certain values and label them.
+* Create dashboard in grafana from data in Loki.
+
+**Requirements** - grafana, loki, caddy.
+
+![logo-minecraft](https://i.imgur.com/HU4kHCj.png)
+
+Reverse proxy is kinda linchpin of a selfhosted setup as it is in charge
 of all the http/https traffic that goes in. So focus on monitoring this
 keystone makes sense.
 
-Will be using Prometheus for monitoring metrics and Loki for log files monitoring.
-
 **Requirements** - grafana, prometheus, loki, caddy container
 
-## Metrics 
+## Metrics - Prometheus
 
 ![logo](https://i.imgur.com/6QdZuVR.png)
 
@@ -1182,19 +1193,24 @@ which in selfhosted enviroment will likely be minmal and not interesting.<br>
 To get more intriguing info of who, when, from where, connects to what service,.. 
 for that acces logs monitoring is needed.
 
-## Logs 
+---
+---
 
-Loki will be used for logs monitoring.<br>
-Loki itself just stores them, to get logs a promtail container will be used
-that will have access to caddy's logs, and its job is to scrape them regularly
-and push them to Loki. Once there, a basic grafana dashboard can be made.
+## Logs - Loki
+
+Loki itself just stores the logs, to get logs a promtail container is used
+that has access to caddy's logs. Its job is to scrape them regularly, maybe
+process them in some way, and then push them to Loki.<br>
+Once there, a basic grafana dashboard can be made.
 
 ![logs_dash](https://i.imgur.com/lWToTMd.png)
 
+### The setup
+
 * Have Grafana, Loki, Caddy working
 * Edit Caddy compose, bind mount `/var/log/caddy`.<br>
-  Add Promtail container, that also has same bind mount, along with bind mount
-  of its config file.<br>
+  Add to the compose also Promtail container, that has the same logs bind mount,
+  along with bind mount of its config file.<br>
   Promtail will scrape logs to which it now has access and pushes them to Loki.
   
   <details>
@@ -1218,7 +1234,7 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
         - ./Caddyfile:/etc/caddy/Caddyfile
         - ./caddy_data:/data
         - ./caddy_config:/config
-        - /var/log/caddy:/var/log/caddy
+        - ./caddy_logs:/var/log/caddy
 
     # LOG AGENT PUSHING LOGS TO LOKI
     promtail:
@@ -1228,7 +1244,7 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
       restart: unless-stopped
       volumes:
         - ./promtail-config.yml:/etc/promtail-config.yml
-        - /var/log/caddy:/var/log/caddy:ro
+        - ./caddy_logs:/var/log/caddy:ro
       command:
         - '-config.file=/etc/promtail-config.yml'
 
@@ -1247,15 +1263,21 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
     - url: http://loki:3100/loki/api/v1/push
 
   scrape_configs:
-    - job_name: caddy
+    - job_name: caddy_access_log
       static_configs:
         - targets:
             - localhost
           labels:
             job: caddy_access_log
+            host: example.com
+            agent: caddy-promtail
             __path__: /var/log/caddy/*.log
   ```
   </details>
+
+* If one would desire to customize what gets pushed by promtail,
+  [here's](https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/)
+  something to read and config derived from it.
 
   <details>
   <summary>promtail-config.yml customizing fields</summary>
@@ -1308,7 +1330,6 @@ and push them to Loki. Once there, a basic grafana dashboard can be made.
             format: "Unix"
   ```
   </details>
-
 
 * Edit `Caddyfile` to enable [access logs](https://caddyserver.com/docs/caddyfile/directives/log).
   Unfortunetly this can't be globally enabled, so the easiest way seems to be 

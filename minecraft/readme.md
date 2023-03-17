@@ -283,6 +283,8 @@ by setting up 6GB swapfile, which I.. err.. didnt think it needed.
   `mv import <directory-name> normal`, there should be no spaces in the name
 * `/mv setspawn` sets spawn point in the current world
 
+* [command block basics](https://www.youtube.com/watch?v=Mp3UJs9v2_0)
+
 # Update
 
 Manual image update:

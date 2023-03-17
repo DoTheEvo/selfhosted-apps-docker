@@ -144,6 +144,8 @@ ExecStart=/opt/borg_backup.sh
 
 # Grafana to ntfy
 
+![ntfy](https://i.imgur.com/gL81jRg.png)
+
 Alerting in grafana to ntfy [works](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana#alertmanager),
 but its ugly with just json shown.
 

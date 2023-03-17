@@ -23,7 +23,7 @@
 * [rustdesk](rustdesk/) - remote desktop, like teamviewer or anydesk
 * [nextcloud](nextcloud/) - file share & sync
 * [opnsense](opnsense/) - a firewall, enterprise level 
-* [qbittorrent](qbittorrent/) - video and music streaming
+* [qbittorrent](qbittorrent/) - torrent client
 * [portainer](portainer/) - docker management
 * [prometheus_grafana](prometheus_grafana/) - monitoring
 * [unifi](unifi/) - management utility for ubiquiti devices

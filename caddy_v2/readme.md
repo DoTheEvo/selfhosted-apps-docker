@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/xmSY5qu.png)
+![logo](https://i.imgur.com/HU4kHCj.png)
 
 1. [Purpose & Overview](#Purpose--Overview)
 2. [Caddy as a reverse proxy in docker](#Caddy-as-a-reverse-proxy-in-docker)
@@ -242,6 +242,9 @@ or running a higher tier firewall/router.
 * [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/opnsense)
   a guide-by-example for opnsense firewall
 
+[Here's more details](https://help.mikrotik.com/docs/display/ROS/NAT#NAT-HairpinNAT)
+on hairpin NAT reflection concept.
+
 </details>
 
 ---
@@ -308,7 +311,7 @@ violet.{$MY_DOMAIN} {
 ### Redirect
 
 Here is an example of a redirect for the common case of switching anyone that
-comes to `www.example.com` to the naked domain `example.com`.
+comes to `www.example.com` to the naked domain `example.com`
 
 ```php
 www.{$MY_DOMAIN} {
