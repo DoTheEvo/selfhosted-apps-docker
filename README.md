@@ -29,7 +29,6 @@
 * [unifi](unifi/) - management utility for ubiquiti devices
 * [snipeit](snipeit/) - IT inventory management
 * [trueNAS scale](trueNASscale/) - network file sharing
-* [watchtower](watchtower/) - automatic docker images update
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [zammad](zammad/) - ticketing system
 * [arch_linux_host_install](arch_linux_host_install)
