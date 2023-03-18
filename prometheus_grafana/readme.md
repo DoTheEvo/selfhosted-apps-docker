@@ -936,8 +936,8 @@ the stackoverflow answer that is the source for that config.
 
 ### First steps in Grafana
 
-* In grafana, loki needs to be added as a datasource, `http://loki:3100`
-* In `Explore` section, filter, job = minecraft_logs, Run query button... 
+* In **grafana**, loki needs to be added as a **datasource**, `http://loki:3100`
+* In **Explore section**, filter, job = `minecraft_logs`, **Run query** button... 
   this should result in seeing minecraft logs and their volume/time graph.
 
 This Explore view will be recreated as a dashboard.
@@ -978,12 +978,13 @@ for grafana loki queries
 
 ![alert-labels](https://i.imgur.com/LuUBZFn.png)
 
-When a player joins minecraft server a log appears *"Bastard joined the game"*<br>
-Alert will be set to look for string *"joined the game"* and send notification
+When **a player joins** minecraft server a **log appears** *"Bastard joined the game"*<br>
+**Alert will be set** to look for string *"joined the game"* and **send notification**
 when it occurs.
 
-At this point might be good time to brush up on promQL/logQL and the data types
-they return when a query happens. That instant vector and range vector thingie.
+Now, might be good time to **brush up on PromQL / LogQL** and the **data types**
+they return when a query happens. That **instant vector** and **range vector**
+thingie. As grafana will scream when using range vector.
 
 ### Create alert rule
 
@@ -1039,11 +1040,11 @@ After all this, there should be notification coming when a player joins.
 
 ### grafana-to-ntfy
 
-For alerts one can use 
+For **alerts** one can use 
 [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-but on its own the alerts from grafana are just plain text json.<br>
+but on its own alerts from grafana are **just plain text json**.<br>
 [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal#grafana-to-ntfy)
-how to setup grafana-to-ntfy, to make the alerts look good.
+how to setup grafana-to-ntfy, to **make alerts look good**.
 
 ![ntfy](https://i.imgur.com/gL81jRg.png)
 
@@ -1052,28 +1053,30 @@ how to setup grafana-to-ntfy, to make the alerts look good.
 
 ### Templates
 
-Not really used here, but they are pain in the ass and I got some info
-as it took me embarrassingly long to find that
+Not really used here, but **they are pain** in the ass and there's some info
+as it took **embarrassingly** long to find that
 `{{ .CommonAnnotations.summary }}` for the title.
 
-* Testing should be done in contact point when editing,
-  useful Test button that allows you send alerts with custom values.
+* **Testing** should be done in **contact point** when editing,
+  useful **Test button** that allows you send alerts with custom values.
 * To [define a template.](https://i.imgur.com/ZczwCx2.png)
 * To [call a template.](https://i.imgur.com/0YdWA8Q.png)
-* My big mistake when playing with this was missing a dot.<br>
+* My **big mistake** when playing with this was **missing a dot**.<br>
   In Contact point, in Title/Message input box. 
   * correct one - `{{ template "test" . }}`
   * the one I had - `{{ template "test" }}`<br>
-* So yeah, dot is important in here. It represents data and context 
-  passed to a template. It can represent global context or when used inside
-  `{{ range }}` it represents iteration loop value.
-* [This](https://pastebin.com/id3264k6) json structure is what an alert looks
-  like. Notice `alerts` being an array and `commonAnnotations` being object.
-  If something is an array, theres need to loop over it to get access to the
-  values in it. For objects one just needs to target the value
-  from global context.. using dot at the beginning.
+* So yeah, **dot** is important in here. It represents **data and context** 
+  passed to a template. It can represent **global context**, or when used inside
+  `{{ range }}` it represents **iteration** loop value.
+* [This](https://pastebin.com/id3264k6) json structure is what an **alert** looks
+  like. Notice `alerts` being an **array** and `commonAnnotations` being **object**.
+  For **array** theres need to **loop** over it to get access to the
+  values in it. For **objects** one just needs to target **the name**
+  from global context.. **using dot** at the beginning.
 * To [iterate over alerts array.](https://i.imgur.com/gdwGhjN.png)
 * To just access a value - `{{ .CommonAnnotations.summary }}`
+* Then theres **conditional** things one can do in **golang templates**,
+  but I am not going to dig that deep... 
 
 Templates resources
 
@@ -1089,20 +1092,20 @@ Templates resources
 
 What can be seen in this example:
 
-* Use of Prometheus to monitor a docker container - 
+* Use of **Prometheus** to **monitor** a docker **container** - 
   [caddy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy).
-* How to import a dashobard to grafana.
-* Use of Loki to monitor logs of a docker container.
-* How to set promtail to push only certain values and label them.
-* Create dashboard in grafana from data in Loki.
+* How to **import a dashobard** to grafana.
+* Use of **Loki** to monitor **logs** of a docker **container**.
+* How to set **Promtail** to push only certain values and label them.
+* Create **dashboard** in grafana from data in **Loki**.
 
 **Requirements** - grafana, loki, caddy.
 
 ![logo-minecraft](https://i.imgur.com/HU4kHCj.png)
 
-Reverse proxy is kinda linchpin of a selfhosted setup as it is in charge
-of all the http/https traffic that goes in. So focus on monitoring this
-keystone makes sense.
+**Reverse proxy** is kinda linchpin of a selfhosted setup as it is **in charge**
+of all the http/https **traffic** that goes in. So focus on monitoring this
+**keystone** makes sense.
 
 **Requirements** - grafana, prometheus, loki, caddy container
 
@@ -1110,8 +1113,8 @@ keystone makes sense.
 
 ![logo](https://i.imgur.com/6QdZuVR.png)
 
-Caddy has build in exporter of metrics for prometheus, so all that is needed
-is enabling it, scrape it by prometheus, and import a dashboard.
+**Caddy** has build in **exporter** of metrics for prometheus, so all that is needed
+is enabling it, **scrape it** by prometheus, and import a **dashboard**.
 
 * Edit Caddyfile to [enable metrics.](https://caddyserver.com/docs/metrics)
 
@@ -1135,7 +1138,7 @@ is enabling it, scrape it by prometheus, and import a dashboard.
   </details>
 
 * Edit compose to publish 2019 port.<br>
-  Likely not necessary if Caddy and Prometheus are on the same docker network,
+  Likely **not necessary** if Caddy and Prometheus are on the **same docker network**,
   but its nice to check if the metrics export works at `<docker-host-ip>:2019/metrics`
 
   <details>
@@ -1167,7 +1170,7 @@ is enabling it, scrape it by prometheus, and import a dashboard.
   ```
   </details>
 
-* Edit prometheus.yml to add caddy scraping point
+* Edit **prometheus.yml** to add caddy **scraping** point
 
   <details>
   <summary>prometheus.yml</summary>
@@ -1184,34 +1187,35 @@ is enabling it, scrape it by prometheus, and import a dashboard.
   ```
   </details>
 
-* In grafana import [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
+* In grafana **import**
+  [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
   or make your own, `caddy_reverse_proxy_upstreams_healthy` shows reverse proxy
   upstreams, but thats all.
 
-But these metrics are more about performance and load put on Caddy,
-which in selfhosted enviroment will likely be minmal and not interesting.<br>
-To get more intriguing info of who, when, from where, connects to what service,.. 
-for that acces logs monitoring is needed.
+But these **metrics** are more about **performance** and **load** put on Caddy,
+which in selfhosted environment will **likely be minimal** and not interesting.<br>
+To get **more intriguing** info of who, when, **from where**, connects
+to what **service**,.. well for that monitoring of **access logs** is needed.
 
 ---
 ---
 
 ## Logs - Loki
 
-Loki itself just stores the logs, to get logs a promtail container is used
-that has access to caddy's logs. Its job is to scrape them regularly, maybe
-process them in some way, and then push them to Loki.<br>
-Once there, a basic grafana dashboard can be made.
+**Loki** itself just **stores** the logs, to get them to Loki a **Promtail** container is used
+that has **access** to caddy's **logs**. Its job is to **scrape** them regularly, maybe
+**process** them in some way, and then **push** them to Loki.<br>
+Once there, a basic grafana **dashboard** can be made.
 
 ![logs_dash](https://i.imgur.com/lWToTMd.png)
 
 ### The setup
 
 * Have Grafana, Loki, Caddy working
-* Edit Caddy compose, bind mount `/var/log/caddy`.<br>
-  Add to the compose also Promtail container, that has the same logs bind mount,
-  along with bind mount of its config file.<br>
-  Promtail will scrape logs to which it now has access and pushes them to Loki.
+* Edit Caddy **compose**, bind mount `/var/log/caddy`.<br>
+  **Add** to the compose also **Promtail container**, that has the same logs bind mount,
+  along with bind mount of its **config file**.<br>
+  Promtail will scrape logs to which it now has access and **pushes** them **to Loki.**
   
   <details>
   <summary>docker-compose.yml</summary>
@@ -1275,9 +1279,16 @@ Once there, a basic grafana dashboard can be made.
   ```
   </details>
 
-* If one would desire to customize what gets pushed by promtail,
-  [here's](https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/)
-  something to read and config derived from it.
+* **Promtail** scrapes a logs, **one line** at the time and is able to do **neat
+  things** with it before sending it - add labels, ignore entire line if some condition is met,
+  only send useful values,...<br>
+  [Pipelines](https://grafana.com/docs/loki/latest/clients/promtail/pipelines/)
+  are used for this.
+  The **example here** is pretty straight forward, in **json** stage a desired
+  value is **extracted**, **template** is created with the use of that value,
+  and **output** is set.
+  [Here's](https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/)
+  some more to read with an example.
 
   <details>
   <summary>promtail-config.yml customizing fields</summary>
@@ -1288,53 +1299,36 @@ Once there, a basic grafana dashboard can be made.
 
   scrape_configs:
     - job_name: caddy_access_log
+
       static_configs:
-      - targets: # tells promtail to look for the logs on the current machine/host
-          - localhost
-        labels:
-          job: caddy_access_log
-          __path__: /var/log/caddy/*.log
+        - targets:
+            - localhost
+          labels:
+            job: caddy_access_log
+            host: example.com
+            agent: caddy-promtail
+            __path__: /var/log/caddy/*.log
+
       pipeline_stages:
-        # Extract all the fields I care about from the
-        # message:
         - json:
             expressions:
-              "level": "level"
-              "timestamp": "ts"
-              "duration": "duration"
-              "response_status": "status"
-              "request_path": "request.uri"
-              "request_method": "request.method"
-              "request_host": "request.host"
-              "request_useragent": "request.headers.\"User-Agent\""
-              "request_remote_ip": "request.remote_ip"
+              request_remote_ip: request.remote_ip
 
-        # Promote the level into an actual label:
-        - labels:
-            level:
-
-        # Regenerate the message as all the fields listed
-        # above:
         - template:
-            # This is a field that doesn't exist yet, so it will be created
-            source: "output"
-            template: |
-                          {{toJson (unset (unset (unset . "Entry") "timestamp") "filename")}}
+            source: output  # creates empty output variable
+            template: '{"remote_ip": {{.request_remote_ip}}}'
+
         - output:
             source: output
 
-        # Set the timestamp of the log entry to what's in the
-        # timestamp field.
-        - timestamp:
-            source: "timestamp"
-            format: "Unix"
   ```
   </details>
 
-* Edit `Caddyfile` to enable [access logs](https://caddyserver.com/docs/caddyfile/directives/log).
-  Unfortunetly this can't be globally enabled, so the easiest way seems to be 
-  to create a logging [snippet](https://caddyserver.com/docs/caddyfile/concepts#snippets)
-  and copy paste import line in to every site block.
+* Edit `Caddyfile` to enable 
+  [**access logs**](https://caddyserver.com/docs/caddyfile/directives/log).
+  Unfortunetly this **can't be globally** enabled, so the easiest way seems to be 
+  to create a **logging** [**snippet**](https://caddyserver.com/docs/caddyfile/concepts#snippets)
+  and copy paste the **import line** in to every site block.
 
   <details>
   <summary>Caddyfile</summary>
@@ -1358,12 +1352,12 @@ Once there, a basic grafana dashboard can be made.
   ```
   </details>
   
-* at this points logs should be visible and explorable in grafana<br>
+* at this points logs should be visible and **explorable in grafana**<br>
   Explore > `{job="caddy_access_log"} |= "" | json`
 
 ## dashboard
 
-* new pane, will be time series graph showing logs volume in time
+* **new pane**, will be **time series** graph showing **logs volume** in time
 
   * Data source = Loki
   * switch from builder to code<br>
@@ -1380,7 +1374,7 @@ Once there, a basic grafana dashboard can be made.
   * Graph style = Bars
   * Fill opacity = 50
 
-* Add another pane, will be a pie chart, showing subdomains divide
+* Add **another pane**, will be a **pie chart**, showing **subdomains** divide
 
   * Data source = Loki
   * switch from builder to code<br>
@@ -1394,19 +1388,20 @@ Once there, a basic grafana dashboard can be made.
   * Graph style = Bars
 
   
-* Add another pane, this will be actual log view
+* Add **another pane**, this will be actual **log view**
 
   * Graph type - Logs
   * Data source - Loki
   * Switch from builder to code
   * query - `{job="caddy_access_log"} |= "" | json`
   * Title - empty
-  * Deduplication - Signature
+  * Deduplication - Exact or Signature
   * Save
 
 useful resources
 
-* https://www.youtube.com/watch?v=UtmmhLraSnE
+* [Unified Alerting Grafana 8 | Prometheus | Notifications | Alert Templating](https://www.youtube.com/watch?v=UtmmhLraSnE)<br>
+  Even if its for v8, it's decently useful
 
 ## Geoip
 
