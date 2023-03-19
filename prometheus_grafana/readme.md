@@ -4,12 +4,9 @@
 
 ![logo](https://i.imgur.com/q41QfyI.png)
 
-WORK IN PROGRESS<br>
-Loki and caddy monitoring parts are not finished yet
-
 # Purpose
 
-Monitoring of the host and the running cointaners.
+Monitoring of a docker host and the cointaners.
 
 * [Official Prometheus](https://prometheus.io/)
 * [Official Grafana](https://grafana.com/)
@@ -31,12 +28,12 @@ Lot of the prometheus stuff here is based off the magnificent
 * **[Pushgateway](#Pushgateway)** - push data to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - setting alerts and getting notifications
 * **[Loki](#Loki)** - prometheus for logs
-* **[Minecraft Loki example](#Minecraft_Loki_example)** - logs and grafana alerts
+* **[Minecraft Loki example](#minecraft-loki-example)** - logs, grafana alerts
   and templates
-* **[Caddy reverse proxy monitoring](#Caddy_reverse_proxy_monitoring)** - 
-  metrics and logs and geoip
+* **[Caddy reverse proxy monitoring](#caddy-reverse-proxy-monitoring)** - 
+  metrics, logs and geoip map
 
-![dashboards_pic](https://i.imgur.com/ac9Qj1F.png)
+![dashboards_pic](https://i.imgur.com/ZmyP0T8.png)
 
 # Overview
 
