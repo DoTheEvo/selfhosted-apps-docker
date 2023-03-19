@@ -8,7 +8,8 @@
 2. [Caddy as a reverse proxy in docker](#Caddy-as-a-reverse-proxy-in-docker)
 3. [Caddy more info and various configurations](#Caddy-more-info-and-various-configurations)
 4. [Caddy DNS challenge](#Caddy-DNS-challenge)
-5. [Other guides](#Other-guides)
+5. [Monitoring](#monitoring)
+6. [Other guides](#other-guides)
 
 *[Older version](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/d973916d56e23bb5564bd9b68e06ec884cfc6af1/caddy_v2)
 of this guide - more detailed and handholding for docker noobs.*
@@ -695,217 +696,15 @@ complex and ugly.
 
 # Monitoring
 
-*work in progress*<br>
-*work in progress*<br>
-*work in progress*
+![dashboards](https://i.imgur.com/dMfxVQy.png)
 
-The endgame - [something like this](https://www.reddit.com/r/selfhosted/comments/w8iex6/is_there_a_way_to_see_traffic_statistics_with_the/)
+Prometheus, Grafana, Loki, Promtail are one way ot to get some sort of monitoring
+of Caddie's performance and logs, create dashboards from these data,
+like a geomap of IPs tha access caddy, and set up allerts for some events,...
 
-googling 
+Complete guide how to get it up for Caddie is part of of:
 
-* https://community.home-assistant.io/t/home-assistant-add-on-promtail/293732
-* https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/
-* https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md
-
-Requires - [Prometheus and Grafana](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana)
-
-![caddy_grafana_dashboard](https://i.imgur.com/NmOpGZX.png)
-
-### Metrics 
-
-Caddy has build in exporter of prometheus metrics, so whats needed:
-
-* Edit Caddyfile to [enable metrics.](https://caddyserver.com/docs/metrics)
-* Edit compose to publish 2019 port.<br>
-  Likely not be necessary if Caddy and Prometheus are on the same docker network,
-  but its nice to check the metrics at `<docker-host-ip>:2019/metrics`
-* Edit prometheus.yml to add caddy scraping point
-* In grafana import [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
-  or make your own, `caddy_reverse_proxy_upstreams_healthy` shows reverse proxy
-  upstreams, but thats all.
-
-<details>
-<summary>Caddyfile</summary>
-
-```php
-{
-    servers {
-        metrics
-    }
-
-    admin 0.0.0.0:2019
-}
-
-
-a.{$MY_DOMAIN} {
-    reverse_proxy whoami:80
-}
-```
-</details>
-
-<details>
-<summary>prometheus.yml</summary>
-
-```yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
-
-scrape_configs:
-  - job_name: 'caddy'
-    static_configs:
-      - targets: ['caddy:2019']
-```
-
-</details>
-
-But metrics feel kinda not enough, they dont even tell how much which subdomain
-gets hit.. let alone some access info and IPs. So time for logs and Loki I guess.
-
-### Logs 
-
-* Have Prometheus, Grafana, Loki working
-* Create `/var/log/caddy` directory on the docker host
-* Edit Caddy compose, bind mount `/var/log/caddy` in to caddy container.<br>
-  Also add Promtail container, that has same bind mount of `/var/log/caddy`
-  directory, along with bind mount of its config file.<br>
-  Promtail will scrape logs and push them to Loki.
-* create promtail-config.yml
-* edit Caddyfile and enable logging at some subdomain<br>
-  seems global logging might be done by using port 443 as a block, not tested yet
-* at this points logs should be visible and explorable in grafana<br>
-  Explore > `{job="caddy_access_log"} |= `` | json`
-* to-do
-* *?? edit promtail-config.yml to get desired values ??*
-* *?? enable somehow geo ip on promtail ??*
-* *?? make dashboard from logs ??*
-
-
-<details>
-<summary>docker-compose.yml</summary>
-
-```yml
-services:
-
-  caddy:
-    image: caddy
-    container_name: caddy
-    hostname: caddy
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-      - "2019:2019"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy_data:/data
-      - ./caddy_config:/config
-      - /var/log/caddy:/var/log/caddy
-
-  # LOG AGENT PUSHING LOGS TO LOKI
-  promtail:
-    image: grafana/promtail
-    container_name: promtail
-    hostname: promtail
-    restart: unless-stopped
-    volumes:
-      - ./promtail-config.yml:/etc/promtail-config.yml
-      - /var/log/caddy:/var/log/caddy:ro
-    command:
-      - '-config.file=/etc/promtail-config.yml'
-
-networks:
-  default:
-    name: $DOCKER_MY_NETWORK
-    external: true
-```
-
-</details>
-
-<details>
-<summary>promtail-config.yml</summary>
-
-```yml
-clients:
-  - url: http://loki:3100/loki/api/v1/push
-
-scrape_configs:
-  - job_name: caddy
-    static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: caddy_logs
-          __path__: /var//log/caddy/*.log
-```
-</details>
-
-<details>
-<summary>promtail-config-custom-picked-info.yml</summary>
-
-```yml
-clients:
-  - url: http://loki:3100/loki/api/v1/push
-
-scrape_configs:
-  - job_name: caddy_access_log
-    static_configs:
-    - targets: # tells promtail to look for the logs on the current machine/host
-        - localhost
-      labels:
-        job: caddy_access_log
-        __path__: /var//log/caddy/*.log
-    pipeline_stages:
-      # Extract all the fields I care about from the
-      # message:
-      - json:
-          expressions:
-            "level": "level"
-            "timestamp": "ts"
-            "duration": "duration"
-            "response_status": "status"
-            "request_path": "request.uri"
-            "request_method": "request.method"
-            "request_host": "request.host"
-            "request_useragent": "request.headers.\"User-Agent\""
-            "request_remote_ip": "request.remote_ip"
-
-      # Promote the level into an actual label:
-      - labels:
-          level:
-
-      # Regenerate the message as all the fields listed
-      # above:
-      - template:
-          # This is a field that doesn't exist yet, so it will be created
-          source: "output"
-          template: |
-                        {{toJson (unset (unset (unset . "Entry") "timestamp") "filename")}}
-      - output:
-          source: output
-
-      # Set the timestamp of the log entry to what's in the
-      # timestamp field.
-      - timestamp:
-          source: "timestamp"
-          format: "Unix"
-```
-</details>
-
-<details>
-<summary>Caddyfile</summary>
-
-```php
-a.{$MY_DOMAIN} {
-    reverse_proxy whoami:80
-    log {
-        output file /var/log/caddy/a_example_com_access.log
-    }
-}
-```
-</details>
+* [Prometheus + Grafana + Loki guide-by-example](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana_loki#caddy-reverse-proxy-monitoring)
 
 
 # Other guides
