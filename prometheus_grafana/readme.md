@@ -27,6 +27,7 @@ Lot of the prometheus stuff here is based off the magnificent
 # Chapters
 
 * **[Core prometheus+grafana](#Overview)** - nice dashboards with metrics of docker host and containers
+* **[PromQL](#PromQL)** - links to various learning resources
 * **[Pushgateway](#Pushgateway)** - push data to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - setting alerts and getting notifications
 * **[Loki](#Loki)** - prometheus for logs
@@ -294,29 +295,29 @@ the default time interval is set to 1h instead of 15m
 
 # PromQL
 
-Some concept, highlights and examples of PromQL.
+Some concept, highlights and examples.
 
-PromQL returns results as vectors"
+* [Stackoverflow - Prometheus instant vector vs range vector](https://stackoverflow.com/questions/68223824/prometheus-instant-vector-vs-range-vector)
+* [Short video](https://youtu.be/yLPTHinHB6Y)
+* [Prometheus Cheat Sheet - Basics \(Metrics, Labels, Time Series, Scraping\)](https://iximiuz.com/en/posts/prometheus-metrics-labels-time-series/)
+* [Learning Prometheus and PromQL - Learning Series](https://iximiuz.com/en/series/learning-prometheus-and-promql/)
+* [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 
-* [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/) basics page, quite to the point and short
-* [Introduction to PromQL](https://blog.knoldus.com/introduction-to-promql/)
-* [relatively short video to the point](https://youtu.be/yLPTHinHB6Y)
-* [Prometheus Cheat Sheet - How to Join Multiple Metrics](https://iximiuz.com/en/posts/prometheus-vector-matching/)
-* [decent stackoverflow answer](https://stackoverflow.com/questions/68223824/prometheus-instant-vector-vs-range-vector)
-
+One thing to get from these is what kind of data a query in PromQL returns.
+Instant verctor vs range vector.
 
 ---
 ---
 
 # Pushgateway
 
-Gives freedom to push information in to prometheus from anywhere.
+Gives freedom to **push** information in to prometheus from **anywhere**.<bt>
 
-## The setup
+### The setup
 
-To add pushgateway functionality to the current stack:
+To **add** pushgateway functionality to the current stack:
 
-* New container `pushgateway` added to the compose file.
+* **New container** `pushgateway` added to the **compose** file.
 
   <details>
   <summary>docker-compose.yml</summary>
@@ -342,7 +343,8 @@ To add pushgateway functionality to the current stack:
   ```
   </details>
 
-* Adding pushgateway to the Caddyfile of the reverse proxy so that it can be reached at `https://push.example.com`<br>
+* Adding pushgateway to the **Caddyfile** of the reverse proxy so that
+  it can be reached at `https://push.example.com`<br>
 
   <details>
   <summary>Caddyfile</summary>
@@ -354,7 +356,7 @@ To add pushgateway functionality to the current stack:
   ```
   </details>  
 
-* Adding pushgateway's scrape point to `prometheus.yml`<br>
+* Adding pushgateway's **scrape point** to `prometheus.yml`<br>
 
   <details>
   <summary>prometheus.yml</summary>
@@ -372,7 +374,7 @@ To add pushgateway functionality to the current stack:
   ```
   </details>
 
-## The basics
+### The basics
 
 ![veeam-dash](https://i.imgur.com/TOuv9bM.png)
 
@@ -386,16 +388,20 @@ Now in grafana, in **Explore** section you should see some results
 when quering for `some_metric`.
 
 The metrics sit on the pushgateway **forever**, unless deleted or container
-shuts down. Prometheus will not remove the metrics from it after scraping,
-it will keep scraping the pushgateway and store the value with the time of
-scraping.
+shuts down. **Prometheus will not remove** the metrics from it **after scraping**,
+it will keep scraping the pushgateway and store the value that sits there with
+the time of scraping.
 
-To wipe the pushgateway clean<br>
+To **wipe** the pushgateway clean<br>
 `curl -X PUT https://push.example.com/api/v1/admin/wipe`
 
-More on pushgateway setup, with the real world use to monitor backups,
-along with pushing metrics from windows in powershell - 
-[**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana)<br>
+### The real world use
+
+[**Veeam Prometheus Grafana - guide-by-example**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
+
+Linked above is much more on **pushgateway setup**,
+a real world use to **monitor backups**, along with **pushing metrics
+from windows** in powershell.<br>
 
 ![veeam-dash](https://i.imgur.com/dUyzuyl.png)
 
@@ -404,18 +410,18 @@ along with pushing metrics from windows in powershell -
 
 # Alertmanager
 
-To send a notification about some metric breaching some preset condition.<br>
-Notifications chanels set here will be email and
-[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
+To send a **notification** about some **metric** breaching some preset **condition**.<br>
+Notifications **chanels** set here will be **email** and
+[**ntfy**](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
 
 ![alert](https://i.imgur.com/b4hchSu.png)
 
 ## The setup
 
-To add alertmanager to the current stack:
+To **add** alertmanager to the current stack:
 
-* New file - `alertmanager.yml` will be bind mounted in alertmanager container.<br>
-  This file contains configuration on how and where to deliver alerts.<br>
+* **New file** - `alertmanager.yml` will be **bind mounted** in alertmanager container.<br>
+  This is the **configuration** on how and where **to deliver** alerts.<br>
 
   <details>
   <summary>alertmanager.yml</summary>
@@ -441,8 +447,8 @@ To add alertmanager to the current stack:
   ```
   </details>
 
-* New file - `alert.rules` will be mounted in to prometheus container<br>
-  This file defines which value of some metric becomes an alert event.
+* **New file** - `alert.rules` will be **bind mounted** in to prometheus container<br>
+  This file **defines** at what value a metric becomes an **alert** event.
 
   <details>
   <summary>alert.rules</summary>
@@ -461,8 +467,8 @@ To add alertmanager to the current stack:
   ```
   </details>
 
-* Changed `prometheus.yml`. Added `alerting` section that points to alertmanager
-  container, and also set is a path to a `rules` file.
+* **Changed** `prometheus.yml`. Added **alerting section** that points to alertmanager
+  container, and also **set path** to a `rules` file.
 
   <details>
   <summary>prometheus.yml</summary>
@@ -497,8 +503,8 @@ To add alertmanager to the current stack:
   ```
   </details>
 
-* New container - `alertmanager` added to the compose file and prometheus
-  container has bind mount rules file added.
+* **New container** - `alertmanager` added to the compose file and **prometheus
+  container** has bind mount **rules file** added.
 
   <details>
     <summary>docker-compose.yml</summary>
@@ -555,9 +561,10 @@ To add alertmanager to the current stack:
   ```
   </details>
 
-* Adding alertmanager to the Caddyfile of the reverse proxy so that it can be reached
-  at `https://alert.example.com`. Not really necessary, but useful as it allows
-  to send alerts from anywhere, not just from prometheus.
+* **Adding** alertmanager to the **Caddyfile** of the reverse proxy so that
+  it can be reached at `https://alert.example.com`. **Not necessary**,
+  but useful as it **allows to send alerts from anywhere**,
+  not just from prometheus, or other containers on same docker network.
 
   <details>
   <summary>Caddyfile</summary>
@@ -574,15 +581,15 @@ To add alertmanager to the current stack:
 ![alert](https://i.imgur.com/C7g0xJt.png)
 
 
-Once above setup is done an alert about low disk space should fire and notification
-email should come.<br>
-In `alertmanager.yml` switch from email to ntfy can be done.
+Once above setup is done **an alert** about low disk space **should fire**
+and a **notification** email should come.<br>
+In `alertmanager.yml` switch from email **to ntfy** can be done.
 
 *Useful*
 
-* alert from anywhere using curl:<br>
+* **alert** from anywhere using **curl**:<br>
   `curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
-* reload rules:<br>
+* **reload rules**:<br>
   `curl -X POST https://prom.example.com/-/reload`
 
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom#define-alerts)
@@ -653,9 +660,9 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
     * **URL** changed for this setup.
     * **Compactor** section is added, to have control over
       [data retention.](https://grafana.com/docs/loki/latest/operations/storage/retention/)
-    * **Fixing** error - *"too many outstanding requests"*, source
-      [here.](https://github.com/grafana/loki/issues/5123)
-      It turn's off parallelism, both split by time interval and shards split.
+    * **Fixing** error - *"too many outstanding requests"*, discussion
+      [here.](https://github.com/grafana/loki/issues/5123)<br>
+      It turns off parallelism, both split by time interval and shards split.
 
   <details>
   <summary>loki-config.yml</summary>
@@ -1101,7 +1108,6 @@ Templates resources
 * [Overview of Grafana Alerting and Message Templating for Slack](https://faun.pub/overview-of-grafana-alerting-and-message-templating-for-slack-6bb740ec44af)
 * [youtube - Unified Alerting Grafana 8 | Prometheus | Victoria | Telegraf | Notifications | Alert Templating](https://youtu.be/UtmmhLraSnE)
 * [Dot notation](https://www.practical-go-lessons.com/chap-32-templates#dot-notation)
-* 
 
 ---
 ---
@@ -1127,7 +1133,7 @@ of all the http/https **traffic** that goes in. So focus on monitoring this
 
 **Requirements** - grafana, prometheus, loki, caddy container
 
-## Metrics - Prometheus
+## Caddy - Metrics - Prometheus
 
 ![logo](https://i.imgur.com/6QdZuVR.png)
 
@@ -1218,14 +1224,15 @@ to what **service**,.. well for that monitoring of **access logs** is needed.
 ---
 ---
 
-## Logs - Loki
+## Caddy - Logs - Loki
+
+![logs_dash](https://i.imgur.com/j9CcJ44.png)
 
 **Loki** itself just **stores** the logs. To get them to Loki a **Promtail** container is used
 that has **access** to caddy's **logs**. Its job is to **scrape** them regularly, maybe
 **process** them in some way, and then **push** them to Loki.<br>
 Once there, a basic grafana **dashboard** can be made.
 
-![logs_dash](https://i.imgur.com/j9CcJ44.png)
 
 ### The setup
 
@@ -1346,7 +1353,7 @@ Once there, a basic grafana **dashboard** can be made.
   [**access logs**](https://caddyserver.com/docs/caddyfile/directives/log).
   Unfortunetly this **can't be globally** enabled, so the easiest way seems to be 
   to create a **logging** [**snippet**](https://caddyserver.com/docs/caddyfile/concepts#snippets)
-  and copy paste the **import line** in to every site block.
+  called `log_common` and copy paste the **import line** in to every site block.
 
   <details>
   <summary>Caddyfile</summary>
@@ -1373,18 +1380,20 @@ Once there, a basic grafana **dashboard** can be made.
 * at this points logs should be visible and **explorable in grafana**<br>
   Explore > `{job="caddy_access_log"} |= "" | json`
 
-## Geoip
+### Geoip
 
-Promtail got recently a geoip stage. One can feed an IP address and an mmdb geoIP 
-datbase and it adds geoip labels to the log entry.
+![geoip_info](https://i.imgur.com/f4P8ydl.png)
+
+**Promtail** got recently a **geoip stage**. One can feed it an **IP address** and an mmdb **geoIP 
+datbase** and it adds geoip **labels** to the log entry.
 
 [The official documentation.](https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md)
 
-* Register account on [maxmind.com](https://www.maxmind.com/en/geolite2/signup).
-* Download mmdb format database, either
+* **Register** a free account on [maxmind.com](https://www.maxmind.com/en/geolite2/signup).
+* **Download** one of the mmdb format **databases**
   * `GeoLite2 City` - 70MB full geoip info - city, postal code, time zone, latitude/longitude,..
   * `GeoLite2 Country` 6MB, just country and continent
-* Bind mount whichever database in to promtail container.
+* **Bind mount** whichever database in to **promtail container**.
 
   <details>
   <summary>docker-compose.yml</summary>
@@ -1428,9 +1437,9 @@ datbase and it adds geoip labels to the log entry.
       external: true
   ```
 
-* In promtail config add json stage where IP address is loaded in to a variable,
-  which then is used in geoip stage.
-  If all is done correctly, the geoip labels are automaticly added to the log entry.
+* In **promtail** config, **json stage** is added where IP address is loaded in to
+  a **variable** called `remote_ip`, which then is used in **geoip stage**.
+  If all else is set correctly, the geoip **labels** are automaticly added to the log entry.
 
   <details>
   <summary>geoip promtail-config.yml</summary>
@@ -1466,19 +1475,21 @@ datbase and it adds geoip labels to the log entry.
 Can be tested with opera build in VPN, or some online 
 [site tester](https://pagespeed.web.dev/).
 
-![geoip_info](https://i.imgur.com/f4P8ydl.png)
+### Dashboard
 
-## dashboard
+![pane1](https://i.imgur.com/hW92sLO.png)
 
-* **new pane**, will be **time series** graph showing **logs volume** in time
+* **new pane**, will be **time series** graph showing **Subdomains hits timeline**
 
+  * Graph type = Time series
   * Data source = Loki
   * switch from builder to code<br>
     `sum(count_over_time({job="caddy_access_log"} |= "" | json [1m])) by (request_host)`
-  * Transform > Rename by regex > Match = `\{request_host="(.*)"\}`; Replace = $1
   * Query options > Min interval = 1m
-  * Graph type = Time series
-  * Title = "Access timeline"
+  * Transform > Rename by regex 
+    * Match = `\{request_host="(.*)"\}`
+    * Replace = `$1`
+  * Title = "Subdomains hits timeline"
   * Transparent
   * Tooltip mode = All
   * Tooltip values sort order = Descending
@@ -1487,19 +1498,56 @@ Can be tested with opera build in VPN, or some online
   * Graph style = Bars
   * Fill opacity = 50
 
+![pane2](https://i.imgur.com/KYZdotg.png)
+
 * Add **another pane**, will be a **pie chart**, showing **subdomains** divide
 
+  * Graph type = Pie chart
   * Data source = Loki
   * switch from builder to code<br>
     `sum(count_over_time({job="caddy_access_log"} |= "" | json [$__range])) by (request_host)`
-  * Transform > Rename by regex > Match = `\{request_host="(.*)"\}`; Replace = $1
-  * Graph type = Pie chart
-  * Title = "Subdomains divide"
+  * Query options > Min interval = 1m
+  * Transform > Rename by regex
+    * Match = `\{request_host="(.*)"\}`
+    * Replace = `$1`
+  * Title = "Subdomains use"
   * Transparent
   * Legen Placement = Right
-  * Value = Total
-  * Graph style = Bars
+  * Value = Last
 
+![pane3](https://i.imgur.com/MjbLVlJ.png)
+
+* Add **another pane**, will be a **Geomap**, showing location of machine accessing
+  Caddy
+
+  * Graph type = Geomap
+  * Data source = Loki
+  * switch from builder to code<br>
+    `{job="caddy_access_log"} |= "" | json`
+  * Query options > Min interval = 1m
+  * Transform > Extract fields
+    * Source = labels
+    * Format = JSON
+    * 1. Field = geoip_location_latitude; Alias = latitude
+    * 2. Field = geoip_location_longitude; Alias = longitude
+  * Title = "Geomap"
+  * Transparent
+  * Map view > View > *Drag and zoom around* > Use current map setting
+
+* Add **another pane**, will be a **pie chart**, showing **IPs** that hit the most
+
+  * Graph type = Pie chart
+  * Data source = Loki
+  * switch from builder to code<br>
+    `sum(count_over_time({job="caddy_access_log"} |= "" | json [$__range])) by (request_remote_ip)`
+  * Query options > Min interval = 1m
+  * Transform > Rename by regex
+    * Match = `\{request_remote_ip="(.*)"\}`
+    * Replace = `$1`
+  * Title = "IPs by number of requests"
+  * Transparent
+  * Legen Placement = Right
+  * Value = Last or Total
   
 * Add **another pane**, this will be actual **log view**
 
@@ -1511,10 +1559,8 @@ Can be tested with opera build in VPN, or some online
   * Deduplication - Exact or Signature
   * Save
 
-useful resources
+![pane3](https://i.imgur.com/bzE6JEg.png)
 
-* [Unified Alerting Grafana 8 | Prometheus | Notifications | Alert Templating](https://www.youtube.com/watch?v=UtmmhLraSnE)<br>
-  Even if its for v8, it's decently useful
 
 # Update
 
