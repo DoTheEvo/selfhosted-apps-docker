@@ -1,4 +1,4 @@
-# Prometheus+Grafana in docker
+# Prometheus+Grafana+Loki in docker
 
 ###### guide-by-example
 
