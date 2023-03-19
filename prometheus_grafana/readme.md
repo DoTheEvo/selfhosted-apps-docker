@@ -41,8 +41,8 @@ Lot of the prometheus stuff here is based off the magnificent
 
 Prometheus is an open source system for monitoring and alerting,
 written in golang.<br>
-It periodically collects metrics from configured targets,
-makes these metrics available for visualization, and can trigger alerts.<br>
+It periodically collects **metrics** from configured **targets**,
+makes these metrics available for visualization, and can trigger **alerts**.<br>
 Prometheus is relatively young project, it is a **pull type** monitoring.
 
 [Glossary.](https://prometheus.io/docs/introduction/glossary/)
@@ -94,16 +94,16 @@ The directories are created by docker compose on the first run.
 # docker-compose
 
 * **Prometheus** - The official image used. Few extra commands passing configuration.
-  Of note is 240 hours(10days) retention policy.
+  Of note is 240 hours(10days) **retention** policy.
 * **Grafana** - The official image used. Bind mounted directory
-  for persistent data storage. User sets as root, as it solves issues I am
+  for persistent data storage. User sets **as root**, as it solves issues I am
   lazy to investigate.
 * **NodeExporter** - An exporter for linux machines,
-  in this case gathering the metrics of the linux machine runnig docker,
+  in this case gathering the **metrics** of the docker host,
   like uptime, cpu load, memory use, network bandwidth use, disk space,...<br>
-  Also bind mount of some system directories to have access to required info.
+  Also **bind mount** of some system directories to have access to required info.
 * **cAdvisor** - An exporter for gathering docker **containers** metrics,
-  showing cpu, memory, network use of each container<br>
+  showing cpu, memory, network use of **each container**<br>
   Runs in `privileged` mode and has some bind mounts of system directories
   to have access to required info.
 
@@ -270,16 +270,16 @@ prom.{$MY_DOMAIN} {
   set URL to `http://prometheus:9090`<br>
 * import dashboards from [json files in this repo](dashboards/)<br>
 
-These dashboards are the preconfigured ones from
+These **dashboards** are the preconfigured ones from
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
-with few changes.<br>
-`docker_host.json` did not show free disk space for me, had to change `fstype`
+with **few changes**.<br>
+**Docker host** dashboard did not show free disk space for me, **had to change fstype**
 from `aufs` to `ext4`.
 Also included is [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
-for host network monitoring not showing traffick. In all of them
+for **host network monitoring** not showing traffick. In all of them
 the default time interval is set to 1h instead of 15m
 
-* **docker_host.json** - dashboard showing linux host machine metrics
+* **docker_host.json** - dashboard showing linux docker host metrics
 * **docker_containers.json** - dashboard showing docker containers metrics,
   except the ones labeled as `monitoring` in the compose file
 * **monitoring_services.json** - dashboar showing docker containers metrics
