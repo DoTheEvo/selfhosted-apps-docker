@@ -1117,8 +1117,9 @@ What can be seen in this example:
   [caddy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy).
 * How to **import a dashobard** to grafana.
 * Use of **Loki** to monitor **logs** of a docker **container**.
-* How to set **Promtail** to push only certain values and label them.
-* Create **dashboard** in grafana from data in **Loki**.
+* How to set **Promtail** to push only certain values and label logs.
+* How to use **geoip** part of **Promtail**.
+* How to create **dashboard** in grafana from data in **Loki**.
 
 **Requirements** - grafana, loki, caddy.
 
