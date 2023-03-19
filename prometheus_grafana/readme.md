@@ -29,8 +29,11 @@ Lot of the prometheus stuff here is based off the magnificent
 * **[Core prometheus+grafana](#Overview)** - nice dashboards with metrics of docker host and containers
 * **[Pushgateway](#Pushgateway)** - push data to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - setting alerts and getting notifications
-* **[Loki](#Loki)** - all of the above but for log files
-* **[Caddy monitoring](#Caddy_monitoring)** - monitoring a reverse proxy
+* **[Loki](#Loki)** - prometheus for logs
+* **[Minecraft Loki example](#Minecraft_Loki_example)** - logs and grafana alerts
+  and templates
+* **[Caddy reverse proxy monitoring](#Caddy_reverse_proxy_monitoring)** - 
+  metrics and logs and geoip
 
 ![dashboards_pic](https://i.imgur.com/ac9Qj1F.png)
 
@@ -628,9 +631,9 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
       restart: unless-stopped
       volumes:
         - ./loki_data:/loki
-        - ./loki-docker-config.yml:/etc/loki-docker-config.yml
+        - ./loki-config.yml:/etc/loki-config.yml
       command:
-        - '-config.file=/etc/loki-docker-config.yml'
+        - '-config.file=/etc/loki-config.yml'
       ports:
         - "3100:3100"
       labels:
@@ -643,14 +646,19 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
   ```
   </details>
 
-* **New file** - `loki-docker-config.yml` bind mounted in the loki container.<br>
-  The file comes from
+* **New file** - `loki-config.yml` bind mounted in the loki container.<br>
+  The config comes from
   [the official example](https://github.com/grafana/loki/tree/main/cmd/loki),
-  but url is changed, and **compactor** section is added, to have control over
-  [data retention.](https://grafana.com/docs/loki/latest/operations/storage/retention/)
+  with some changes.
+    * **URL** changed for this setup.
+    * **Compactor** section is added, to have control over
+      [data retention.](https://grafana.com/docs/loki/latest/operations/storage/retention/)
+    * **Fixing** error - *"too many outstanding requests"*, source
+      [here.](https://github.com/grafana/loki/issues/5123)
+      It turn's off parallelism, both split by time interval and shards split.
 
   <details>
-  <summary>loki-docker-config.yml</summary>
+  <summary>loki-config.yml</summary>
 
   ```yml
   auth_enabled: false
@@ -669,6 +677,13 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
       kvstore:
         store: inmemory
 
+  # --- disable splitting to fix "too many outstanding requests"
+
+  query_range:
+    parallelise_shardable_queries: false
+
+  # ---  compactor to have control over length of data retention
+
   compactor:
     working_directory: /loki/compactor
     compaction_interval: 10m
@@ -678,6 +693,9 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
   limits_config:
     retention_period: 240h
+    split_queries_by_interval: 0  # part of disable splitting fix
+
+  # -------------------------------------------------------
 
   schema_config:
     configs:
@@ -1202,12 +1220,12 @@ to what **service**,.. well for that monitoring of **access logs** is needed.
 
 ## Logs - Loki
 
-**Loki** itself just **stores** the logs, to get them to Loki a **Promtail** container is used
+**Loki** itself just **stores** the logs. To get them to Loki a **Promtail** container is used
 that has **access** to caddy's **logs**. Its job is to **scrape** them regularly, maybe
 **process** them in some way, and then **push** them to Loki.<br>
 Once there, a basic grafana **dashboard** can be made.
 
-![logs_dash](https://i.imgur.com/lWToTMd.png)
+![logs_dash](https://i.imgur.com/j9CcJ44.png)
 
 ### The setup
 
@@ -1355,6 +1373,101 @@ Once there, a basic grafana **dashboard** can be made.
 * at this points logs should be visible and **explorable in grafana**<br>
   Explore > `{job="caddy_access_log"} |= "" | json`
 
+## Geoip
+
+Promtail got recently a geoip stage. One can feed an IP address and an mmdb geoIP 
+datbase and it adds geoip labels to the log entry.
+
+[The official documentation.](https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md)
+
+* Register account on [maxmind.com](https://www.maxmind.com/en/geolite2/signup).
+* Download mmdb format database, either
+  * `GeoLite2 City` - 70MB full geoip info - city, postal code, time zone, latitude/longitude,..
+  * `GeoLite2 Country` 6MB, just country and continent
+* Bind mount whichever database in to promtail container.
+
+  <details>
+  <summary>docker-compose.yml</summary>
+
+  ```yml
+  services:
+
+    caddy:
+      image: caddy
+      container_name: caddy
+      hostname: caddy
+      restart: unless-stopped
+      env_file: .env
+      ports:
+        - "80:80"
+        - "443:443"
+        - "443:443/udp"
+        - "2019:2019"
+      volumes:
+        - ./Caddyfile:/etc/caddy/Caddyfile
+        - ./caddy_data:/data
+        - ./caddy_config:/config
+        - ./caddy_logs:/var/log/caddy
+
+    # LOG AGENT PUSHING LOGS TO LOKI
+    promtail:
+      image: grafana/promtail
+      container_name: caddy-promtail
+      hostname: caddy-promtail
+      restart: unless-stopped
+      volumes:
+        - ./promtail-config.yml:/etc/promtail-config.yml
+        - ./caddy_logs:/var/log/caddy:ro
+        - ./GeoLite2-City.mmdb:/etc/GeoLite2-City.mmdb:ro
+      command:
+        - '-config.file=/etc/promtail-config.yml'
+
+  networks:
+    default:
+      name: $DOCKER_MY_NETWORK
+      external: true
+  ```
+
+* In promtail config add json stage where IP address is loaded in to a variable,
+  which then is used in geoip stage.
+  If all is done correctly, the geoip labels are automaticly added to the log entry.
+
+  <details>
+  <summary>geoip promtail-config.yml</summary>
+
+  ```yml
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+  scrape_configs:
+    - job_name: caddy_access_log
+
+      static_configs:
+        - targets:
+            - localhost
+          labels:
+            job: caddy_access_log
+            host: example.com
+            agent: caddy-promtail
+            __path__: /var/log/caddy/*.log
+
+      pipeline_stages:
+        - json:
+            expressions:
+              remote_ip: request.remote_ip
+
+        - geoip:
+            db: "/etc/GeoLite2-City.mmdb"
+            source: remote_ip
+            db_type: "city"
+  ```
+  </details>
+
+Can be tested with opera build in VPN, or some online 
+[site tester](https://pagespeed.web.dev/).
+
+![geoip_info](https://i.imgur.com/f4P8ydl.png)
+
 ## dashboard
 
 * **new pane**, will be **time series** graph showing **logs volume** in time
@@ -1402,10 +1515,6 @@ useful resources
 
 * [Unified Alerting Grafana 8 | Prometheus | Notifications | Alert Templating](https://www.youtube.com/watch?v=UtmmhLraSnE)<br>
   Even if its for v8, it's decently useful
-
-## Geoip
-
-[to-do](https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md)
 
 # Update
 
