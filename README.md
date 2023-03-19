@@ -25,7 +25,7 @@
 * [opnsense](opnsense/) - a firewall, enterprise level 
 * [qbittorrent](qbittorrent/) - torrent client
 * [portainer](portainer/) - docker management
-* [prometheus_grafana](prometheus_grafana/) - monitoring
+* [prometheus_grafana_loki](prometheus_grafana_loki/) - monitoring
 * [unifi](unifi/) - management utility for ubiquiti devices
 * [snipeit](snipeit/) - IT inventory management
 * [trueNAS scale](trueNASscale/) - network file sharing

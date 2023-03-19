@@ -45,6 +45,7 @@ Works same when pinging from archlinux or pinging from win8.1
  
 [TCP vs UDP](https://youtu.be/jE_FcgpQ7Co)
 
-# asdasdasd
+# useful links
 
-
+* https://dnsdumpster.com/<br>
+  can check subdomains registered, ideal would be wildcard certificate
