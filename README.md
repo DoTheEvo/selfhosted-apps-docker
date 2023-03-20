@@ -47,8 +47,8 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 
 # Core concepts
 
-- **docker-compose.yml** does **not** need any **editing** to get something up,
-   **changes** are to be done in the **.env** file.
+- `docker-compose.yml` does **not** need any **editing** to get something up,
+   **changes** are to be done in the `.env` file.
 - **Not using** `ports` directive if theres **only** web traffic for a container.<br>
   Theres an expectation of running a **reverse proxy** which makes **mapping ports**
   to a docker host **unnecessary**. Instead `expose` is used which is basically
