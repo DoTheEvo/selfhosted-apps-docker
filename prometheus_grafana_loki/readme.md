@@ -97,7 +97,7 @@ The directories are created by docker compose on the first run.
   Of note is 240 hours(10days) **retention** policy.
 * **Grafana** - The official image used. Bind mounted directory
   for persistent data storage. User sets **as root**, as it solves issues I am
-  lazy to investigate.
+  lazy to investigate, likely me editing some files as root.
 * **NodeExporter** - An exporter for linux machines,
   in this case gathering the **metrics** of the docker host,
   like uptime, cpu load, memory use, network bandwidth use, disk space,...<br>
@@ -265,10 +265,10 @@ prom.{$MY_DOMAIN} {
 
 ## First run and Grafana configuration
 
-* login admin/admin to `graf.example.com`, change the password
-* add Prometheus as a Data source in configuration<br>
-  set URL to `http://prometheus:9090`<br>
-* import dashboards from [json files in this repo](dashboards/)<br>
+* Login **admin/admin** to `graf.example.com`, change the password.
+* **Add** Prometheus as a **Data source** in Configuration<br>
+  Set **URL** to `http://prometheus:9090`<br>
+* **Import** dashboards from [json files in this repo](dashboards/)<br>
 
 These **dashboards** are the preconfigured ones from
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
@@ -376,29 +376,29 @@ To **add** pushgateway functionality to the current stack:
 ![veeam-dash](https://i.imgur.com/TOuv9bM.png)
 
 To **test pushing** some metric, execute in linux:<br>
-`echo "some_metric 3.14" | curl --data-binary @- https://push.example.com/metrics/job/blabla/instance/whatever`
+  * `echo "some_metric 3.14" | curl --data-binary @- https://push.example.com/metrics/job/blabla/instance/whatever`
+  * Visit `push.example.com` and see the metric there.
+  * In Grafana > Explore > query for `some_metric` and see its value there.
 
-You see **labels** being set to the pushed metric in the path.<br>
-Label `job` is required, but after that it's whatever you want,
-though use of `instance` label is customary.<br>
-Now in grafana, in **Explore** section you should see some results
-when quering for `some_metric`.
+In that command you see the metric itself: `some_metric` and it's value: `3.14`<br>
+But you also see **labels** being set, one label named `job`, which is required,
+but after that it's whatever you want.<br>
 
 The metrics sit on the pushgateway **forever**, unless deleted or container
-shuts down. **Prometheus will not remove** the metrics from it **after scraping**,
-it will keep scraping the pushgateway and store the value that sits there with
-the time of scraping.
+shuts down. **Prometheus will not remove** the metrics **after scraping**,
+it will keep scraping the pushgateway, every 15 seconds or whatever is set,
+and store the value that sits there with the timestamp of scraping.
 
 To **wipe** the pushgateway clean<br>
 `curl -X PUT https://push.example.com/api/v1/admin/wipe`
 
 ### The real world use
 
-[**Veeam Prometheus Grafana - guide-by-example**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
+[**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
 
-Linked above is much more on **pushgateway setup**,
-a real world use to **monitor backups**, along with **pushing metrics
-from windows** in powershell.<br>
+Linked above is a guide-by-example with more info on **pushgateway setup**.<br>
+A real world use to **monitor backups**, along with pushing metrics
+from **windows in powershell**.<br>
 
 ![veeam-dash](https://i.imgur.com/dUyzuyl.png)
 
@@ -408,7 +408,7 @@ from windows** in powershell.<br>
 # Alertmanager
 
 To send a **notification** about some **metric** breaching some preset **condition**.<br>
-Notifications **chanels** set here will be **email** and
+Notifications channels used here are **email** and
 [**ntfy**](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
 
 ![alert](https://i.imgur.com/b4hchSu.png)
@@ -417,8 +417,9 @@ Notifications **chanels** set here will be **email** and
 
 To **add** alertmanager to the current stack:
 
-* **New file** - `alertmanager.yml` will be **bind mounted** in alertmanager container.<br>
+* **New file** - `alertmanager.yml` to be **bind mounted** in alertmanager container.<br>
   This is the **configuration** on how and where **to deliver** alerts.<br>
+  Correct smtp or ntfy info needs to be filled out.
 
   <details>
   <summary>alertmanager.yml</summary>
@@ -444,7 +445,7 @@ To **add** alertmanager to the current stack:
   ```
   </details>
 
-* **New file** - `alert.rules` will be **bind mounted** in to prometheus container<br>
+* **New file** - `alert.rules` to be **bind mounted** in to prometheus container<br>
   This file **defines** at what value a metric becomes an **alert** event.
 
   <details>
@@ -514,8 +515,8 @@ To **add** alertmanager to the current stack:
       image: prom/prometheus:v2.42.0
       container_name: prometheus
       hostname: prometheus
-      restart: unless-stopped
       user: root
+      restart: unless-stopped
       depends_on:
         - cadvisor
       command:
@@ -539,6 +540,7 @@ To **add** alertmanager to the current stack:
       image: prom/alertmanager:v0.25.0
       container_name: alertmanager
       hostname: alertmanager
+      user: root
       restart: unless-stopped
       volumes:
         - ./alertmanager.yml:/etc/alertmanager.yml
@@ -578,9 +580,9 @@ To **add** alertmanager to the current stack:
 ![alert](https://i.imgur.com/C7g0xJt.png)
 
 
-Once above setup is done **an alert** about low disk space **should fire**
+Once above setup is done, **an alert** about low disk space **should fire**
 and a **notification** email should come.<br>
-In `alertmanager.yml` switch from email **to ntfy** can be done.
+In `alertmanager.yml` a switch from email **to ntfy** can be done.
 
 *Useful*
 
@@ -592,9 +594,12 @@ In `alertmanager.yml` switch from email **to ntfy** can be done.
 [stefanprodan/dockprom](https://github.com/stefanprodan/dockprom#define-alerts)
 has more detailed section on alerting worth checking out.    
 
-# Loki
+---
+---
 
-![loki_arch](https://i.imgur.com/aoMPrVV.png)
+![Loki-logo](https://i.imgur.com/HUohN3P.png)
+
+# Loki
 
 Loki is made by the grafana team. Sometimes called a Prometheus for logs,
 it's a **push** type monitoring, where an agent - **promtail**
@@ -613,6 +618,8 @@ quickly and easily, with less cluttering of compose and less containers runnig.
 
 There will be **two examples** of logs monitoring.<br>
 A **minecraft server** and a **caddy revers proxy**, both docker containers.
+
+![loki_arch](https://i.imgur.com/aoMPrVV.png)
 
 ## Loki setup
 
