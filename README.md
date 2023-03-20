@@ -55,7 +55,7 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
   just documentation.<br>
 - For **persistent** storage **bind mount** `./whatever_data` is used.
   No volumes, nor static path somewhere... just relative path next to compose file.
-- **no version declaration** at the beginning of **compose**, as the practice was
+- **No version** declaration at the beginning of **compose**, as the practice was
   [**deprecated**](https://nickjanetakis.com/blog/docker-tip-51-which-docker-compose-api-version-should-you-use)
 
 ---
