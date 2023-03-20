@@ -39,6 +39,12 @@ Can also just check the directories listed at the top for work in progress
 Check also [StarWhiz / docker_deployment_notes](https://github.com/StarWhiz/docker_deployment_notes/blob/master/README.md)<br>
 Repo documents self hosted apps in similar format and also uses caddy for reverse proxy
 
+---
+
+* ### [For Docker Noobs](https://github.com/DoTheEvo/selfhosted-apps-docker#for-docker-noobs)
+
+---
+
 # Core concepts
 
 - `docker-compose.yml` do not need any editing to get started,
@@ -222,18 +228,22 @@ First, docker is easy. Like really.<br>
 
 Second, there are two main uses.
 
-* A developer who daily works on an app and docker eases everything about it, from testing to deployment
-* A self-hosting / devops approach, where you just want to get a service running
+* A developer who daily works on an apps and docker eases everything about it,
+  from setting up enviroment, to testing and deployment.
+* A hosting approach, where you are not that concerned with detials of what
+  and how works in the container that is prepared for you by developers,
+  you just want it running
 
 This whole repo is obviously about the second use. So be careful that you wont
-spend time on resources used to educate developers. I mean if you get through
-that you will know docker better. But theres always the danger that after sinking
-4 hours learning, one still cant get plain nginx web server up and working.
+spend time on resources used to educate developers. Sure, if you get through
+that you will know docker better, but theres always the danger that after sinking
+4 hours "learning", one still cant get plain nginx web server up and working
+and loses motivation.<br>
 And my personal preference in learning is getting something up as fast as possible
-and then tinker with it and try to understand it.
+and then tinker with it and try to understand how it works.
 
-So to solve this, when googling for guides, look for **docker compose**
-rather than just **docker** tutorials and notice if they are talking
+So when googling for guides, look for **docker compose**
+rather than just **docker** tutorials and notice if they are talking some core
 fundamentals or deployment.
 
 * [This](https://youtu.be/DM65_JyGxCo) one is pretty good. That entire channel
