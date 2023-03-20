@@ -47,16 +47,16 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 
 # Core concepts
 
-- `docker-compose.yml` do not need any editing to get started,
-   changes are to be done in the `.env` file.
-- Not using `ports` directive if theres only web traffic for a container.<br>
-  Theres an expectation of running a reverse proxy which makes mapping ports
-  to a docker host unnecessary. Instead `expose` is used which is basically
+- **docker-compose.yml** does **not** need any **editing** to get something up,
+   **changes** are to be done in the **.env** file.
+- **Not using** `ports` directive if theres **only** web traffic for a container.<br>
+  Theres an expectation of running a **reverse proxy** which makes **mapping ports**
+  to a docker host **unnecessary**. Instead `expose` is used which is basically
   just documentation.<br>
-- For persistent storage bind mount `./whatever_data` is used.
+- For **persistent** storage **bind mount** `./whatever_data` is used.
   No volumes, nor static path somewhere... just relative path next to compose file.
-- no version is declared in compose, as the practice was
-  [deprecated](https://nickjanetakis.com/blog/docker-tip-51-which-docker-compose-api-version-should-you-use)
+- **no version declaration** at the beginning of **compose**, as the practice was
+  [**deprecated**](https://nickjanetakis.com/blog/docker-tip-51-which-docker-compose-api-version-should-you-use)
 
 ---
 
