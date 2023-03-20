@@ -41,7 +41,7 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 
 ---
 
-* ### [For Docker Noobs](#for-docker-noobs)
+* ### [For Docker Noobs](#for-docker-noobs-1)
 
 ---
 
