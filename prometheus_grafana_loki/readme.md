@@ -602,22 +602,21 @@ has more detailed section on alerting worth checking out.
 # Loki
 
 Loki is made by the grafana team. Sometimes called a Prometheus for logs,
-it's a **push** type monitoring, where an agent - **promtail**
-scrapes logs and then pushes them on to a Loki instance.<br>
+it's a **push** type monitoring.<br>
+It uses [LogQL](https://promcon.io/2019-munich/slides/lt1-08_logql-in-5-minutes.pdf)
+for queries, which is similar to PromQL in its use of labels.
 
-For docker containers theres also an option to install
-[**loki-docker-driver**](https://grafana.com/docs/loki/latest/clients/docker-driver/)
-on a docker host and log pushing is set either globally in /etc/docker/daemon.json
-or per container in compose files.<br>
-But as it turns out, **promtail** capabilities might be missed,
-like its ability to add labels to logs it scrapes based on some rule.
-Or processing data in some way, like translate IP addresses in to country
-names or cities.<br>
-Still loki-docker-driver is useful for getting containers logs in to loki
-quickly and easily, with less cluttering of compose and less containers runnig.
+There are two ways to **push logs** to Loki from a docker container.
 
-There will be **two examples** of logs monitoring.<br>
-A **minecraft server** and a **caddy revers proxy**, both docker containers.
+  * [**Loki-docker-driver**](https://grafana.com/docs/loki/latest/clients/docker-driver/)
+    **installed** on a docker host and log pushing is set either globally in
+    `/etc/docker/daemon.json` or per container in compose files.<br>
+    It's the simpler, easier way, but **lacks fine control** over the logs
+    being pushed.
+  * **[Promtail](https://grafana.com/docs/loki/latest/clients/promtail/)**
+    deployed as an another **container**, with bind mount of logs it should scrape,
+    and bind mount of its config file. This config file is very powerful,
+    giving a lot of **control** how logs are processed and pushed.
 
 ![loki_arch](https://i.imgur.com/aoMPrVV.png)
 
@@ -635,7 +634,7 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
     # LOG MANAGMENT WITH LOKI
     loki:
-      image: grafana/loki:2.7.3
+      image: grafana/loki:main-0295fd4
       container_name: loki
       hostname: loki
       user: root
@@ -659,7 +658,7 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
 
 * **New file** - `loki-config.yml` bind mounted in the loki container.<br>
   The config comes from
-  [the official example](https://github.com/grafana/loki/tree/main/cmd/loki),
+  [the official example](https://github.com/grafana/loki/tree/main/cmd/loki)
   with some changes.
     * **URL** changed for this setup.
     * **Compactor** section is added, to have control over
@@ -856,6 +855,18 @@ A **minecraft server** and a **caddy revers proxy**, both docker containers.
     ```
     </details>
 
+#### First Loki use in Grafana
+
+* In **grafana**, loki needs to be added as a **datasource**, `http://loki:3100`
+* In **Explore section**, switch to Loki as source
+  * if loki-docker-driver then filter by `container_name` or `compose_project`
+  * if promtail then filter by job name set in promtail config
+    in the labels section
+
+If all was set correctly logs should be visible in Grafana.
+
+![query](https://i.imgur.com/XSevjIR.png)
+
 # Minecraft Loki example
 
 What can be seen in this example:
@@ -865,23 +876,29 @@ What can be seen in this example:
 * How to visualize the logs in a dashboard.
 * How to set an alert when a specific pattern appears in the logs.
 * How to extract information from log to include it in the alert notification.
-* Basic of grafana alert templates, so that the notification actually looks good,
-  and shows only relevant info.
+* Basics of grafana alert templates, so that notifications actually look good,
+  and show only relevant info.
 
 **Requirements** - grafana, loki, minecraft.
 
 ![logo-minecraft](https://i.imgur.com/VphJTKG.png)
 
-### The Setup
+### The objective and overview
 
-Initially **loki-docker-driver was used** to get logs to Loki, and it was simple
+The **main objective** is to get an **alert** when a player **joins** the server.<br>
+The secondary one is to have a place where recent *"happening"* on the server
+can be seen.
+
+Initially **loki-docker-driver** was used to get logs to Loki, and it was simple
 and worked nicely. But during alert stage
 I **could not** figure out how to extract string from logs and include it in
 an **alert** notification. Specificly to not just say that "a player joined",
 but to have there name of the player that joined.<br>
-The way to solve that was to **switch to promtail** and make use of its 
+**Switch to promtail** solved this, with the use of its 
 [pipeline_stages](https://grafana.com/docs/loki/latest/clients/promtail/pipelines/).
 Which was **suprisingly simple** and elegant.
+
+### The Setup
 
 **Promtail** container is added to minecraft's **compose**, with bind mount
 access to minecraf's logs.<br>
@@ -949,10 +966,10 @@ scrape_configs:
           job: minecraft_logs
           __path__: /var/log/minecraft/*.log
     pipeline_stages:
-    - regex:
-        expression: '.*:\s(?P<player>.*)\sjoined the game$'
-    - labels:
-        player:
+      - regex:
+          expression: .*:\s(?P<player>.*)\sjoined the game$
+      - labels:
+          player:
 ```
 </details>
 
@@ -963,39 +980,41 @@ the stackoverflow answer that is the source for that config.
 
 ![regex](https://i.imgur.com/bT5XSHn.png)
 
-### First steps in Grafana
+### In Grafana
 
-* In **grafana**, loki needs to be added as a **datasource**, `http://loki:3100`
+* If Loki is not yet added, it needs to be added as a **datasource**, `http://loki:3100`
 * In **Explore section**, filter, job = `minecraft_logs`, **Run query** button... 
   this should result in seeing minecraft logs and their volume/time graph.
 
-This Explore view will be recreated as a dashboard.
+This Explore view will be **recreated** as a dashboard.
 
-### Dashboard minecraft_logs
+### Dashboard for minecraft logs
 
 ![dashboard-minecraft](https://i.imgur.com/M1k0Dn4.png)
 
-* New dashboard, new panel
+* **New dashboard, new panel**
+  * Graph type - `Time series`
   * Data source - Loki
   * Switch from `builder` to `code`<br>
-  * query - `count_over_time({container_name="minecraft"} |= `` [1m])`<br>
-  * Transform - Rename by regex - `(.*)` - `Logs`
-  * Graph type - `Time series`
+  * query - `count_over_time({job="minecraft_logs"} |= `` [1m])`<br>
+  * `Query options` - Min interval=1m
+  * Transform - Rename by regex
+    Match - `(.*)`
+    Replace - `Logs`
   * Title - Logs volume
   * Transparent background
   * Legend off
   * Graph styles - bar
   * Fill opacity - 50
   * Color scheme - single color
-  * `Query options` - Min interval=1m
   * Save
-* Add another pane to the dashboard
+* **Add another panel**
   * Graph type - `Logs`
   * Data source - Loki
   * Switch from `builder` to `code`<br>
-    query - `{container_name="minecraft"} |= ""`<br>
+    query - `{job="minecraft_logs"} |= ""`<br>
   * Title - *empty*
-  * Deduplication - Signature
+  * Deduplication - Signature or Exact
   * Save
 
 This should create a similar dashboard to the one in the picture above.<br>
@@ -1007,9 +1026,9 @@ for grafana loki queries
 
 ![alert-labels](https://i.imgur.com/LuUBZFn.png)
 
-When **a player joins** minecraft server a **log appears** *"Bastard joined the game"*<br>
-**Alert will be set** to look for string *"joined the game"* and **send notification**
-when it occurs.
+When a **player joins** minecraft server a **log line** appears *"Bastard joined the game"*<br>
+An **Alert** will be set to detect string *"joined the game"* and send
+a **notification** when it occurs.
 
 Now, might be good time to **brush up on PromQL / LogQL** and the **data types**
 they return when a query happens. That **instant vector** and **range vector**
@@ -1052,7 +1071,9 @@ thingie. As grafana will scream when using range vector.
   - New contact point
   - Name = ntfy
   - Integration = Webhook
-  - URL = https://ntfy.example.com/grafana
+  - URL = `https://ntfy.example.com/grafana`<br>
+    or if grafana-to-ntfy is already setup then `http://grafana-to-ntfy:8080`<br>
+    but also credentials need to be set.
   - Title = `{{ .CommonAnnotations.summary }}`
   - Message = I put in [empty space unicode character](https://emptycharacter.com/)
   - Disable resolved message = check
@@ -1120,7 +1141,7 @@ Templates resources
 
 What can be seen in this example:
 
-* Use of **Prometheus** to **monitor** a docker **container** - 
+* Use of **Prometheus** to monitor a docker **container** - 
   [caddy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy).
 * How to **import a dashobard** to grafana.
 * Use of **Loki** to monitor **logs** of a docker **container**.
@@ -1130,7 +1151,7 @@ What can be seen in this example:
 
 **Requirements** - grafana, loki, caddy.
 
-![logo-minecraft](https://i.imgur.com/HU4kHCj.png)
+![logo-caddy](https://i.imgur.com/rB6sjKQ.png)
 
 **Reverse proxy** is kinda linchpin of a selfhosted setup as it is **in charge**
 of all the http/https **traffic** that goes in. So focus on monitoring this
@@ -1218,10 +1239,8 @@ is enabling it, **scrape it** by prometheus, and import a **dashboard**.
 
 * In grafana **import**
   [caddy dashboard](https://grafana.com/grafana/dashboards/14280-caddy-exporter/)<br>
-  or make your own, `caddy_reverse_proxy_upstreams_healthy` shows reverse proxy
-  upstreams, but thats all.
-
-But these **metrics** are more about **performance** and **load** put on Caddy,
+  
+But these **metrics** are about **performance** and **load** put on Caddy,
 which in selfhosted environment will **likely be minimal** and not interesting.<br>
 To get **more intriguing** info of who, when, **from where**, connects
 to what **service**,.. well for that monitoring of **access logs** is needed.
@@ -1310,15 +1329,14 @@ Once there, a basic grafana **dashboard** can be made.
   </details>
 
 * **Promtail** scrapes a logs, **one line** at the time and is able to do **neat
-  things** with it before sending it - add labels, ignore entire line if some condition is met,
-  only send useful values,...<br>
+  things** with it before sending it - add labels, ignore some lines,
+  only send some values,...<br>
   [Pipelines](https://grafana.com/docs/loki/latest/clients/promtail/pipelines/)
   are used for this.
-  The **example here** is pretty straight forward, in **json** stage a desired
-  value is **extracted**, **template** is created with the use of that value,
-  and **output** is set.
+  Bellow is an example of extracting just a single value - an IP address
+  and using it in a tempalte that gets send to Loki and nothing else.
   [Here's](https://zerokspot.com/weblog/2023/01/25/testing-promtail-pipelines/)
-  some more to read with an example.
+  some more to read on this.
 
   <details>
   <summary>promtail-config.yml customizing fields</summary>
@@ -1343,11 +1361,9 @@ Once there, a basic grafana **dashboard** can be made.
         - json:
             expressions:
               request_remote_ip: request.remote_ip
-
         - template:
             source: output  # creates empty output variable
             template: '{"remote_ip": {{.request_remote_ip}}}'
-
         - output:
             source: output
 
@@ -1356,7 +1372,7 @@ Once there, a basic grafana **dashboard** can be made.
 
 * Edit `Caddyfile` to enable 
   [**access logs**](https://caddyserver.com/docs/caddyfile/directives/log).
-  Unfortunetly this **can't be globally** enabled, so the easiest way seems to be 
+  Unfortunately this **can't be globally** enabled, so the easiest way seems to be 
   to create a **logging** [**snippet**](https://caddyserver.com/docs/caddyfile/concepts#snippets)
   called `log_common` and copy paste the **import line** in to every site block.
 
@@ -1390,7 +1406,7 @@ Once there, a basic grafana **dashboard** can be made.
 ![geoip_info](https://i.imgur.com/f4P8ydl.png)
 
 **Promtail** got recently a **geoip stage**. One can feed it an **IP address** and an mmdb **geoIP 
-datbase** and it adds geoip **labels** to the log entry.
+database** and it adds geoip **labels** to the log entry.
 
 [The official documentation.](https://github.com/grafana/loki/blob/main/docs/sources/clients/promtail/stages/geoip.md)
 
@@ -1482,9 +1498,9 @@ Can be tested with opera build in VPN, or some online
 
 ### Dashboard
 
-![pane1](https://i.imgur.com/hW92sLO.png)
+![panel1](https://i.imgur.com/hW92sLO.png)
 
-* **new pane**, will be **time series** graph showing **Subdomains hits timeline**
+* **new panel**, will be **time series** graph showing **Subdomains hits timeline**
 
   * Graph type = Time series
   * Data source = Loki
@@ -1503,9 +1519,9 @@ Can be tested with opera build in VPN, or some online
   * Graph style = Bars
   * Fill opacity = 50
 
-![pane2](https://i.imgur.com/KYZdotg.png)
+![panel2](https://i.imgur.com/KYZdotg.png)
 
-* Add **another pane**, will be a **pie chart**, showing **subdomains** divide
+* Add **another panel**, will be a **pie chart**, showing **subdomains** divide
 
   * Graph type = Pie chart
   * Data source = Loki
@@ -1515,14 +1531,14 @@ Can be tested with opera build in VPN, or some online
   * Transform > Rename by regex
     * Match = `\{request_host="(.*)"\}`
     * Replace = `$1`
-  * Title = "Subdomains use"
+  * Title = "Subdomains divide"
   * Transparent
-  * Legen Placement = Right
+  * Legend Placement = Right
   * Value = Last
 
-![pane3](https://i.imgur.com/MjbLVlJ.png)
+![panel3](https://i.imgur.com/MjbLVlJ.png)
 
-* Add **another pane**, will be a **Geomap**, showing location of machine accessing
+* Add **another panel**, will be a **Geomap**, showing location of machine accessing
   Caddy
 
   * Graph type = Geomap
@@ -1533,13 +1549,13 @@ Can be tested with opera build in VPN, or some online
   * Transform > Extract fields
     * Source = labels
     * Format = JSON
-    * 1. Field = geoip_location_latitude; Alias = latitude
-    * 2. Field = geoip_location_longitude; Alias = longitude
+    * 1. Field = `geoip_location_latitude`; Alias = `latitude`
+    * 2. Field = `geoip_location_longitude`; Alias = `longitude`
   * Title = "Geomap"
   * Transparent
   * Map view > View > *Drag and zoom around* > Use current map setting
 
-* Add **another pane**, will be a **pie chart**, showing **IPs** that hit the most
+* Add **another panel**, will be a **pie chart**, showing **IPs** that hit the most
 
   * Graph type = Pie chart
   * Data source = Loki
@@ -1554,7 +1570,7 @@ Can be tested with opera build in VPN, or some online
   * Legen Placement = Right
   * Value = Last or Total
   
-* Add **another pane**, this will be actual **log view**
+* Add **another panel**, this will be actual **log view**
 
   * Graph type - Logs
   * Data source - Loki
@@ -1564,7 +1580,7 @@ Can be tested with opera build in VPN, or some online
   * Deduplication - Exact or Signature
   * Save
 
-![pane3](https://i.imgur.com/bzE6JEg.png)
+![panel3](https://i.imgur.com/bzE6JEg.png)
 
 
 # Update
