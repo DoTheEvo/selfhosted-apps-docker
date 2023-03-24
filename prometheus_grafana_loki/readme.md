@@ -24,7 +24,6 @@ Lot of the prometheus stuff here is based off the magnificent
 # Chapters
 
 * **[Core prometheus+grafana](#Overview)** - nice dashboards with metrics of docker host and containers
-* **[PromQL](#PromQL)** - links to various learning resources
 * **[Pushgateway](#Pushgateway)** - push data to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - setting alerts and getting notifications
 * **[Loki](#Loki)** - prometheus for logs
@@ -354,6 +353,10 @@ To **add** pushgateway functionality to the current stack:
   </details>  
 
 * Adding pushgateway's **scrape point** to `prometheus.yml`<br>
+  Of note is **honor_labels** set to true,
+  which makes sure that **conflicting labels** like `job`, set during push
+  are kept over labels set in `prometheus.yml` for the scrape job.
+  [Docs](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config).
 
   <details>
   <summary>prometheus.yml</summary>
@@ -373,7 +376,7 @@ To **add** pushgateway functionality to the current stack:
 
 ### The basics
 
-![veeam-dash](https://i.imgur.com/TOuv9bM.png)
+![push-web](https://i.imgur.com/9Jk0HKu.png)
 
 To **test pushing** some metric, execute in linux:<br>
   * `echo "some_metric 3.14" | curl --data-binary @- https://push.example.com/metrics/job/blabla/instance/whatever`
@@ -381,8 +384,9 @@ To **test pushing** some metric, execute in linux:<br>
   * In Grafana > Explore > query for `some_metric` and see its value there.
 
 In that command you see the metric itself: `some_metric` and it's value: `3.14`<br>
-But you also see **labels** being set, one label named `job`, which is required,
-but after that it's whatever you want.<br>
+But there are also **labels** being set as part of the url. One label named `job`,
+which is required, but after that it's whatever you want.
+They just need to be in **pairs** - label name and label value.
 
 The metrics sit on the pushgateway **forever**, unless deleted or container
 shuts down. **Prometheus will not remove** the metrics **after scraping**,
