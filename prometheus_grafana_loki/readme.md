@@ -75,7 +75,7 @@ Prometheus is relatively young project, it is a **pull type** monitoring.
 /home/
  └── ~/
      └── docker/
-         └── prometheus/
+         └── monitoring/
              ├── 🗁 grafana_data/
              ├── 🗁 prometheus_data/
              ├── 🗋 docker-compose.yml
@@ -1611,7 +1611,7 @@ that makes daily snapshot of the entire directory.
 
 #### Restore
 
-* down the prometheus containers `docker-compose down`</br>
-* delete the entire prometheus directory</br>
-* from the backup copy back the prometheus directory</br>
+* down the containers `docker-compose down`</br>
+* delete the entire monitoring directory</br>
+* from the backup copy back the monitoring directory</br>
 * start the containers `docker-compose up -d`
