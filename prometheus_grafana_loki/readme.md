@@ -6,20 +6,22 @@
 
 # Purpose
 
-Monitoring of a docker host and the cointaners.
+Monitoring of a docker host and cointaners.
 
 * [Official Prometheus](https://prometheus.io/)
 * [Official Grafana](https://grafana.com/)
 * [Official Loki](https://grafana.com/oss/loki/)
 
 Monitoring in this case means gathering and showing information on how services
-or machines or containers are running. Can be cpu, io, ram, disk use... 
-can be number of http requests, errors, or results of backups.<br>
-Prometheus deals with metrics. Loki deals with logs. Grafana is there to show
-the data on a dashboard.
+or machines or containers are running.<br>
+Can be cpu, io, ram, disk use... can be number of http requests, errors,
+results of backups, or a world map showing location of IP addresses
+that access your services.<br>
+Prometheus deals with **metrics**. Loki deals with **logs**.
+Grafana is there to show the data on **dashboards**.
 
-Lot of the prometheus stuff here is based off the magnificent
-[stefanprodan/dockprom.](https://github.com/stefanprodan/dockprom)
+Most of the prometheus stuff here is based off the magnificent
+[**stefanprodan/dockprom**.](https://github.com/stefanprodan/dockprom)
 
 # Chapters
 
@@ -224,7 +226,7 @@ If one does not exist yet: `docker network create caddy_net`
 
 [Official documentation.](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 
-Contains the bare minimum setup of targets from where metrics are to be pulled.
+Contains the bare minimum settings of targets from where metrics are to be pulled.
 
 `prometheus.yml`
 ```yml
@@ -352,7 +354,7 @@ To **add** pushgateway functionality to the current stack:
   ```
   </details>  
 
-* Adding pushgateway's **scrape point** to `prometheus.yml`<br>
+* Adding pushgateway as a **scrape point** to `prometheus.yml`<br>
   Of note is **honor_labels** set to true,
   which makes sure that **conflicting labels** like `job`, set during push
   are kept over labels set in `prometheus.yml` for the scrape job.
@@ -368,6 +370,7 @@ To **add** pushgateway functionality to the current stack:
 
   scrape_configs:
     - job_name: 'pushgateway-scrape'
+      scrape_interval: 60s
       honor_labels: true
       static_configs:
         - targets: ['pushgateway:9091']
@@ -390,7 +393,7 @@ They just need to be in **pairs** - label name and label value.
 
 The metrics sit on the pushgateway **forever**, unless deleted or container
 shuts down. **Prometheus will not remove** the metrics **after scraping**,
-it will keep scraping the pushgateway, every 15 seconds or whatever is set,
+it will keep scraping the pushgateway, every X seconds,
 and store the value that sits there with the timestamp of scraping.
 
 To **wipe** the pushgateway clean<br>
@@ -398,7 +401,7 @@ To **wipe** the pushgateway clean<br>
 
 ### The real world use
 
-[**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
+* [**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
 
 Linked above is a guide-by-example with more info on **pushgateway setup**.<br>
 A real world use to **monitor backups**, along with pushing metrics
@@ -414,6 +417,10 @@ from **windows in powershell**.<br>
 To send a **notification** about some **metric** breaching some preset **condition**.<br>
 Notifications channels used here are **email** and
 [**ntfy**](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
+
+*Note*<br>
+I myself am **not** planning on using alertmanager. 
+Grafana can do alerts for both logs and metrics.
 
 ![alert](https://i.imgur.com/b4hchSu.png)
 
