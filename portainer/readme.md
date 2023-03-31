@@ -12,10 +12,11 @@ Web GUI for overview and management of docker environment.
 * [Github](https://github.com/portainer/portainer)
 * [DockerHub image used](https://hub.docker.com/r/portainer/portainer-ce/)
 
-Lightweight management web UI, that allows to easily manage
-docker containers, networks, volumes, images,... the work.
+Lightweight, allows to easily manage docker containers,
+images, networks, volumes,... 
 
-In my use it is mostly information tool, rather than a management tool.
+I don't really use as I love [ctop])(https://github.com/bcicen/ctop),
+but I keep eye out on it and recommend it to noobs.
 
 # Files and directory structure
 
