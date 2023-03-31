@@ -11,9 +11,6 @@
 5. [Monitoring](#monitoring)
 6. [Other guides](#other-guides)
 
-*[Older version](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/d973916d56e23bb5564bd9b68e06ec884cfc6af1/caddy_v2)
-of this guide - more detailed and handholding for docker noobs.*
-
 # Purpose & Overview
 
 Reverse proxy is needed if one wants access to services based on the hostname.<br>
