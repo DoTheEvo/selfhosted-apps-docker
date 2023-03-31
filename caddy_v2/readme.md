@@ -351,6 +351,28 @@ nextcloud.{$MY_DOMAIN} {
 }
 ```
 
+### Backend communication
+
+Some containers might be set to communicate only through https 443 port.
+But since they are behind proxy, their certificates wont be singed, wont be trusted.
+
+Caddies sub-directive `transport` sets how to communicate with the backend.<br>
+Setting the upstream's scheme to `https://`
+or declaring the `tls` transport subdirective makes it use https.
+Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to
+untrusted certificates coming from the backend.
+
+```
+whatever.{$MY_DOMAIN} {
+    reverse_proxy https://server-blue:443 {
+        transport http {
+            tls
+            tls_insecure_skip_verify
+        }
+    }
+}
+```
+
 ### Named matchers and IP filtering
 
 Caddy has [matchers](https://caddyserver.com/docs/caddyfile/matchers)<br>
@@ -425,28 +447,6 @@ a.{$MY_DOMAIN} {
 b.{$MY_DOMAIN} {
     reverse_proxy nginx:80
     import LAN_only
-}
-```
-
-### Backend communication
-
-Some containers might be set to communicate only through https 443 port.
-But since they are behind proxy, their certificates wont be singed, wont be trusted.
-
-Caddies sub-directive `transport` sets how to communicate with the backend.<br>
-Setting the upstream's scheme to `https://`
-or declaring the `tls` transport subdirective makes it use https.
-Setting `tls_insecure_skip_verify` makes Caddy ignore errors due to
-untrusted certificates coming from the backend.
-
-```
-whatever.{$MY_DOMAIN} {
-    reverse_proxy https://server-blue:443 {
-        transport http {
-            tls
-            tls_insecure_skip_verify
-        }
-    }
 }
 ```
 
