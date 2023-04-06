@@ -612,10 +612,13 @@ has more detailed section on alerting worth checking out.
 
 # Loki
 
-Loki is made by the grafana team. Sometimes called a Prometheus for logs,
-it's a **push** type monitoring.<br>
+Loki is a log aggregation tool, made by the grafana team.
+Sometimes called a Prometheus for logs, it's a **push** type monitoring.<br>
+
 It uses [LogQL](https://promcon.io/2019-munich/slides/lt1-08_logql-in-5-minutes.pdf)
 for queries, which is similar to PromQL in its use of labels.
+
+[The official documentation overview](https://grafana.com/docs/loki/latest/fundamentals/overview/)
 
 There are two ways to **push logs** to Loki from a docker container.
 
@@ -668,7 +671,7 @@ There are two ways to **push logs** to Loki from a docker container.
   </details>
 
 * **New file** - `loki-config.yml` bind mounted in the loki container.<br>
-  The config comes from
+  The config here comes from
   [the official example](https://github.com/grafana/loki/tree/main/cmd/loki)
   with some changes.
     * **URL** changed for this setup.
