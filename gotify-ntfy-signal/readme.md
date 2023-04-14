@@ -81,6 +81,7 @@ ntfy uses "topics" for categorization, which creates a very handy disconnect fro
 sender and receiver.<br>
 Lets say there's a minecraft server and there are notifications when someone 
 joins. These notifications are send to a `minecraft` topic, not to a specific users.
+Users can subscribe to the topic if they want those notifications.
 This gives great flexibility and is the main reason why ntfy wins
 over other solutions.
 
