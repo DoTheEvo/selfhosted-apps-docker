@@ -121,6 +121,15 @@ To execute it periodicly cron is used.
   0    4    *   *   *   /opt/ghettovcb/bin/ghetto_run.sh
   ```
   To save read only file in vi use `:wq!`
+* restart cron service<br>
+  `kill $(cat /var/run/crond.pid)`<br>
+  `crond`
+
+### Restore from backup
+
+[Documentation](https://communities.vmware.com/t5/VI-VMware-ESX-3-5-Documents/Ghetto-Tech-Preview-ghettoVCB-restore-sh-Restoring-VM-s-backed/ta-p/2792996)
+
+* 
 
 
 Logs about backups are in `/tmp`
