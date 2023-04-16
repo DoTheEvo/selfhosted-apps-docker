@@ -25,11 +25,20 @@ https://blog.techygeekshome.info/2021/04/vmware-esxi-esxcli-commands-to-update-h
 
 The script makes snapshot of a VM, copies the "old" vmdk and other files
 to a backup location, then deletes the snapshot.<br>
-The space use of this approach where every version takes up lot of space
-can be an issue, maybe solved by backup datastore having deduplication,
-but thats maybe for the future.
+This approach, where backup in time is full backup takes up a lot of space.
+Some form of deduplication might be a solution.
 
 VMs that have any existing snapshot wont get backed up.
+
+Files that are backed up:
+
+* vmdk - virtual disk file, every virtual disk has a separate file.
+  In webgui datastore browser only one vmdk file is seen per disk,
+  but on filesystem theres `blabla.vmdk` and `blablka-flat.vmdk`.
+  The `flat` one is where the data actually are, the other one is a descriptor
+  file.
+* nvram - bios settings of a VM
+* vmx - virtual machine settings, can be edited
 
 ### Backup storage locations
 
@@ -150,5 +159,6 @@ unmap, windows, `fsck_ufs -Ey /dev/da0p3`
 * https://www.youtube.com/watch?v=ySMitWnNxp4
 * https://forums.unraid.net/topic/30507-guide-scheduled-backup-your-esxi-vms-to-unraid-with-ghettovcb/
 * https://blog.kingj.net/2016/07/03/how-to/backing-up-vmware-esxi-vms-with-ghettovcb/
+* https://sudonull.com/post/95754-Backing-up-ESXi-virtual-machines-with-ghettoVCB-scripts#esxi-3
 
 #### email 
