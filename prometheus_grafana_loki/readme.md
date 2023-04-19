@@ -309,7 +309,11 @@ Instant verctor vs range vector.
 
 # Pushgateway
 
-Gives freedom to **push** information in to prometheus from **anywhere**.<bt>
+Gives freedom to **push** information in to prometheus from **anywhere**.<br>
+
+Be aware that it should **not be abused** to turn prometheus in to push type
+monitoring. It is only intented for
+[specific situations.](https://github.com/prometheus/pushgateway/blob/master/README.md)
 
 ### The setup
 
@@ -1147,6 +1151,7 @@ Templates resources
 * [Overview of Grafana Alerting and Message Templating for Slack](https://faun.pub/overview-of-grafana-alerting-and-message-templating-for-slack-6bb740ec44af)
 * [youtube - Unified Alerting Grafana 8 | Prometheus | Victoria | Telegraf | Notifications | Alert Templating](https://youtu.be/UtmmhLraSnE)
 * [Dot notation](https://www.practical-go-lessons.com/chap-32-templates#dot-notation)
+* [video - Annotations and Alerts tutorial for Grafana with Timescale](https://youtu.be/bmOkirtC65w)
 
 ---
 ---
