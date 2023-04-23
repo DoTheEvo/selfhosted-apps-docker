@@ -135,7 +135,7 @@ Looks like this `/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090`
 * [Download](https://github.com/lamw/ghettoVCB/archive/refs/heads/master.zip)
   the repo files on a pc from which you would upload them on to esxi
 * create a directory on a datastore where the script and configs will reside<br>
-  `/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto`
+  `/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto_script`
 * upload the files, should be 6, can skip `build` directory and `readme.md`
 * ssh in to esxi
 * cd in to the datastore ghetto directory
@@ -149,7 +149,7 @@ Gotta know basics how to edit files with ancient `vi`
 * cd in to the datastore ghetto directory
   `cp ./ghettoVCB.conf ./ghetto_1.conf`<br>
 * Only edit this file, for starter setting where to copy backups<br>
-  `vi /opt/ghettovcb/ghetto_1.conf`<br>
+  `vi ./ghetto_1.conf`<br>
   `VM_BACKUP_VOLUME=/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/Backups`
 * Create a file that will contain list of VMs to backup<br>
   `touch ./vms_to_backup_list`<br>
@@ -164,7 +164,7 @@ Gotta know basics how to edit files with ancient `vi`
   ```
   #!/bin/sh
 
-  GHETTO_DIR=/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto
+  GHETTO_DIR=/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto_script
 
   $GHETTO_DIR/ghettoVCB.sh \
       -g $GHETTO_DIR/ghetto_1.conf \
@@ -185,7 +185,7 @@ Gotta know basics how to edit files with ancient `vi`
   ```
   #!/bin/sh
 
-  GHETTO_DIR=/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto
+  GHETTO_DIR=/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto_script
 
   $GHETTO_DIR/ghettoVCB.sh \
       -g $GHETTO_DIR/ghetto_1.conf \
@@ -211,12 +211,12 @@ To execute it periodicly cron is used. But theres an issue of cronjob being lost
 on esxi restart, which require few extra steps to solve.
 
 * Make backup of roots crontab<br>
-  `cp /var/spool/cron/crontabs/root /var/spool/cron/crontabs/root.backup`
+  `cp /var/spool/cron/crontabs/root /vmfs/volumes/datastore1/ghetto_script/root_cron.backup`
 * Edit roots crontab to execute the run script at 4:00<br>
   add the following line at the end in [cron format](https://crontab.guru/)<br>
   `vi /var/spool/cron/crontabs/root`
   ```
-  0    4    *   *   *   /vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto/ghetto_run.sh
+  0    4    *   *   *   /vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto_script/ghetto_run.sh
   ```
   To save read only file in vi use `:wq!`
 * restart cron service<br>
@@ -225,12 +225,15 @@ on esxi restart, which require few extra steps to solve.
 
 To make the cronjob permanent 
 
+* Make backup of local.sh file<br>
+  `cp /etc/rc.local.d/local.sh /vmfs/volumes/datastore1/ghetto_script/local.sh.backup`
 * Edit `etc/rc.local.d/local.sh` file, adding the following lines at the end,
-  replacing the part in quotes in the echo line with your cronjob line.<br>
-  `vi etc/rc.local.d/local.sh`<br>
+  but before the `exit 0` line.
+  Replace the part in quotes in the echo line with your cronjob line.<br>
+  `vi /etc/rc.local.d/local.sh`<br>
   ```
   /bin/kill $(cat /var/run/crond.pid) > /dev/null 2>&1
-  /bin/echo "0    4    *   *   *   /vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto/ghetto_run.sh" >> /var/spool/cron/crontabs/root
+  /bin/echo "0    4    *   *   *   /vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/ghetto_script/ghetto_run.sh" >> /var/spool/cron/crontabs/root
   /bin/crond
   ```
   ESXi host must have disabled secure boot for local.sh to execute.
@@ -249,24 +252,24 @@ Logs about backups are in `/tmp`
 [Documentation](https://communities.vmware.com/t5/VI-VMware-ESX-3-5-Documents/Ghetto-Tech-Preview-ghettoVCB-restore-sh-Restoring-VM-s-backed/ta-p/2792996)
 
 * In webgui create a full path where to restore the VM
-* The restore-config-template-file is in th ghetto directory on datastore<br>
+* The restore-config-template-file is in the ghetto_script directory on datastore<br>
   named `ghettoVCB-restore_vm_restore_configuration_template`
   Make copy of it<br>
   `cp ./ghettoVCB-restore_vm_restore_configuration_template ./vms_to_restore_list`<br>
 * Edit this file, adding new line, in which separated by `;` are:
-    * path to the backup, the directory with date in name
+    * path to the backup, the directory has date in name
     * path where to restore this backup
     * disk type - 1=thick | 2=2gbsparse | 3=thin | 4=eagerzeroedthick<br>
     * optional - new name of the VM<br>
-  `vi /opt/ghettovcb/vms_to_restore_list`
+  `vi ./vms_to_restore_list`
   ```
   "/vmfs/volumes/6187f7e1-c584077c-d7f6-3c4937073090/Backups/OPNsense/OPNsense-2023-04-16_04-00-00;/vmfs/volumes/6378107d-b71bee00-873d-b42e99f40944/OPNsense_restored;3;OPNsense-restored"
   ```
 * Execute the restore script with the config given as a parameter.<br>
-  `opt/ghettovcb/bin/ghettoVCB-restore.sh -c /opt/ghettovcb/vms_to_restore_list`
+  `./ghettoVCB-restore.sh -c ./vms_to_restore_list`
 * Register the restored VM.<br>
   If it's in the same location as the original was, it should just go through.
-  If the location is different then esxi asks if it was moved or copied.
+  If the location is different, then esxi asks if it was moved or copied.
   * Copied - You are planning to use both VMs at the same time,
     selecting this option generates new UUID for the VM, new MAC address,
     maybe some other hardware identifiers as well.
