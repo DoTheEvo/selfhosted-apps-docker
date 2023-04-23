@@ -102,9 +102,6 @@ Logs from systems in VMs are in >Virtual Machines > Name-of-VM > Monitor > Logs
 * [github](https://github.com/lamw/ghettoVCB)
 * [documentation](https://communities.vmware.com/t5/VI-VMware-ESX-3-5-Documents/ghettoVCB-sh-Free-alternative-for-backing-up-VM-s-for-ESX-i-3-5/ta-p/2773570)
 
-* [https://github.com/lamw/ghettoVCB/issues/233](https://github.com/lamw/ghettoVCB/issues/233)
-
-
 The script makes snapshot of a VM, copies the "old" vmdk and other files
 to a backup location, then deletes the snapshot.<br>
 This approach, where backup in time is full backup takes up a lot of space.
