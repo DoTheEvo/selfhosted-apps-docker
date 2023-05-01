@@ -395,7 +395,8 @@ Interfaces: Diagnostics: ARP Table<br>
 
 Firewall: Log Files: Live View<br>
 Great tool to investigate settings and behavior with it's filter
-and autorefresh on/off and up to 20k last entries
+and autorefresh on/off and up to 20k last entries.<br>
+Must **enable logging** for a rule to be visible there.
 
 * checking out a specific firewall rule latest use<br>
   `label` `contains` `some string from the rules description`<br>
