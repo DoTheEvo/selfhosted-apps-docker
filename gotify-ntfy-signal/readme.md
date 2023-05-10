@@ -44,6 +44,8 @@ services:
     restart: unless-stopped
     command:
       - serve
+    ports:
+      - "80:80"
     volumes:
       - ./ntfy_cache:/var/cache/ntfy
       - ./ntfy_etc:/etc/ntfy
@@ -147,20 +149,33 @@ ExecStart=/opt/borg_backup.sh
 
 ![ntfy](https://i.imgur.com/gL81jRg.png)
 
-Alerting in grafana to ntfy [works](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana#alertmanager),
-but its ugly with just json shown.
+Alerting in grafana to ntfy works, but its ugly with just json shown.
 
 To solve this 
 
-* deploy container [grafana-to-ntfy](https://github.com/kittyandrew/grafana-to-ntfy).
-  Should be on the same network with grafana.
-  Set in `.env` ntfy url of your ntfy server and specific topic
+* Add container [grafana-to-ntfy](https://github.com/kittyandrew/grafana-to-ntfy).
+  Set in `.env` ntfy local url
 * in grafana set contact point webhook aimed at `http://grafana-to-ntfy:8080`,
   with credentials from the `.env`
 
 `docker-compose.yml`
 ```yml
 services:
+
+  ntfy:
+    image: binwiederhier/ntfy:v2.4.0
+    container_name: ntfy
+    hostname: ntfy
+    env_file: .env
+    restart: unless-stopped
+    command:
+      - serve
+    ports:
+      - "80:80"
+    volumes:
+      - ./ntfy_cache:/var/cache/ntfy
+      - ./ntfy_etc:/etc/ntfy
+
   grafana-to-ntfy:
     container_name: grafana-to-ntfy
     hostname: grafana-to-ntfy
@@ -168,11 +183,15 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    ports:
+      - "8080:8080"
+  
 
 networks:
   default:
     name: $DOCKER_MY_NETWORK
     external: true
+
 ```
 
 `.env`
@@ -181,7 +200,7 @@ networks:
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
-NTFY_URL=https://ntfy.example.com/grafana
+NTFY_URL=http://ntfy:80/whatever
 BAUTH_USER=admin
 BAUTH_PASS=test
 ```
