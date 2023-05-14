@@ -230,3 +230,6 @@ that makes daily snapshot of the /etc directory which contains the config file.
 Replace the content of the config file with the one from the backup.
 
 
+# Links
+
+[Site to Site config](https://www.procustodibus.com/blog/2020/12/wireguard-site-to-site-config/)
