@@ -73,10 +73,9 @@ services:
       - ./jellyfin-cache:/cache
       - /mnt/bigdisk/serialy:/media/video:ro
       - /mnt/bigdisk/mp3/moje:/media/music:ro
-    expose:
-      - 8096
     ports:
-      - 1900:1900/udp
+      - "1900:1900/udp"
+      - "8096:8096"
 
 networks:
   default:
@@ -87,7 +86,6 @@ networks:
 `.env`
 ```bash
 # GENERAL
-MY_DOMAIN=example.com
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 ```
