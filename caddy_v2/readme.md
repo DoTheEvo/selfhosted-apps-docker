@@ -390,6 +390,13 @@ network be allowed through?<br>
 Well, the [remote_ip](https://caddyserver.com/docs/caddyfile/matchers#remote-ip)
 matcher comes to play, which enables you to filter requests by their IP.<br>
 
+* *note* - if your router uses hairpin/NATreflection to get around
+  [the issue](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2#editing-hosts-file)
+  of accessing locally hosted stuff from LAN side by the hostname,
+  then this will block LAN side too. As remote_ip will be your public ip.
+  Local DNS server is needed, with records sending traffic to docker host
+  instead of hairpin/NATreflection
+
 Named matchers are defined by `@` and can be named whatever you like.
 
 ```
