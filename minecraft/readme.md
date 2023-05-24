@@ -152,6 +152,10 @@ to not need to enter `minecraft.example.com:30108` then google
 "minecraft srv record" and you should find correct settings.<br>
 Like [this one](https://i.imgur.com/hDhZQ.png).
 
+# Monitoring
+
+[How to monitor minecraft server using prometheus, loki, granana.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana_loki)
+
 # Plugins
 
 * [multiverse core](https://dev.bukkit.org/projects/multiverse-core)
