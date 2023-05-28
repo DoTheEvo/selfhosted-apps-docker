@@ -291,18 +291,55 @@ the default time interval is set to 1h instead of 15m
 ---
 ---
 
-# PromQL
+# PromQL basics
 
-Some concept, highlights and examples.
+My understanding of this shit.. 
+
+* Prometheus stores **metrics**, each metric has a name, like `cpu_temp`.
+* the metrics values are stored as **time series**, just simple - timestamped values<br>
+  `[43 @1684608467][41 @1684608567][48 @1684608667]`.
+* This metric has **labels** `[name="server-19", state="idle", city="Frankfurt"]`.<br>
+  These allow far better **targeting** of the data, or as they say **multidimensionality.**
+
+**Queries** to retrieve metrics.
+
+* `cpu_temp` - **simple query** will show values over whatever time period
+is selected in the interface.
+* `cpu_temp{state="idle"}` - will narrow down results by applying a **label**.<br>
+  `cpu_temp{state="idle", name="server-19"}` - **multiple labels** narrow down results.
+
+A query can return various **data type**, kinda tricky concept is difference between:
+
+* **instant vector** - query returns a single value with a single timestamp.
+  It is simple and intuitive. All the above examples are instant vectors.<br>
+  Of note, there is **no thinking about time range here**. That is few layers above,
+  if one picks last 1h or last 7 days... that plays no role here,
+  this is a query response datatype and it is still instant vector - a single value in
+  point of time.
+
+* **range vector** - returns multiple values with a single timestamp<br>
+  This is **needed by some [query functions](https://prometheus.io/docs/prometheus/latest/querying/functions)**
+  but on its own useless.<br>
+  A useless example would be `cpu_temp[10m]`. This query first looks at the last
+  timestamp data, then it would take all data points within the previous 10m
+  before that one timestamp, and return all those values.
+  **This colletion would have a single timestamp.**<br>
+  This functionality allows use of various **functions** that can do complex tasks.<br> 
+  Actual useful example of a range vector would be `changes(cpu_temp[10m])`
+  where the function
+  [changes\(\)](https://prometheus.io/docs/prometheus/latest/querying/functions/#changes)
+  would take that range vector info, look at those 10min of data and return 
+  a single value, telling how many times the value of that metric changed in those 10 min.
+
+Links
 
 * [Stackoverflow - Prometheus instant vector vs range vector](https://stackoverflow.com/questions/68223824/prometheus-instant-vector-vs-range-vector)
-* [Short video](https://youtu.be/yLPTHinHB6Y)
+* [The Anatomy of a PromQL Query](https://promlabs.com/blog/2020/06/18/the-anatomy-of-a-promql-query/)
 * [Prometheus Cheat Sheet - Basics \(Metrics, Labels, Time Series, Scraping\)](https://iximiuz.com/en/posts/prometheus-metrics-labels-time-series/)
 * [Learning Prometheus and PromQL - Learning Series](https://iximiuz.com/en/series/learning-prometheus-and-promql/)
 * [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 
-One thing to get from these is what kind of data a query in PromQL returns.
-Instant verctor vs range vector.
+</details>
 
 ---
 ---
@@ -1121,14 +1158,14 @@ how to setup grafana-to-ntfy, to **make alerts look good**.
 
 ### Templates
 
-Not really used here, but **they are pain** in the ass and there's some info
+Not really used here, but **they are pain** and there's some info
 as it took **embarrassingly** long to find that
 `{{ .CommonAnnotations.summary }}` for the title.
 
 * **Testing** should be done in **contact point** when editing,
-  useful **Test button** that allows you send alerts with custom values.
-* To [define a template.](https://i.imgur.com/ZczwCx2.png)
-* To [call a template.](https://i.imgur.com/0YdWA8Q.png)
+  useful **Test button** that allows you to send alerts with custom values.
+* To [define a template.](https://i.imgur.com/vYPO7yd.png)
+* To [call a template.](https://i.imgur.com/w3Sb6fF.png)
 * My **big mistake** when playing with this was **missing a dot**.<br>
   In Contact point, in Title/Message input box. 
   * correct one - `{{ template "test" . }}`
@@ -1141,7 +1178,7 @@ as it took **embarrassingly** long to find that
   For **array** theres need to **loop** over it to get access to the
   values in it. For **objects** one just needs to target **the name**
   from global context.. **using dot** at the beginning.
-* To [iterate over alerts array.](https://i.imgur.com/gdwGhjN.png)
+* To [iterate over alerts array.](https://i.imgur.com/yKmZLLQ.png)
 * To just access a value - `{{ .CommonAnnotations.summary }}`
 * Then theres **conditional** things one can do in **golang templates**,
   but I am not going to dig that deep... 
