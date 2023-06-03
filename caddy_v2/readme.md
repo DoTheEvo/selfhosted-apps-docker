@@ -524,7 +524,7 @@ b.{$MY_DOMAIN} {
 }
 ```
 
-### Logging
+### Logging - Access log
 
 [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)<br>
 Very useful and powerful way to get info on who is accessing what.
