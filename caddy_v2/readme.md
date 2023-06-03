@@ -111,8 +111,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy_config:/data
-      - ./caddy_data:/config
+      - ./caddy_config:/config
+      - ./caddy_data:/data
 
 networks:
   default:
@@ -527,19 +527,30 @@ b.{$MY_DOMAIN} {
 ### Logging
 
 [Official documentation.](https://caddyserver.com/docs/caddyfile/directives/log)<br>
-If access logs for specific site are desired
+Very useful and powerful way to get info on who is accessing what.
 
-```  
-bookstack.{$MY_DOMAIN} {
-    log {
-        output file /data/logs/bookstack_access.log {
-            roll_size 20mb
-            roll_keep 5
-        }
+Already bind mounted `./caddy_data:/data` directory will be used to store the logs.<br>
+A snippet is used so that config is cleaner as logging in caddy
+is done per site block, so every block needs to import it, but it allows
+separation of logs per domain/subdomain if desired.
+
+```php
+(log_common) {
+  log {
+    output file /data/logs/caddy_access.log {
+      roll_size 20mb
+      roll_keep 5
     }
-    reverse_proxy bookstack:80
+  }
+}
+
+map.{$MY_DOMAIN} {
+  import log_common
+  reverse_proxy minecraft:8100
 }
 ```
+
+In the monitoring section theres more use of logging and visualizing it in grafana.
 
 # Caddy DNS challenge
 
@@ -641,7 +652,7 @@ Add global option `acme_dns`<br>
 or add `tls` directive to the site-blocks.
 
 `Caddyfile`
-```
+```php
 {
   acme_dns cloudflare {$CLOUDFLARE_API_TOKEN}
 }
