@@ -130,3 +130,8 @@ Nano editor is relatively simple and everywhere so that will be used.
 * you dont understand how this shit works, fixing not working stuff be hard,
   but now you can start to consume all the guides and tutorials on
   docker compose and try stuff...
+
+## where to go from here
+
+Can check out [this repo](https://github.com/DoTheEvo/selfhosted-apps-docker)
+and stuff in it.
