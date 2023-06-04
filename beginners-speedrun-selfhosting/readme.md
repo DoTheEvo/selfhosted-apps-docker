@@ -3,26 +3,26 @@
 ###### guide-by-example
 
 You want to selfhost stuff.<br>
-You know little and want to start somewhere FAST!
+You know little and want to start somewhere, FAST!
 
-## requirements
+# Requirements
 
-* a spare PC that will be the server
-  * can be virtualmachine, makes it even easier.. virtualbox, hyperv.
-* ability to google shit out
-  * if the guide says do X, and steps seem insuficient to you, 
-    you write that shit it in to google and add word youtube.
-* ability to convince oneself the linux terminal is not scary.
-  Its really trivial a slow monkey could copy paste few commands.
+* A **spare PC** that will be the server.<br>
+  Can be **virtualmachine**.. virtualbox, hyperv.
+* **Google**.<br>
+  If the guide says do X, and steps seem insuficient, 
+  you google that shit and add the word **youtube**.
 
-## install a linux on the server
+# Install a linux on the server
 
-[some video](https://www.youtube.com/watch?v=SyBuNZxzy_Y)
+![endeavouros_logo](https://i.imgur.com/DSMmaj8.png)
+
+[Some video.](https://www.youtube.com/watch?v=SyBuNZxzy_Y)
 
 * **download linux iso**. For noobs I picked [EndeavourOS \(2GB\)](https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive/EndeavourOS_Cassini_Nova-03-2023_R1.iso)
-  * why that linux and not xxx? Fuck you, thats why. Not writing a novel here.
+  * why that linux and not xxx? Under the hood its Arch Linux.
 * **make bootable usb** from the iso, recommend use [ventoy](https://www.ventoy.net/en/doc_start.html)
-  * literally just download; run; select usb; click install; exit; copy iso on to it
+  * download; run; select usb; click install; exit; copy iso on to it
 * **boot from the usb**, maybe on newer machines need to disable secure boot in bios
 * **click through the installation**
   * pick online installer when offered
@@ -32,9 +32,12 @@ You know little and want to start somewhere FAST!
   * username lets say you pick `noob`
 * done
 
-## basic setup of the linux server
+# Basic setup of the linux server
 
-SSH - a tiny application that allows you to execute commands
+![ssh](https://i.imgur.com/ElFrBog.png)
+
+
+**SSH** - a tiny application that allows you to execute commands
       from your comfy windows PC on the damn server 
 
 * log in to the server and be in terminal
@@ -49,14 +52,18 @@ SSH - a tiny application that allows you to execute commands
 
 *arrow up key in terminal will cycle through old comamnds in history*
 
-## remote connect to the server
+# Remote connect to the server
+
+![mobasterm_logo](https://i.imgur.com/aBL85Tr.png)
 
 * **install** [mobaXterm](https://mobaxterm.mobatek.net/) on your windows machine
 * use it to **connect** to the server using its ip address and username
   * [have a pic](https://i.imgur.com/lhRGt1p.png)<br>
 * done
 
-## installing docker
+# Install docker
+
+![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
 Docker - a thing that makes hosting super easy, people prepared *recipies*,
          you copy paste them, maybe edit a bit, run them
@@ -68,11 +75,11 @@ Docker - a thing that makes hosting super easy, people prepared *recipies*,
 * log out, log back in
 * done
 
-## using docker
+# Using docker
 
 Well, its time to learn how to create and edit files and copy paste shit
 in to them, IN LINUX!<br>
-Honestly could be annoying as fuck at first, but mobaXterm should make it easy
+Honestly could be annoying as fuck at first, but mobaXterm should make it easier
 with the right mouse click paste.<br>
 Nano editor is relatively simple and everywhere so that will be used.
 
@@ -83,7 +90,7 @@ Nano editor is relatively simple and everywhere so that will be used.
 * go in to it `cd nginx`
 * Oh look at you being all hacker in terminal, following simple directions
 * create empty docker-compose.yml file `nano docker-compose.yml`
-* paste in to it this, spacing matters
+* paste in to it this *recipe*, spacing matters
   ```
   services:
 
@@ -95,14 +102,14 @@ Nano editor is relatively simple and everywhere so that will be used.
       - "80:80"
   ```
 * save using `ctrl+s`; exit `ctrl+x`
-* run command `docker compose up -d`<br>
-  will say the container started, if some error try `sudo docker compose up -d`
+* run command `sudo docker compose up -d`<br>
+  will say the container started
 * on your windows machine go to your browser<br>
-  in address bar put the ip of your server `192.168.1.8`, bam<br>
+  in address bar put the ip of your server `192.168.1.8` bam<br>
 
 ![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
 
-## undertanding what you just did 
+# undertanding what you just did 
 
 * on linux server a docker container is running, its a webserver and it is
   accessible for others.<br>
@@ -114,19 +121,19 @@ Nano editor is relatively simple and everywhere so that will be used.
   and you can be doing this shit through a webpage. I dont use it, but it
   got good I heard.
 
-## undertanding what you did not get done
+# undertanding what you did not get done
 
 * this shit is on your own local network, not accessible from the outside.
   Cant call grandma and tell her to write `192.168.1.8` in to her browser
   to see your awesome nginx welcome running.
-  She tells you that the dumb fuck you are you do not have public IP and ports
+  She tells you that the dumb fuck you are, you do not have public IP and ports
   forwarded.<br>
   To get that working is bit challenging, probably deserves own page,
   not realy speedrun, but thorough steps as shit gets sideways fast and people
   can dick around for hours trying wrong shit.
 * everything here is just basic setup that breaks easily,
-  server got dynamic IP, turn it off for a day and it might get a different ip
-  assigned. Container is not set to start on boot,... 
+  server got dynamic IP, turn it off for a weekend and it might get a different ip
+  assigned next time it starts. Container is not set to start on boot,... 
 * you dont understand how this shit works, fixing not working stuff be hard,
   but now you can start to consume all the guides and tutorials on
   docker compose and try stuff...
