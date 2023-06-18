@@ -1,4 +1,4 @@
-# Jellyfin in docker
+# Audiobookshelf
 
 ###### guide-by-example
 
@@ -10,11 +10,10 @@ WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
 
-Stream movies/tv-shows/music to a browser, or a [large selection of devices and services.](https://jellyfin.org/clients/) 
+Selfhosted audiobook library.
 
-* [Official site](https://jellyfin.org/)
-* [Github](https://github.com/jellyfin/jellyfin)
-* [DockerHub](https://hub.docker.com/r/jellyfin/jellyfin/)
+* [Official site](https://www.audiobookshelf.org/)
+* [Github](https://github.com/advplyr/audiobookshelf)
 
 Jellyfin if a free media system, an alternative to proprietary Plex.<br>
 The core server side is written in C#, web client in Javascript,

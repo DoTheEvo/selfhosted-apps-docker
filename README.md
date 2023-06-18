@@ -49,10 +49,6 @@ Repo documents self hosted apps in similar format and also uses caddy for revers
 
 - `docker-compose.yml` does **not** need any **editing** to get something up,
    **changes** are to be done in the `.env` file.
-- **Not using** `ports` directive if theres **only** web traffic for a container.<br>
-  Theres an expectation of running a **reverse proxy** which makes **mapping ports**
-  to a docker host **unnecessary**. Instead `expose` is used which is basically
-  just documentation.<br>
 - For **persistent** storage **bind mount** `./whatever_data` is used.
   No volumes, nor static path somewhere... just relative path next to compose file.
 - **No version** declaration at the beginning of **compose**, as the practice was
@@ -224,28 +220,27 @@ or enable freshly discovered feature for all future deployments.
 
 ### For docker noobs
 
-First, docker is easy. Like really.<br>
+Docker is easy. Really.<br>
 
-Second, there are two main uses.
+There are two main uses.
 
-* A developer who daily works on apps and docker eases everything about it,
-  from setting up enviroment, to testing and deployment.
-* A hosting approach, where you are not that concerned with detials of what
-  and how works in the container that is prepared for you by developers,
-  you just want it running
+* For developers who daily work on apps and docker eases everything about it,
+  from setting up environment, to testing and deployment.
+* A hosting approach, where you mostly care about getting containers, that are
+  prepared for you by developers, up and running.
 
-This whole repo is obviously about the second use. So be careful that you wont
+This repo is about the second use. So be careful that you wont
 spend time on resources used to educate developers. Sure, if you get through
-that you will know docker better, but theres always the danger that after sinking
-4 hours learning, one still cant get plain nginx web server up and working
-and loses motivation.<br>
-And my personal preference in learning is getting something up as fast as possible
-and then tinker with it and try to understand how it works.
+that you will know docker better, but theres the danger that after sinking
+4 hours reading and watching videos you still cant get a plain nginx web server
+up and running and loses motivation.<br>
 
 So when googling for guides, look for **docker compose**
-rather than just **docker** tutorials and notice if they are talking some core
-fundamentals or deployment.
+rather than just **docker** tutorials.
 
+[Beginners speedrun to selfhosting something in docker](beginners-speedrun-selfhosting/)
+
+* [Good stuff](https://adamtheautomator.com/docker-compose-tutorial/)
 * [This](https://youtu.be/DM65_JyGxCo) one is pretty good. That entire channel
 has good stuff. 
 

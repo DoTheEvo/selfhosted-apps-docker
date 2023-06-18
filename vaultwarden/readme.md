@@ -68,9 +68,10 @@ services:
     env_file: .env
     volumes:
       - ./vaultwarden_data/:/data/
+    ports:
+      - "3012:3012"
     expose:
-      - 80:80
-      - 3012:3012
+      - "80"
 
 networks:
   default:

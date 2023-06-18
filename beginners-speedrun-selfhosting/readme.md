@@ -65,7 +65,7 @@ You know little and want to start somewhere, FAST!
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
-Docker - a thing that makes hosting super easy, people prepared *recipies*,
+**Docker** - a thing that makes hosting super easy, people prepared *recipies*,
          you copy paste them, maybe edit a bit, run them
 
 * **install docker-compose** - `sudo pacman -S docker-compose`

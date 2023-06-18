@@ -250,3 +250,9 @@ so in nginx check /opt/zammad and its content with `ls -al`,
 if its owned by zammad user.
 if its root use `chown -R zammad:zammad /opt/zammad`
 and down and up the stack.
+
+-------
+
+# Links
+
+* [Zammad Helpdesk creating duplicate users when using SAML auth](https://www.reddit.com/r/selfhosted/comments/13esjnx/zammad_helpdesk_creating_duplicate_users_when/)

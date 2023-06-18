@@ -206,8 +206,8 @@ WantedBy=multi-user.target
 
 # Kopia in Windows
 
-While GUI version seems like a way to go.. well its not there yet.
-The schedule it uses is running only under a user, theres no certainty it will run.
+While GUI version seems like a way to go.. its not there yet.
+The way the schedule is running - it uses is running only under a user, theres no certainty it will run.
 
 So here goes cli version
 
