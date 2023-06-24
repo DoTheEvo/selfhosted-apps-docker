@@ -59,8 +59,8 @@ services:
     env_file: .env
     volumes:
       - ./bookstack_db_data:/config
-    expose:
-      - 3306:3306
+    ports:
+      - "3306:3306"
 
   bookstack:
     image: linuxserver/bookstack
@@ -72,8 +72,8 @@ services:
       - bookstack-db
     volumes:
       - ./bookstack_data:/config
-    expose:
-      - 80:80
+    ports:
+      - "80:80"
 
 networks:
   default:
