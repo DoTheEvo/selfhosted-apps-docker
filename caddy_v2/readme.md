@@ -65,7 +65,7 @@ All the future containers and Caddy must be on this new network.
   
 Can be named whatever you want, but it must be a new custom named network.
 Otherwise [dns resolution would not work](https://docs.docker.com/network/drivers/bridge/)
-and containers would not be able to target eachother just by the hostname.
+and containers would not be able to target each other just by the hostname.
 
 ### - Files and directory structure
 
