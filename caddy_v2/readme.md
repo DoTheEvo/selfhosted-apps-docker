@@ -24,7 +24,7 @@ while `jellyfin.example.com` points to the media server on the network.
 
 Caddy is a pretty damn good web server with automatic HTTPS. Written in Go.
 
-Web servers are build to deal with http traffic, so they are an obvious choice
+Web servers are build to deal with http traffic, so they are the obvious choice
 for the function of reverse proxy. In this setup Caddy is used mostly as
 [a TLS termination proxy](https://www.youtube.com/watch?v=H0bkLsUe3no). 
 Https encrypted tunel ends with it, so that the traffic can be analyzed 
@@ -75,7 +75,7 @@ or machines on the network.
   most notably `autosave.json` which is a backup of the last loaded config
 * `caddy_data/` - a directory storing TLS certificates
 * `.env` - a file containing environment variables for docker compose
-* `Caddyfile` - the Caddy configuration file
+* `Caddyfile` - Caddy configuration file
 * `docker-compose.yml` - a docker compose file, telling docker how to run containers
 
 You only need to provide the three files.<br>
@@ -85,9 +85,12 @@ the content of these is visible only as root of the docker host.
 ### - Create a new docker network
 
 `docker network create caddy_net`
+
+All the future containers and Caddy must be on this new network.
   
-All the future containers and Caddy must be on the same network,
-ping-able by their hostnames.
+Can be named whatever you want, but it must be a new custom named network.
+Otherwise [dns resolution would not work](https://docs.docker.com/network/drivers/bridge/)
+and containers would not be able to target eachother just by the hostname.
 
 ### - Create docker-compose.yml and .env file
 
@@ -154,9 +157,7 @@ Can test if correctly set with online dns lookup tools,
 The value of `{$MY_DOMAIN}` is provided by the `.env` file.<br>
 The subdomains point at docker containers by their **hostname** and **exposed port**.
 So every docker container you spin should have hostname definied and be on 
-`caddy_net`, or some other named custom network, as the default bridge docker network
-[does not provide](https://docs.docker.com/network/bridge/)
-automatic DNS resolution between containers.<br>
+`caddy_net`.<br>
 
 <details>
 <summary><h3>Setup some docker containers</h3></summary>
