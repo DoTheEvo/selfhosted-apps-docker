@@ -45,8 +45,7 @@ services:
       - ./wireguard_data:/etc/wireguard
     ports:
       - "51820:51820/udp"  # vpn traffic
-    expose:
-      - "51821"            # web interface
+      - "51821:51821"      # web interface
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
