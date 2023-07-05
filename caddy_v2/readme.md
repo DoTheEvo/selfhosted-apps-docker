@@ -57,6 +57,16 @@ and only some special casess with extra functionality need extra work.
 Caddy will be running as a docker container and will route traffic to other containers,
 or machines on the network.
 
+### - Create a new docker network
+
+`docker network create caddy_net`
+
+All the future containers and Caddy must be on this new network.
+  
+Can be named whatever you want, but it must be a new custom named network.
+Otherwise [dns resolution would not work](https://docs.docker.com/network/drivers/bridge/)
+and containers would not be able to target eachother just by the hostname.
+
 ### - Files and directory structure
 
 ```
@@ -81,16 +91,6 @@ or machines on the network.
 You only need to provide the three files.<br>
 The directories are created by docker compose on the first run, 
 the content of these is visible only as root of the docker host.
-
-### - Create a new docker network
-
-`docker network create caddy_net`
-
-All the future containers and Caddy must be on this new network.
-  
-Can be named whatever you want, but it must be a new custom named network.
-Otherwise [dns resolution would not work](https://docs.docker.com/network/drivers/bridge/)
-and containers would not be able to target eachother just by the hostname.
 
 ### - Create docker-compose.yml and .env file
 
