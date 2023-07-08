@@ -54,8 +54,8 @@ and only some special casess with extra functionality need extra work.
 
 # Caddy as a reverse proxy in docker
 
-Caddy will be running as a docker container and will route traffic to other containers,
-or machines on the network.
+Caddy will be running as a docker container, will be in charge of ports 80 and 443,
+and will route traffic to other containers, or machines on the network.
 
 ### - Create a new docker network
 
@@ -319,7 +319,9 @@ www.{$MY_DOMAIN} {
 ```
 
 Or what if theres a need for a short url for something often used, but selfhosted
-url-shorterners seem bloate... looking at you Shlink and Kutt.
+url-shorterners seem bloated... looking at you Shlink and Kutt.<br>
+So lets say you want `down.example.com` to take you straight away to some 
+publicly shared download on your nextcloud.
 
 ```php
 down.{$MY_DOMAIN} {
@@ -327,7 +329,8 @@ down.{$MY_DOMAIN} {
 }
 ```
 
-or if prefering doing path instead of subdomain
+or if prefering doing path instead of subdomain,
+so that it would be `example.com/down`
 
 ```php
 {$MY_DOMAIN} {
