@@ -41,6 +41,7 @@ services:
     container_name: wg-easy
     hostname: wg-easy
     restart: unless-stopped
+    env_file: .env
     volumes:
       - ./wireguard_data:/etc/wireguard
     ports:
