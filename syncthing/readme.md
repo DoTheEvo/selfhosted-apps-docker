@@ -11,8 +11,9 @@ Synchronize folders between devices.<br>
 * [Official](https://syncthing.net/)
 * [Github](https://github.com/syncthing/syncthing)
 
-Simple and elegant solution for Synchronizing folders and nothing else.<br>
-Clients are installed on the devices, and then added to the syncthing server.
+Simple and elegant solution for Synchronizing folders.<br>
+Clients are installed on devices, and paired with the Syncthing server.
+There are Windows, MacOs, Linux, Android clients, and 3rd party Möbius Sync for iOS.
 
 Written in Go.
 
@@ -43,17 +44,16 @@ services:
     env_file: .env
     volumes:
       - /mnt/mirror/syncthing:/var/syncthing
-    network_mode: host
     ports:
       - 8384:8384 # Web UI
       - 22000:22000/tcp # TCP file transfers
       - 22000:22000/udp # QUIC file transfers
       - 21027:21027/udp # Receive local discovery broadcasts
   
-  networks:
-    default:
-      name: $DOCKER_MY_NETWORK
-      external: true      
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true      
 ```
 
 `.env`
