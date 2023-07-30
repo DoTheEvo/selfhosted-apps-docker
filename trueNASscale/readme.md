@@ -386,9 +386,8 @@ On arch linux there is a good and detailed [instructions on the wiki.](https://w
 
 * install `open-iscsi`
 * start service `sudo systemctl start iscsid.service`<br>
-  do not `enable` it just start it to test<br>
-  to have it present after boot:
-  - `sudo systemctl enable iscsi.service`
+  to have it present after boot:<br>
+  - `sudo systemctl enable --now iscsi.service`
   - edit `/etc/iscsi/nodes/../default` and set `node.startup = automatic`
   - apply systemd mount files 
 * discover targets at the ip<br>
