@@ -4,6 +4,10 @@
 
 ![logo](https://i.imgur.com/TAIgm4Y.png)
 
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+
 # Purpose & Overview
 
 UPS - uninterruptible power supply managment. Huge drivers support.
@@ -19,19 +23,17 @@ when power goes out and ups battery starts to get low.
 Nut is collection of programs and drivers, mostly written in C. 
 For webgui it uses apache webserver.
 
-
-
-
-
 [Techno Tim youtube video](https://www.youtube.com/watch?v=vyBP7wpN72c)
 
 As per the video I am testing this running on rpi.
 [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/arch_raspberry_pi)
 arch on rpi setup.
+
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
+WORK IN PROGRESS<br>
  
 ---
-
-![interface-pic](https://i.imgur.com/ekA7Hms.png)
 
 # Files and directory structure
 
