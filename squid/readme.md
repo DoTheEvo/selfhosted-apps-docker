@@ -36,7 +36,7 @@ Free oracle cloud instance can be used to host squid somewhere in the world.<br>
             └── 🗋 squid.conf
 ```              
 * `docker-compose.yml` - a docker compose file, telling docker how to run the container
-* `squid.conf` - main configuration files for squid
+* `squid.conf` - main configuration file for squid
 
 # Compose
 
