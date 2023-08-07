@@ -375,8 +375,17 @@ Manual setup
 
 Enable iSCSI service. 
 
-To test if it works.<br>
-On windows just launching `iscsicpl.exe` and refreshing, connect, should work.
+### Mounting the Share
+
+**Windows**
+
+* run `iscsicpl.exe` - iSCSI Initiator
+* Set trueNAS ip as `Target`; Quick connect
+
+This connects the share as block device and ads it to Favorite Targets,
+meaning the share is remounted on boot.
+
+**Linux**
 
 Arch linux wiki has [detailed instructions](https://wiki.archlinux.org/title/Open-iSCSI)
 
@@ -386,7 +395,7 @@ Arch linux wiki has [detailed instructions](https://wiki.archlinux.org/title/Ope
 * edit `/var/lib/iscsi/nodes/../default` and set `node.startup = automatic`
 * `sudo iscsiadm -m node -L all` - login to all available targets 
 
-Of note is recent change of configs location from /etc/iscsi to /var/lib/iscsi
+Of note is a recent change of configs location from /etc/iscsi to /var/lib/iscsi
 
 ### Encryption setup using fs
 
