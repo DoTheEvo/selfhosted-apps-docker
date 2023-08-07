@@ -4,10 +4,6 @@
 
 ![logo](https://i.imgur.com/9ocPlzl.png)
 
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-
 # Purpose & Overview
 
 Network storage operating system managed through web GUI.<br>
@@ -382,21 +378,15 @@ Enable iSCSI service.
 To test if it works.<br>
 On windows just launching `iscsicpl.exe` and refreshing, connect, should work.
 
-On arch linux there is a good and detailed [instructions on the wiki.](https://wiki.archlinux.org/title/Open-iSCSI)
+Arch linux wiki has [detailed instructions](https://wiki.archlinux.org/title/Open-iSCSI)
 
-* install `open-iscsi`
-* start service `sudo systemctl start iscsid.service`<br>
-  to have it present after boot:<br>
-  - `sudo systemctl enable --now iscsi.service`
-  - edit `/etc/iscsi/nodes/../default` and set `node.startup = automatic`
-  - apply systemd mount files 
-* discover targets at the ip<br>
-  `sudo iscsiadm --mode discovery --portal 10.0.19.11 --type sendtargets`<br>
-  after this command a new directory is created `/etc/iscsi/nodes/`
-* login to all available targets
-  `sudo iscsiadm -m node -L all`
-* see availabl block devices<br>
-  `lsblks`
+* `sudo pacman -S open-iscsi` - install
+* `sudo systemctl enable --now iscsi.service` - start and enable it on boot
+* `sudo iscsiadm --mode discovery --portal 10.0.19.11 --type sendtargets` - discover shares
+* edit `/var/lib/iscsi/nodes/../default` and set `node.startup = automatic`
+* `sudo iscsiadm -m node -L all` - login to all available targets 
+
+Of note is recent change of configs location from /etc/iscsi to /var/lib/iscsi
 
 ### Encryption setup using fs
 
@@ -463,14 +453,7 @@ WantedBy=multi-user.target
   Data Protection > S.M.A.R.T. Tests > Add > all disks/short/weekly
 * enable autoamtic snapshots
 
-# Testing access to ZFS disks on a desktop
+Possible future chapters
 
-
-# Reinstall and import of pools
-
-
-# Update
-
-
-# Backup and restore
-
+* Testing access to ZFS disks on a desktop
+* Reinstall and import of pools
