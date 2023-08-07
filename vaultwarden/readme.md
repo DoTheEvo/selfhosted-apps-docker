@@ -47,7 +47,7 @@ only the server is a different implementation.
 * `vaultwarden_data/` - a directory storing vaultwarden's data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the container
-* `bitwarden-backup-script.sh` - a backup script, to be run daily
+* `vaultwarden-backup-script.sh` - a backup script, to be run daily
 
 Only the files are required. The directories are created on the first run.
 
