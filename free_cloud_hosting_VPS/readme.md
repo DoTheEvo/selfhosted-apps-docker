@@ -74,7 +74,7 @@ the ammount displayed should be 0€.
 
 in examples here port will be 7777/tcp
 
-**firewalld in ubuntu - allow stuff in**
+**firewalld in ubuntu open port**
 
 * `sudo apt-get update && sudo apt-get upgrade`
 * `sudo apt install firewalld`
