@@ -48,6 +48,7 @@ Seen comments online that some just cant get the registration done.
 
 Instances > Create instance
 
+* If none selected, pick Compartment in left column, default root
 * Name - whatever
 * Create in compartment - default
 * Placement - default; `Always Free-eligible`
@@ -72,15 +73,6 @@ the ammount displayed should be 0€.
 
 ### Firewall settings
 
-in examples here port will be 7777/tcp
-
-**firewalld in ubuntu open port**
-
-* `sudo apt-get update && sudo apt-get upgrade`
-* `sudo apt install firewalld`
-* `sudo firewall-cmd --zone=public --permanent --add-port=7777/tcp`
-* `sudo firewall-cmd --reload`
-
 **Oracle network settings ingress rule**
 
 * Virtual Cloud Networks > VNC you got there > Subnet > Securty List > Ingress Rules
@@ -91,6 +83,16 @@ in examples here port will be 7777/tcp
   * IP Protocol - `All Protocols`
 
 ![ingress](https://i.imgur.com/YouPN9n.png) 
+
+
+**firewalld in ubuntu open port**
+
+in examples here port will be 7777/tcp
+
+* `sudo apt-get update && sudo apt-get upgrade`
+* `sudo apt install firewalld`
+* `sudo firewall-cmd --zone=public --permanent --add-port=7777/tcp`
+* `sudo firewall-cmd --reload`
 
 **To test**
 
@@ -142,12 +144,16 @@ So to get it as a VM on oracle cloud.
 
 * Download the latest qcow2 image<br>
   [https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2](https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2)
-* Storage > Buckets > Bucket in the list > Upload
+* Storage > Buckets > Create Bucket > Defaults are fine  
+* Pick the bucket from the list > Upload  the qcow2 arch image
 * Compute > Custom images > Import image 
   * Operating system - Generic Linux
   * Import from an Object Storage bucket
   * Image type - QCOW2
   * Paravirtualized mode
+  * Import image
+
+Afterwards its going same as with any other instance.
 
 arch/arch for SSH login, recommend disabling password login and do IP restriction
 
