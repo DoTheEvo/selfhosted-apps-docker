@@ -17,51 +17,47 @@ Backups.
 
 Kopia is a new open source backup utility with basicly **all** modern features.</br>
 Cross-platform, deduplication, encryption, compression, multithreaded speed,
-native cloud storage support, GUI versions, repository replication, snapshots mounting,...
+native cloud storage support, repository replication, snapshots mounting,
+GUI versions, server version,...
 
 Written in golang.
 
-In this setup kopia cli is used to backup docker containers and the host,
-but general use and concepts are universal.</br>
-
 # Some aspects of Kopia
 
-* Kopia configuraiton uses term policies to apply to various 
-  - global policy, from which repos inherit settings
-  - repos policy created on repo creation
-* Backup configuration is stored in a repository where backups are stored.<br>
-* You connect to a repository before using it, and disconnect afterwards.<br>
-  Only one repository can be connected at the time(at least for cli version).
-* Currently to ignore a folder - `CACHEDIR.TAG` file can be placed inside,
-  with specific [content](https://bford.info/cachedir/) 
-  and set policy: `--ignore-cache-dirs true`
+There are 3 ways to go about running kopia
+
+* **cli** - Command line.<br>
+  You call the binary passing some commands, it executes stuff, done.<br>
+  Requires extra work - scripts with configs, scheduling.
+* **KopiaUI** - GUI version of kopia.<br>
+  Easier managment, takes uppon itself scheduling.<br>
+  Drawback is that it runs under one user and only when logged in.
+* **Kopia Server** - running kopia and its webserver in the background<br>
+  Managment through web browser at an url, can run as a docker container.
+
+[Official Getting Started Guide](https://kopia.io/docs/getting-started/)<br>
+[Official Features](https://kopia.io/docs/features/)
+
+* Kopia is a single ~35MB binary file.
+* Backups are stored in a **repository** that needs to be created first,
+  and is always encrypted - requires password.
+  * Before any action, Kopia needs to connecto to a repo.
+* **Snapshot**, appart from typical meaning, kopia also uses it to for
+  targets(paths) to be backed up.
+* **Policy** is a term used to define behaviour of the backup/repo,
+  like backups retention, what to ignore, logging, scheduling(server/UI),
+  actions before and after backup,...
+* **Policies** are stored inside a repo and can apply at various levels and
+  can inherit from each other
+  - global policy, the default that comes predefined during repo creation
+  - per user policy and per machine policy
+  - snapshot level policy, only applying for that one path
 * Maintence is automatic
 * ..
 
-# Files and directory structure
+# Kopia on a linux machine
 
-```
-/home/
-│ └── ~/
-│     └── docker/
-│         ├── container-setup #2
-│         ├── container-setup #1
-│         ├── ...
-│
-/mnt/
-│ └── mirror/
-│      └── KOPIA/
-│            └── arch_docker_host/
-│
-/opt/
-  └── kopia-backup-home-etc.sh
-```
-
-only the script `kopia-backup-home-etc.sh` in /opt is created<br>
-uf, systemd unit files too, but I am not "drawing" /etc/systemd/system/ up there...
-even this will probably get deleted
-
-# The setup
+cli version of kopia will be used, with a script and systemd-timers for scheduling.
 
 ### install kopia
 
@@ -69,21 +65,20 @@ for arch linux, kopia is on AUR `yay kopia-bin`
 
 ### the initial steps
 
+General use of sudo so that kopia has access everywhere.
 
-use of sudo so that kopia has access everywhere<br>
+* **repo creation**
+
+`mkdir -p /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repo connect filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
+`sudo kopia repo status`<br>
 
 * **the policy info and change**
 
 `sudo kopia policy get --global`<br>
 `sudo kopia policy list`<br>
 `sudo kopia policy set --global --ignore-cache-dirs true --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14`<br>
-
-* **repo creation**
-
-`mkdir -p /mnt/mirror/KOPIA/docker_host_kopia`<br>
-`sudo kopia repository create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
-`sudo kopia repository connect filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
-`sudo kopia repository status`<br>
 
 * **manual run**
 
@@ -92,17 +87,18 @@ use of sudo so that kopia has access everywhere<br>
 
 * **mounting a backup**
 
-`sudo kopia snapshot list`<br>
+`sudo kopia mount all /mnt/tmp &` - mounts all snapshots<br>
+`sudo kopia snapshot list`<br> 
 `sudo kopia mount k7e2b0a503edd7604ff61c68655cd5ad7 /mnt/tmp &`<br>
 `sudo umount /mnt/tmp`<br>
 
-### the backup script
+### The backup script
 
 `/opt/kopia-backup-home-etc.sh`
 ```bash
 #!/bin/bash
 
-#sudo kopia policy set --global --ignore-cache-dirs true --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14
+#sudo kopia policy set --global --keep-annual 1 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 14
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
@@ -112,6 +108,8 @@ kopia repository connect filesystem --path $REPOSITORY_PATH --password $KOPIA_PA
 kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 ```
+make the script executable<br>
+`sudo chmod +x /opt/kopia-backup-home-etc.sh`
 
 ### Scheduled backups using systemd
 
@@ -119,8 +117,10 @@ Usually cron is used, but systemd provides better logging and control,
 so better get used to using it.<br>
 [Heres](https://github.com/kopia/kopia/issues/2685#issuecomment-1384524828)
 some discussion on unit files.<br>
-[ntfy](https://github.com/binwiederhier/ntfy) is used for notifications,
+[ntfy](https://github.com/binwiederhier/ntfy) can be used for notifications,
 more info [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal#linux-systemd-unit-file-service)
+
+* `sudo micro /etc/systemd/system/kopia-home-etc.service`
 
 ```kopia-home-etc.service```
 ```ini
@@ -147,6 +147,7 @@ Environment="HOME=/root"
 ExecStart=/opt/kopia-backup-home-etc.sh
 ```
 
+* `sudo micro /etc/systemd/system/kopia-home-etc.timer`
 
 ```kopia-home-etc.timer```
 ```ini
@@ -161,6 +162,10 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 ```
+
+* `sudo systemctl enable --now kopia-home-etc.timer`
+* `systemctl status kopia-home-etc.timer`
+* `journalctl -u kopia-home-etc.timer` - see history
 
 # Mounting network storage using systemd
 
@@ -206,18 +211,53 @@ WantedBy=multi-user.target
 
 # Kopia in Windows
 
-While GUI version seems like a way to go.. its not there yet.
-The way the schedule is running - it uses is running only under a user, theres no certainty it will run.
+## Kopia Server on Windows
 
-So here goes cli version
+* download this repo, delete shit, keep `kopia_server_deploy` folder
+* run `DEPLOY.cmd`, it will
+  * Removes powershell scripts restriction.
+  * Creates folder `C:\Kopia` and kopies files there
+  * imports a task schedule that will start Kopia Server at boot
+* visit in browser `localhost:51515`
+* setup repo
+* setup what to backup and schedule
+* edit the `kopia_backup_scipt.ps1`, set what to backup and where
+* for the same repo location execute<br>
+  `sudo kopia repository create filesystem --path C:\Backup`
+* run the script
 
-* [download](https://github.com/kopia/kopia/releases/) latest named  kopia-X.XX.X-windows-x64.zip
-, \~11MB
-* extract, move to `C:\kopia`
-* download `win_vss_before.ps1` and `win_vss_after.ps1` from this repo,
-  or crete them from
-  [here](https://kopia.io/docs/advanced/actions/#windows-shadow-copy)
-* kopia-backup-home-etc.sh
+## Kopia cli on Windows
+
+
+While GUI version seems like a way to go.. IMO its not there yet.
+The schedule seems to be dependant on user logging in... 
+and general weird feeling of poor GUI quality.
+
+So here goes cli version. As after some hands-on experience with cli version
+the GUI version might click in better too, later.
+
+* download this repo, delete shit, keep `kopia-deploy` folder
+* run `DEPLOY.cmd`, it will
+  * Removes powershell scripts restriction.
+  * Install scoop, sudo, kopia.
+  * Creates folder `C:\Kopia` and kopies there<br>
+    `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
+  * imports a task schedule
+* edit the `kopia_backup_scipt.ps1`, set what to backup and where
+* for the same repo location execute<br>
+  `sudo kopia repository create filesystem --path C:\Backup`
+* run the script
+
+To do the above things manualy:
+
+* install kopia using scoop
+  * open terminal as admin
+  * `Set-ExecutionPolicy RemoteSigned`
+  * `iex "& {$(irm get.scoop.sh)} -RunAsAdmin"`
+  * `scoop install sudo --global`
+  * `sudo scoop install kopia --global`
+* download this repo, extract to `c:\kopia`  
+* edit kopia-backup-home-etc.sh as see fit
 
 * powershell as as administrator
 * --enable-actions
@@ -227,3 +267,7 @@ So here goes cli version
 
 kopia policy set <target_dir> --before-folder-action "powershell -WindowStyle Hidden <path_to_script>\before.ps1"
 kopia policy set <target_dir> --after-folder-action  "powershell -WindowStyle Hidden <path_to_script>\after.ps1"
+
+
+
+
