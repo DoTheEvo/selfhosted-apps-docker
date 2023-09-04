@@ -35,4 +35,3 @@ foreach ($path in $BACKUP_THIS) {
 }
 
 kopia repository disconnect
-

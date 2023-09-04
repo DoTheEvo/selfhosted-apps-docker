@@ -4,10 +4,13 @@
 
 ![logo](https://i.imgur.com/A2mosM6.png)
 
+
 WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
-#Kopia-on-a-linux-machine
+
+# Content
+
 * [Kopia on a linux machine](#Kopia-on-a-linux-machine)
 * [Kopia on a Windows machine](#Kopia-on-a-windows-machine)
 * [Kopia in Docker](#Kopia-in-Docker)
@@ -61,8 +64,8 @@ Embedded webGUI for server mode is done in React. KopiaUI comes with electron.
 
 * Kopia is a single ~35MB binary file.
 * Backups are stored in a **repository** that needs to be created first,
-  and is always encrypted.
-  * Before any action, Kopia needs to connect to a repo.
+  and is always encrypted.<br>
+  Before any action, Kopia needs to connect to a repo.
 * **Snapshots**, apart from typical meaning, kopia also uses the term for
   targets(paths) that are being backed up.
 * **Policy** is a term used to define behavior of the backup/repo,
@@ -79,12 +82,12 @@ Embedded webGUI for server mode is done in React. KopiaUI comes with electron.
   Default max size is 5GB, but it gets swept periodically every few minutes.<br>
   Useful commands are `kopia cache info` and `kopia cache clear`
 * [Here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
-  how **retention** works under the hood.  
+  how **retention** works under the hood.<br>
 * ..
 
 # Kopia on a linux machine
 
-![list_snapshots_cli](https://i.imgur.com/5sG3osF.png)
+![list_snapshots_cli](https://i.imgur.com/lQ8W5yh.png)
 
 cli version of kopia will be used to periodically backup to a mounted network storage.<br>
 The backup script will be executed using systemd-timers for scheduling.
@@ -402,7 +405,7 @@ services:
         # Mount local folders to snapshot
         - ./some_data:/data:ro
         # Mount repository location
-        - ./kopia_repository:/repository
+        - /mnt/mirror/kopia_repository:/repository
         # Mount path for browsing mounted snaphots
         - ./kopia_tmp:/tmp:shared
 
@@ -460,7 +463,8 @@ kopia.{$MY_DOMAIN} {
   set password
 
 Now this container can do backups of mounted stuff in to other mounted places
-while managed through webgui.<br>
+or cloud, while managed through webgui.
+
 To also make it function as a repository server a user account needs to be added.
 The users are stored in the repo.
 
@@ -468,8 +472,7 @@ The users are stored in the repo.
   `docker container exec -it kopia /bin/bash`
 * add user@machine and set the password<br>
   `kopia server user add user1@machine1`
-* on another machine on network install kopia server or koppiaUI<br>
-  on first run:
+* on another machine test with koppiaUI, on the first run:<br>
   * Pick `Kopia Repository Server`
   * Server address: `https://kopia.example.com:443`
   * *Trusted server certificate fingerprint (SHA256)*<br>
@@ -481,7 +484,7 @@ The users are stored in the repo.
 
 ### Troubleshooting
 
-* check kopia docker contaienr logs, I like using [ctop](https://github.com/bcicen/ctop)
-* `nslookup kopia.example.com` check if you are gettin to you server from client
+* check kopia docker container logs, I like using [ctop](https://github.com/bcicen/ctop)
+* `nslookup kopia.example.com` check if you are getting to you server from client
 * Make sure you use port 443 in server address. 
 
