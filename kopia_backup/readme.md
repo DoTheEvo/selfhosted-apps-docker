@@ -26,24 +26,23 @@ Backups.
 Kopia is a new open source backup utility with basically **all** modern features.</br>
 Cross-platform, deduplication, encryption, compression, multithreaded speed,
 native cloud storage support, repository replication, snapshots mounting,
-GUI versions, server version,...
+GUI version, server version,...
 
 Written in golang.<br>
-Embedded webGUI for server mode is done in React. KopiaUI comes with electron.
+Embedded webGUI for server mode is done in React. KopiaUI comes packaged with electron.
 
 ### Ways to use Kopia
 
 * **cli** - Command line.<br>
   You call the kopia binary passing some commands, it executes stuff, done.<br>
   Deployment requires extra work - scripts with configs, scheduling.
-* **Kopia Server** - kopia binary runs in the server mode.<br> 
+* **Kopia Server** - kopia binary runs in server mode.<br> 
   Runs in the background, with its web server answering at url: `localhost:51515`<br>
-  Through the web GUI the management is easier than using cli.
-  As an addition to normal backup functions, the server mode can also act
-  as a centralized repository for other machines running kopia instances.<br>
+  Web GUI makes the management easier than using cli. Additionally in server mode
+  kopia can serve as a centralized repository for other machines that run kopia instances.<br>
   Deployment requires extra work similar to cli, but actual use is through web GUI.
 * **KopiaUI** - GUI version.<br>
-  KopiaUI comes packaged with electron to provide the feel of a standalone desktop app.<br>
+  Kopia that comes packaged with electron to provide the feel of a standalone desktop app.<br>
   Good for simple deployment where average user just wants to backup stuff.<br>
   Benefits over cli or server is easier setup and management.<br>
   Drawback is that it runs under one user and only when that user is logged in.
@@ -66,7 +65,7 @@ Embedded webGUI for server mode is done in React. KopiaUI comes with electron.
 * Backups are stored in a **repository** that needs to be created first,
   and is always encrypted.<br>
   Before any action, Kopia needs to connect to a repo.
-* **Snapshots**, apart from typical meaning, kopia also uses the term for
+* **Snapshots**, apart from the typical meaning, kopia also uses the term for
   targets(paths) that are being backed up.
 * **Policy** is a term used to define behavior of the backup/repo,
   like backups retention, what to ignore, logging, scheduling(server/UI),
@@ -81,8 +80,8 @@ Embedded webGUI for server mode is done in React. KopiaUI comes with electron.
 * During snapshots Kopia uses local **cache**, location varies depending on the OS.
   Default max size is 5GB, but it gets swept periodically every few minutes.<br>
   Useful commands are `kopia cache info` and `kopia cache clear`
-* [Here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
-  how **retention** works under the hood.<br>
+* **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
+  how it works under the hood.<br>
 * ..
 
 # Kopia on a linux machine
@@ -252,11 +251,12 @@ WantedBy=multi-user.target
 
 # Kopia on a Windows machine
 
-![windows_snapshot_history_gui](https://i.imgur.com/nqkng5k.png)
+![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
 
 ## Kopia Server on Windows
 
-* Download this repo, keep `kopia_server_deploy_win` folder, delete rest.
+* [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
+  keep `kopia_server_deploy_win` folder, delete the rest.
 * Run `DEPLOY.cmd`, it will:
   * Removes powershell scripts restriction.
   * Creates folder `C:\Kopia` and kopies files there
@@ -290,7 +290,8 @@ While KopiaUI version seems like the way to go I really dislike the idea
 of not having trust in kopia if using it on servers that run with users
 logged out. Since KopiaUI works only if user is logged in. 
 
-* Download this repo, keep `kopia_cli_deploy_win` folder, delete rest.
+* [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
+  keep `kopia_cli_deploy_win` folder, delete the rest.
 * Run `DEPLOY.cmd`, it will:
   * Removes powershell scripts restriction.
   * kopies kopia.exe in to `C:\Windows\System32`
