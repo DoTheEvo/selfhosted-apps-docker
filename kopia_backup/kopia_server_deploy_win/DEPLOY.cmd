@@ -41,10 +41,14 @@ if exist C:\Windows\System32\Tasks\kopia_server_backup_start (
 echo - starting Kopia Server
 schtasks /run /tn kopia_server_backup_start
 
+echo - copying link to Desktop
+robocopy "%~dp0\" "%USERPROFILE%\Desktop" "Kopia.url" /NDL /NJH /NJS
+
 echo.
 echo --------------------------------------------------------------
 echo.
 echo DEPLOYMENT DONE
 echo KOPIA SERVER CAN NOW BE FIND AT WEB PAGE: localhost:51515
+echo A LINK SHOULD BE ON YOUR DESKTOP
 echo.
 pause
