@@ -309,14 +309,18 @@ logged out. Since KopiaUI works only if user is logged in.
 
 ### VSS snapshots
 
-To make use of VSS snapshots before running backup execute these two commands,
-replacing `C:\Test` with the snapshot target path.<br>
+Volume Shadow Copy Service freezes the state of the disk in time and makes
+this snapshot available to use. This is what allows backup of files that are in use.<br>
+[Here's some youtube video on VSS.](https://youtu.be/RUwocwP2ilI?t=85)
 
-* `kopia policy set C:\Test --before-folder-action "powershell -WindowStyle Hidden C:\Kopia\win_vss_before.ps1"`
-* `kopia policy set C:\Test --after-folder-action  "powershell -WindowStyle Hidden C:\Kopia\win_vss_after.ps1"`
+To make use of this feature edit `kopia_backup_scipt.ps1` changing
+`$USE_SHADOW_COPY = $false` to `$USE_SHADOW_COPY = $true`
 
 Note the use of `--enable-actions` in the backup script `kopia_backup_scipt.ps1`,
-which is required for actions to work.
+which is required for before/after actions to work.
+
+To test if its working, one can execute command `vssadmin list shadows`
+to see current VSS snapshots and then execute it again during the backup.
 
 ### Kopia install using scoop, machine-wide
 
