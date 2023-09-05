@@ -82,6 +82,8 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
   Useful commands are `kopia cache info` and `kopia cache clear`
 * **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
   how it works under the hood.<br>
+* **Restore** from backups is most easily done by mounting a snapshot.<br>
+  Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * ..
 
 # Kopia on a linux machine
@@ -99,10 +101,13 @@ For arch linux, kopia is on AUR `yay kopia-bin`
 
 * **repo creation**
 
-`mkdir -p /mnt/mirror/KOPIA/docker_host_kopia`<br>
+
 `sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
 `sudo kopia repo connect filesystem --path /mnt/mirror/KOPIA/docker_host_kopia`<br>
-`sudo kopia repo status`<br>
+`sudo kopia repo status`
+
+If the path used during creation does not exists, kopia will create it in full.<br>
+After creation the repo is connected, so connnect command is just demonstration. 
 
 * **the policy info and change**
 
@@ -110,12 +115,15 @@ For arch linux, kopia is on AUR `yay kopia-bin`
 `sudo kopia policy list`<br>
 `sudo kopia policy set --global --keep-annual 2 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 3`<br>
 
-* **manual run**
+* **manual backup run**
 
 `sudo kopia snapshot create /home/spravca/docker /etc`<br>
 `sudo kopia snapshot list`<br>
 
-* **mounting a backup**
+Since the connection exists with a repo,
+all that is needed is target that should be backed up.
+
+* **mounting backups**
 
 `sudo kopia mount all /mnt/tmp &` - mounts all snapshots<br>
 `sudo kopia snapshot list`<br> 
@@ -271,12 +279,12 @@ Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots, or just looking around
 if all works as it should.
 
-It is also popular to use nssm to start up and manage kopia as a service.<br>
+It is also popular to use [nssm](https://nssm.cc/) to start up and manage
+Kopia as a service.
 
 While Kopia runs now in server mode, the fact that we pass `--insecure` flag
 means it cant serve as a repository for other kopia instances.
 For that look at docker deployment section or in to making changes too.
-
 
 <details>
 <summary><h2>Kopia cli on Windows</h2></summary>
