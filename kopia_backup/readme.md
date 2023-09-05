@@ -261,18 +261,34 @@ WantedBy=multi-user.target
 
 ![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
 
-## Kopia Server on Windows
+## KopiaUI vs cli vs Server
+
+While KopiaUI seems like the way to go because of the simple deployment and
+use, it has a drawback. The way the schedule works, where the user must be logged in
+for backups to take place is something to be very aware of.<br> 
+
+Another thing is that KopiaUI does not really need any guide or tutorial.
+It just works for any normal average user who is always logged in with
+that one account.
+
+## Kopia Server in Windows
+
+Kopia binary is copied in to `C:\Kopia\` and a scheduled task is importet
+that start kopia on boot in server mode.
+In server mode kopia runs in the background, with its web server
+answering at url: `localhost:51515`
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
-  keep `kopia_server_deploy_win` folder, delete the rest.
+  delete everything except `kopia_server_deploy_win` folder.
 * Run `DEPLOY.cmd`, it will:
   * Removes powershell scripts restriction.
-  * Creates folder `C:\Kopia` and kopies files there
+  * Creates folder `C:\Kopia` and copies files there
   * Imports a task schedule that will start `C:\Kopia\kopia_server_start.cmd`<br>
-    Can edit flags used for the server.
   * Places kopia.url on the current user desktop
+* check content of `C:\Kopia\kopia_server_start.cmd`<br>
+  note or change the credentials, the default: `admin // aaa`
 * visit in browser `localhost:51515`
-* setup repo
+* setup repo through webgui
 * setup what to backup and schedule
 
 Kopia should now run on boot and be easy to manage through web GUI.<br>
@@ -284,19 +300,15 @@ Kopia as a service.
 
 While Kopia runs now in server mode, the fact that we pass `--insecure` flag
 means it cant serve as a repository for other kopia instances.
-For that look at docker deployment section or in to making changes too.
+For that look at docker deployment section or in to making changes to the cmd file.
 
-<details>
-<summary><h2>Kopia cli on Windows</h2></summary>
+## Kopia cli in Windows
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
 *Written before I realiezed I could be using kopia server.*<br>
-*Also, at the moment its the only way I know how to make actions work for VSS snapshots.*
-
-While KopiaUI version seems like the way to go I really dislike the idea 
-of not having trust in kopia if using it on servers that run with users
-logged out. Since KopiaUI works only if user is logged in. 
+*Also, at the moment its the only way I know how to make actions work
+for VSS snapshots.*
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
   keep `kopia_cli_deploy_win` folder, delete the rest.
@@ -339,8 +351,6 @@ Just something to have note of, if decided to switch to heavy scoop use.
 * `iex "& {$(irm get.scoop.sh)} -RunAsAdmin"`
 * `scoop install sudo --global`
 * `sudo scoop install kopia --global`
-
-</details>
 
 ---
 ---
