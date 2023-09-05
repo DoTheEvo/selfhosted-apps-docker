@@ -44,6 +44,6 @@ if exist C:\Windows\System32\Tasks\kopia_backup_schedule (
 echo.
 echo --------------------------------------------------------------
 echo.
-echo DEPLOYMENT DONE, RUN THE FOLLOWING COMMAND TO INITIALIZE A REPO
-echo kopia repo create filesystem --path C:\kopia_repo --password aaa
+echo DEPLOYMENT DONE
+echo GO READ WHATS WRITTEN IN C:\Kopia\kopia_backup_scipt.ps1
 pause

@@ -1,21 +1,21 @@
 # Before using this script, initiate the repo
 # kopia repo create filesystem --path C:\kopia_repo --password aaa
 
-# useful commands
-# kopia repo connect filesystem --path C:\kopia_repo -p aaa
-# kopia snap list -all
-# kopia mount all K:
-#   mounting should be used as non-admin user, weird windows thing
-#   or one does not see the drive, in that case
-#   net use - shows path that can be pasted to explorer or browser
+# useful commands:
+# - kopia repo connect filesystem --path C:\kopia_repo -p aaa
+# - kopia snap list -all
+# - kopia mount all K:
+# mounting should be used as non-admin user, weird windows thing
+# or one does not see the drive, in that case:
+# - net use - shows path that can be pasted to explorer or browser
 #   \\127.0.0.1@51295\DavWWWRoot
 
-# logs location when run as task scheduler
+# logs location when run by task scheduler as SYSTEM
 # C:\Windows\System32\config\systemprofile\AppData
 
-# config
+# config below
 # example of $BACKUP_THIS with multiple paths
-# [array]$BACKUP_THIS = 'C:\Test','C:\Test2','C:\Test3'
+# - [array]$BACKUP_THIS = 'C:\Test','C:\Test2','C:\Test3'
 
 $REPOSITORY_PATH = 'C:\kopia_repo'
 $KOPIA_PASSWORD='aaa'

@@ -264,18 +264,18 @@ WantedBy=multi-user.target
 
 ![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
 
-## KopiaUI
+## KopiaUI in Windows
 
 While KopiaUI seems like the way to go because of the simple deployment and
 use, it has a drawback. The way the schedule works, where the user must be
 logged in for backups to take place is something to be very aware of.<br> 
 
-Another thing is that KopiaUI does not really need guidance here.
-It just works for any normal user who is always logged in with one account.
+Othewise KopiaUI does not really need guidance here.
+It just works for any normal use.
 
 ## Kopia Server in Windows
 
-Kopia binary is copied in to `C:\Kopia\` and a scheduled task is importet
+Kopia binary is copied in to `C:\Kopia\` and a scheduled task is imported
 that start kopia on boot in server mode.
 In server mode kopia runs in the background, with its web server
 answering at url: `localhost:51515` where it can be managed.
@@ -286,12 +286,12 @@ answering at url: `localhost:51515` where it can be managed.
   * Removes powershell scripts restriction.
   * Creates folder `C:\Kopia` and copies files there
   * Imports a task schedule that will start `C:\Kopia\kopia_server_start.cmd`<br>
-  * Places kopia.url on the current user desktop
-* check content of `C:\Kopia\kopia_server_start.cmd`<br>
+  * Places `kopia.url` on the current user's desktop
+* Check content of `C:\Kopia\kopia_server_start.cmd`<br>
   note or change the credentials, the default: `admin // aaa`
-* visit in browser `localhost:51515`
-* setup repo through webgui
-* setup what to backup and schedule
+* Visit in browser `localhost:51515`
+* Setup new repo through webgui.
+* Setup what to backup and schedule.
 
 Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots to restore files,
@@ -308,8 +308,19 @@ For that look at docker deployment section or in to making changes to the cmd fi
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
-This was written before I realiezed I could be using kopia server.<br>
-At the moment its the only way I know how to make actions work for VSS snapshots.
+Kopia binary is copied in to `C:\Windows\System32\`
+and a scheduled task is imported that executes a powershell script
+`C:\Kopia\kopia_backup_scipt.ps1` at 21:19.
+The script executes few kopia commands - connects to a repo, backs up stuff,
+and disconnects.
+
+Bit more hands on than having a gui, but once setup one can easily get by with
+two commands: `kopia snap list -all` and `kopia mount all K:`<br>
+Note that mount command should be executed in non admin terminal. Weird
+windows thing. 
+
+Also at the moment cli is the only way I know how to make kopia actions work,
+so that VSS snapshots can be used.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
   delete everything except `kopia_cli_deploy_win` folder.
@@ -325,7 +336,6 @@ At the moment its the only way I know how to make actions work for VSS snapshots
 * edit the scheduled task to the prefered time, default is daily at 21:19
 * run scheduled task manually
 * check if it worked
-  * `kopia repo status`
   * `kopia snap list --all` 
 
 ### VSS snapshots
