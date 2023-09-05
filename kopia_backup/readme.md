@@ -11,8 +11,8 @@ WORK IN PROGRESS<br>
 
 # Content
 
-* [Kopia on a linux machine](#Kopia-on-a-linux-machine)
-* [Kopia on a Windows machine](#Kopia-on-a-windows-machine)
+* [Kopia in Linux](#Kopia-in-Linux)
+* [Kopia in Windows](#Kopia-in-Windows)
 * [Kopia in Docker](#Kopia-in-Docker)
 
 # Purpose & Overview
@@ -86,7 +86,7 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * ..
 
-# Kopia on a linux machine
+# Kopia in Linux
 
 ![list_snapshots_cli](https://i.imgur.com/lQ8W5yh.png)
 
@@ -257,7 +257,7 @@ WantedBy=multi-user.target
 ---
 ---
 
-# Kopia on a Windows machine
+# Kopia in Windows
 
 ![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
 
@@ -382,7 +382,7 @@ Just something to have note of, if decided to switch to heavy scoop use.
 ### docker-compose
 
 The data to be backed up are mounted in read only mode.<br>
-To be able to mount snapshots, extra privilages are required and fuse access.
+To be able to mount snapshots, extra privileges are required and fuse access.
 
 ```
 services:
