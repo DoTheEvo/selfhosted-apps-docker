@@ -84,6 +84,9 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
   how it works under the hood.<br>
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
+* **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
+  history and duration then has to be find in logs
+* **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files
 * ..
 
 # Kopia in Linux
@@ -261,22 +264,21 @@ WantedBy=multi-user.target
 
 ![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
 
-## KopiaUI vs cli vs Server
+## KopiaUI
 
 While KopiaUI seems like the way to go because of the simple deployment and
-use, it has a drawback. The way the schedule works, where the user must be logged in
-for backups to take place is something to be very aware of.<br> 
+use, it has a drawback. The way the schedule works, where the user must be
+logged in for backups to take place is something to be very aware of.<br> 
 
-Another thing is that KopiaUI does not really need any guide or tutorial.
-It just works for any normal average user who is always logged in with
-that one account.
+Another thing is that KopiaUI does not really need guidance here.
+It just works for any normal user who is always logged in with one account.
 
 ## Kopia Server in Windows
 
 Kopia binary is copied in to `C:\Kopia\` and a scheduled task is importet
 that start kopia on boot in server mode.
 In server mode kopia runs in the background, with its web server
-answering at url: `localhost:51515`
+answering at url: `localhost:51515` where it can be managed.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
   delete everything except `kopia_server_deploy_win` folder.
@@ -292,8 +294,8 @@ answering at url: `localhost:51515`
 * setup what to backup and schedule
 
 Kopia should now run on boot and be easy to manage through web GUI.<br>
-Be it creating backup jobs, mounting old snapshots, or just looking around
-if all works as it should.
+Be it creating backup jobs, mounting old snapshots to restore files,
+or just looking around if all works as it should.
 
 It is also popular to use [nssm](https://nssm.cc/) to start up and manage
 Kopia as a service.
@@ -306,20 +308,19 @@ For that look at docker deployment section or in to making changes to the cmd fi
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
-*Written before I realiezed I could be using kopia server.*<br>
-*Also, at the moment its the only way I know how to make actions work
-for VSS snapshots.*
+This was written before I realiezed I could be using kopia server.<br>
+At the moment its the only way I know how to make actions work for VSS snapshots.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
-  keep `kopia_cli_deploy_win` folder, delete the rest.
+  delete everything except `kopia_cli_deploy_win` folder.
 * Run `DEPLOY.cmd`, it will:
   * Removes powershell scripts restriction.
   * kopies kopia.exe in to `C:\Windows\System32`
   * Creates folder `C:\Kopia` and kopies there<br>
     `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
   * imports a task schedule
-* Open the `kopia_backup_scipt.ps1` and follow the instructions there.<br>
-  Which is just to create repo before running the script.<br>
+* Read `kopia_backup_scipt.ps1` and follow the instructions there.<br>
+  Which should be to just to create repo before running the script.<br>
   `kopia repo create filesystem --path C:\kopia_repo --password aaa`
 * edit the scheduled task to the prefered time, default is daily at 21:19
 * run scheduled task manually
@@ -330,7 +331,8 @@ for VSS snapshots.*
 ### VSS snapshots
 
 Volume Shadow Copy Service freezes the state of the disk in time and makes
-this snapshot available to use. This is what allows backup of files that are in use.<br>
+this snapshot available to use.
+This is what allows backup of open files that are in use.<br>
 [Here's some youtube video on VSS.](https://youtu.be/RUwocwP2ilI?t=85)
 
 To make use of this feature edit `kopia_backup_scipt.ps1` changing
