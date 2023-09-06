@@ -87,6 +87,8 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
   history and duration then has to be find in logs
 * **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files
+* [Compression](https://kopia.io/docs/advanced/compression/) is good,
+  `s2-default` seems decent.
 * ..
 
 # Kopia in Linux
@@ -277,17 +279,17 @@ Othewise KopiaUI does not need guide. It just works for normal use.
 Kopia always running in the background, but also webgui to manage it in.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
-  delete everything except `kopia_backup/kopia_server_deploy_win_service` folder.
+  delete everything except `kopia_backup/kopia_server_deploy_service_win` folder.
 * Run `DEPLOY.cmd` as admin, it will:
   * Removes powershell scripts restriction.
   * Creates folder `C:\Kopia` and copies files there.
-  * Uses [shawl](https://github.com/mtkennerly/shawl) to crate Kopia service.
+  * Uses [shawl](https://github.com/mtkennerly/shawl) to create Kopia service.
   * Places `kopia.url` on the current user's desktop.
 * One should check content of `C:\Kopia\kopia_server_start.cmd`<br>
-  note credentials set there: `admin // aaa`
+  that's where credentials are set, default: `admin // aaa`
 * Visit in browser `localhost:51515`
 * Setup new repo through webgui.
-* Setup what to backup and schedule.
+* Setup what to backup, compression and schedule.
 
 Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots to restore files,
