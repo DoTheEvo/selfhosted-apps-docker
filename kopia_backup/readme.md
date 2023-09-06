@@ -267,28 +267,24 @@ WantedBy=multi-user.target
 ## KopiaUI in Windows
 
 While KopiaUI seems like the way to go because of the simple deployment and
-use, it has a drawback. The way the schedule works, where the user must be
-logged in for backups to take place is something to be very aware of.<br> 
+use, it has a drawback. The way the schedule works - that the user must be
+logged in for backups to take place.
 
-Othewise KopiaUI does not really need guidance here.
-It just works for any normal use.
+Othewise KopiaUI does not need guide. It just works for normal use.
 
 ## Kopia Server in Windows
 
-Kopia binary is copied in to `C:\Kopia\` and a scheduled task is imported
-that start kopia on boot in server mode.
-In server mode kopia runs in the background, with its web server
-answering at url: `localhost:51515` where it can be managed.
+Kopia always running in the background, but also webgui to manage it in.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
-  delete everything except `kopia_server_deploy_win` folder.
-* Run `DEPLOY.cmd`, it will:
+  delete everything except `kopia_backup/kopia_server_deploy_win_service` folder.
+* Run `DEPLOY.cmd` as admin, it will:
   * Removes powershell scripts restriction.
-  * Creates folder `C:\Kopia` and copies files there
-  * Imports a task schedule that will start `C:\Kopia\kopia_server_start.cmd`<br>
-  * Places `kopia.url` on the current user's desktop
-* Check content of `C:\Kopia\kopia_server_start.cmd`<br>
-  note or change the credentials, the default: `admin // aaa`
+  * Creates folder `C:\Kopia` and copies files there.
+  * Uses [shawl](https://github.com/mtkennerly/shawl) to crate Kopia service.
+  * Places `kopia.url` on the current user's desktop.
+* One should check content of `C:\Kopia\kopia_server_start.cmd`<br>
+  note credentials set there: `admin // aaa`
 * Visit in browser `localhost:51515`
 * Setup new repo through webgui.
 * Setup what to backup and schedule.
@@ -297,12 +293,16 @@ Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots to restore files,
 or just looking around if all works as it should.
 
-It is also popular to use [nssm](https://nssm.cc/) to start up and manage
-Kopia as a service.
+All relevant files are in `C:\Kopia`, from binaries, `repository.config`, to logs.
 
-While Kopia runs now in server mode, the fact that we pass `--insecure` flag
-means it cant serve as a repository for other kopia instances.
-For that look at docker deployment section or in to making changes to the cmd file.
+Kopia server runs in insecure mode, so no https and no actual server for other
+machines on network to use, just local deployment. 
+
+Before shawl, task scheduler was used.<br>
+This [matushorvath/Kopia as Windows Service](https://gist.github.com/matushorvath/dd7148c201ceae03ddebc1b4bbef4d20)
+guide helped move beyond that. It contains more info if one would want to 
+actually run as server repository for other machines.<br>
+Also use of [nssm](https://nssm.cc/) is popular.
 
 ## Kopia cli in Windows
 
