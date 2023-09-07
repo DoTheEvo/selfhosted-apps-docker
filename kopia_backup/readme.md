@@ -44,7 +44,7 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 * **KopiaUI** - GUI version.<br>
   Kopia that comes packaged with electron to provide the feel of a standalone desktop app.<br>
   Good for simple deployment where average user just wants to backup stuff.<br>
-  Benefits over cli or server is easier setup and management.<br>
+  Benefits over cli or server is easier setup, management and multiple repo connecting at once.<br>
   Drawback is that it runs under one user and only when that user is logged in.
 * **Kopia in Docker** - Kopia Server running in docker<br>
   Can fulfill two needs:
@@ -58,14 +58,18 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 # Some aspects of Kopia
 
 [Official Getting Started Guide](https://kopia.io/docs/getting-started/)<br>
-[Kopia Build Architecture](https://github.com/kopia/kopia/blob/master/BUILD.md)<br>
-[Official Features](https://kopia.io/docs/features/)
+[Official Features](https://kopia.io/docs/features/)<br>
+[Advanced Topics](https://kopia.io/docs/advanced/)
+
+The above linked documentation is well written and worth a look
+if planning serious use.
 
 * Kopia is a single ~35MB binary file.
 * Backups are stored in a **repository** that needs to be created first,
-  and is always encrypted.<br>
-  Before any action, Kopia needs to connect to a repo.
-* **Snapshots**, apart from the typical meaning, kopia also uses the term for
+  and is always encrypted.
+* Before any action, Kopia needs to be **connected to a repo** as repos store most of 
+  the settings and commands are executed in their context.
+* **Snapshots**, apart from the typical meaning, is the term used by Kopia for
   targets(paths) that are being backed up.
 * **Policy** is a term used to define behavior of the backup/repo,
   like backups retention, what to ignore, logging, scheduling(server/UI),
@@ -76,19 +80,25 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
     can be edited like any other.
   - Per user policy, per machine policy.
   - Snapshot level policy, only applying for that one path.
-* **Maintenance** is automatic
+* **Maintenance** is automatic.
 * During snapshots Kopia uses local **cache**, location varies depending on the OS.
   Default max size is 5GB, but it gets swept periodically every few minutes.<br>
   Useful commands are `kopia cache info` and `kopia cache clear`
 * **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
   how it works under the hood.<br>
+  The core concept that it is the **most recent** item of a time-group thats counted
+  first towards whats kept should be understood. Or it can surprise that for example
+  `keep-annual=2` is worthless in january, as the **most recent** two different years
+  are backups so close to each other.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
   history and duration then has to be find in logs
 * **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files
-* [Compression](https://kopia.io/docs/advanced/compression/) is good,
-  `s2-default` seems decent.
+* [Compression](https://kopia.io/docs/advanced/compression/) is good and 
+  should be set before backup starts.`zstd-fastest` is my go-to. If backups
+  feel slow `s2-default` is less cpu heavy but with worse compression.<br>
+  Useful command: `kopia content stats`
 * ..
 
 # Kopia in Linux
@@ -116,9 +126,9 @@ After creation the repo is connected, so connnect command is just demonstration.
 
 * **the policy info and change**
 
-`sudo kopia policy get --global`<br>
 `sudo kopia policy list`<br>
-`sudo kopia policy set --global --keep-annual 2 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 3`<br>
+`sudo kopia policy show --global`<br>
+`sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3`<br>
 
 * **manual backup run**
 
@@ -147,7 +157,7 @@ So both `/home` and `/etc` are set to be backed up.
 # initialize repository
 #   sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia
 # adjust global policy
-#   sudo kopia policy set --global --keep-annual 2 --keep-monthly 6 --keep-weekly 4 --keep-daily 14 --keep-hourly 0 --keep-latest 3
+#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
@@ -268,11 +278,24 @@ WantedBy=multi-user.target
 
 ## KopiaUI in Windows
 
-While KopiaUI seems like the way to go because of the simple deployment and
-use, it has a drawback. The way the schedule works - that the user must be
-logged in for backups to take place.
+KopiaUI does not really need a guide. It's simple and just works for normal use.<br>
+But since we are here...
 
-Othewise KopiaUI does not need guide. It just works for normal use.
+* [Download latest release](https://github.com/kopia/kopia/releases)
+* Extract it somewhere, lets say `C:\Kopia`
+* Run it, click through repo creation
+* select what to backup
+  * set schedule
+  * recommend setting compression, at least s2-default
+* Right click tray icon and set to "Launch at startup"
+* done
+
+It will now start on users login, and executes at set schedule.
+
+While KopiaUI seems like the way to go because of the simple deployment and
+use, it has a drawback. The scheduled backups works only when user is logged in.
+Which for many deployments feel like it introduces unnecessary uncertainty,
+or is not even viable when servers often run with no user logged in. 
 
 ## Kopia Server in Windows
 
