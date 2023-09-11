@@ -68,37 +68,34 @@ if planning serious use.
 * Backups are stored in a **repository** that needs to be created first,
   and is always encrypted.
 * Before any action, Kopia needs to be **connected to a repo** as repos store most of 
-  the settings and commands are executed in their context.
-* **Snapshots**, apart from the typical meaning, is the term used by Kopia for
-  targets(paths) that are being backed up.
-* **Policy** is a term used to define behavior of the backup/repo,
-  like backups retention, what to ignore, logging, scheduling(server/UI),
-  actions before and after backup,...
+  the settings(policies), and commands are executed in their context.
+  Multiple machines can be connected simultaneously.
+* **Snapshots**, is the term used by Kopia for targets(paths) that are being backed up.
+* **Policy** - settings for repo/backup behaviour, stuff like backups retention,
+  what to ignore, logging, scheduling(server/UI), actions before and after backup,...
 * **Policies** are stored inside a repo and can apply at various levels and
   can **inherit** from each other
   - **Global** policy, the default that comes predefined during repo creation,
     can be edited like any other.
-  - Per user policy, per machine policy.
+  - Per user@machine policy
   - Snapshot level policy, only applying for that one path.
 * **Maintenance** is automatic.
-* During snapshots Kopia uses local **cache**, location varies depending on the OS.
-  Default max size is 5GB, but it gets swept periodically every few minutes.<br>
-  Useful commands are `kopia cache info` and `kopia cache clear`
 * **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
   how it works under the hood.<br>
-  The core concept that it is the **most recent** item of a time-group thats counted
-  first towards whats kept should be understood. Or it can surprise that for example
-  `keep-annual=2` is worthless in january, as the **most recent** two different years
-  are backups so close to each other.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
   history and duration then has to be find in logs
-* **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files
+* **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files<br>
+  Useful to search in cli-logs are the terms `kopia/server snapshotting` and
+  `kopia/server finished` 
 * [Compression](https://kopia.io/docs/advanced/compression/) is good and 
-  should be set before backup starts.`zstd-fastest` is my go-to. If backups
-  feel slow `s2-default` is less cpu heavy but with worse compression.<br>
+  should be set before backup starts. My go-to is `zstd-fastest`. If backups
+  feel slow `s2-default` is less cpu heavy but with worse compression.
   Useful command: `kopia content stats`
+* During snapshots Kopia uses local **cache**, location varies depending on the OS.
+  Default max size is 5GB, but it gets swept periodically every few minutes.<br>
+  Useful commands are `kopia cache info` and `kopia cache clear`
 * ..
 
 # Kopia in Linux
@@ -106,7 +103,7 @@ if planning serious use.
 ![list_snapshots_cli](https://i.imgur.com/lQ8W5yh.png)
 
 cli version of kopia will be used to periodically backup to a mounted network storage.<br>
-The backup script will be executed using systemd-timers for scheduling.
+The backup script will be periodicly executed using systemd-timers.
 
 ### Install Kopia
 
@@ -284,9 +281,11 @@ But since we are here...
 * [Download latest release](https://github.com/kopia/kopia/releases)
 * Extract it somewhere, lets say `C:\Kopia`
 * Run it, click through repo creation
-* select what to backup
+* set global policy
+  * recommend setting compression, `zstd-fastest`
   * set schedule
-  * recommend setting compression, at least s2-default
+  * retention rules
+* select what to backup
 * Right click tray icon and set to "Launch at startup"
 * done
 
@@ -312,7 +311,11 @@ Kopia always running in the background, but also webgui to manage it in.
   that's where credentials are set, default: `admin // aaa`
 * Visit in browser `localhost:51515`
 * Setup new repo through webgui.
-* Setup what to backup, compression and schedule.
+* set global policy
+  * recommend setting compression, `zstd-fastest`
+  * set schedule
+  * retention rules
+* Select what to backup.
 
 Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots to restore files,
@@ -333,14 +336,14 @@ Also use of [nssm](https://nssm.cc/) is popular.
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
-Kopia binary is copied in to `C:\Windows\System32\`
+Kopia binary is copied in to `C:\Kopia` along with other files.
 and a scheduled task is imported that executes a powershell script
 `C:\Kopia\kopia_backup_scipt.ps1` at 21:19.
 The script executes few kopia commands - connects to a repo, backs up stuff,
 and disconnects.
 
-Bit more hands on than having a gui, but once setup one can easily get by with
-two commands: `kopia snap list -all` and `kopia mount all K:`<br>
+Bit more hands on than having a gui, but for daily use one can easily get by with
+the commands: `kopia snap list -all` and `kopia mount all K:`<br>
 Note that mount command should be executed in non admin terminal. Weird
 windows thing. 
 
@@ -351,17 +354,18 @@ so that VSS snapshots can be used.
   delete everything except `kopia_cli_deploy_win` folder.
 * Run `DEPLOY.cmd`, it will:
   * Removes powershell scripts restriction.
-  * kopies kopia.exe in to `C:\Windows\System32`
   * Creates folder `C:\Kopia` and kopies there<br>
-    `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
+    `kopia.exe`, `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
+  * Adds `C:\Kopia` to the system env variable PATH.
   * imports a task schedule
 * Read `kopia_backup_scipt.ps1` and follow the instructions there.<br>
-  Which should be to just to create repo before running the script.<br>
-  `kopia repo create filesystem --path C:\kopia_repo --password aaa`
+  Which should be to just to create repo before running the script.
 * edit the scheduled task to the prefered time, default is daily at 21:19
 * run scheduled task manually
 * check if it worked
-  * `kopia snap list --all` 
+  * `kopia snap list --all`
+
+The script is set to save logs in to `C:\Kopia`.
 
 ### VSS snapshots
 

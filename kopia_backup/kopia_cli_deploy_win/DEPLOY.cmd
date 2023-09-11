@@ -13,10 +13,6 @@ if %errorLevel% == 0 (
 echo - powershell ExecutionPolicy changing to Bypass
 powershell.exe Set-ExecutionPolicy -ExecutionPolicy Bypass
 
-echo - copying kopia.exe in to system32
-robocopy "%~dp0\" "C:\Windows\System32" "kopia.exe" /NDL /NJH /NJS
-echo.
-
 echo - checking if C:\Kopia folder exists, creating it if not
 if not exist "C:\Kopia\" (
   mkdir C:\Kopia
@@ -28,10 +24,14 @@ if exist "C:\Kopia\kopia_backup_scipt.ps1" (
 )
 
 echo - copying files to C:\Kopia
+robocopy "%~dp0\" "C:\Kopia" "kopia.exe" /NDL /NJH /NJS
 robocopy "%~dp0\" "C:\Kopia" "kopia_backup_scipt.ps1" /NDL /NJH /NJS
 robocopy "%~dp0\" "C:\Kopia" "win_vss_before.ps1" /NDL /NJH /NJS
 robocopy "%~dp0\" "C:\Kopia" "win_vss_after.ps1" /NDL /NJH /NJS
 echo.
+
+echo - adding C:\Kopia to PATH
+setx /M PATH "%PATH%;C:\Kopia"
 
 if exist C:\Windows\System32\Tasks\kopia_backup_schedule (
     echo - scheduled task with that name already exists, skipping
