@@ -336,14 +336,13 @@ Also use of [nssm](https://nssm.cc/) is popular.
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
-Kopia binary is copied in to `C:\Kopia` along with other files.
-and a scheduled task is imported that executes a powershell script
+All relevant files are in `C:\Kopia`, from binaries, `repository.config`, to logs.
+A scheduled task is imported that executes a powershell script
 `C:\Kopia\kopia_backup_scipt.ps1` at 21:19.
-The script executes few kopia commands - connects to a repo, backs up stuff,
-and disconnects.
+The script connects to a set repo and backup set targets.
 
-Bit more hands on than having a gui, but for daily use one can easily get by with
-the commands: `kopia snap list -all` and `kopia mount all K:`<br>
+This approach is bit more hands on than having a gui, but for daily use one
+can easily get by with the commands: `kopia snap list -all` and `kopia mount all K:`<br>
 Note that mount command should be executed in non admin terminal. Weird
 windows thing. 
 
@@ -352,7 +351,7 @@ so that VSS snapshots can be used.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
   delete everything except `kopia_cli_deploy_win` folder.
-* Run `DEPLOY.cmd`, it will:
+* Run `DEPLOY.cmd`
   * Removes powershell scripts restriction.
   * Creates folder `C:\Kopia` and kopies there<br>
     `kopia.exe`, `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
@@ -377,8 +376,8 @@ This is what allows backup of open files that are in use.<br>
 To make use of this feature edit `kopia_backup_scipt.ps1` changing
 `$USE_SHADOW_COPY = $false` to `$USE_SHADOW_COPY = $true`
 
-Note the use of `--enable-actions` in the backup script `kopia_backup_scipt.ps1`,
-which is required for before/after actions to work.
+Note the use of `--enable-actions` which is required for before/after actions
+to work.
 
 To test if its working, one can execute command `vssadmin list shadows`
 to see current VSS snapshots and then execute it again during the backup.
@@ -549,6 +548,7 @@ The users are stored in the repo.
 ### Troubleshooting
 
 * check kopia docker container logs, I like using [ctop](https://github.com/bcicen/ctop)
-* `nslookup kopia.example.com` check if you are getting to you server from client
+  to see container runtime logs, or the ones mounted in logs directory
+* DNS issue, check `nslookup kopia.example.com` if on the machine
+  is getting correct iP
 * Make sure you use port 443 in server address. 
-
