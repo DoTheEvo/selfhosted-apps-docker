@@ -31,6 +31,9 @@ robocopy "%~dp0\" "C:\Kopia" "win_vss_after.ps1" /NDL /NJH /NJS
 robocopy "%~dp0\" "C:\Kopia" "shawl.exe" /NDL /NJH /NJS
 echo.
 
+echo - adding C:\Kopia to PATH
+setx /M PATH "%PATH%;C:\Kopia"
+
 echo - creting Kopia service
 C:\Kopia\shawl.exe add --log-dir C:\kopia\Kopia_service_logs --name Kopia -- C:\Kopia\kopia_server_start.cmd
 

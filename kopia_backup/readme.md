@@ -4,16 +4,12 @@
 
 ![logo](https://i.imgur.com/A2mosM6.png)
 
-
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-
 # Content
 
 * [Kopia in Linux](#Kopia-in-Linux)
 * [Kopia in Windows](#Kopia-in-Windows)
 * [Kopia in Docker](#Kopia-in-Docker)
+* [Kopia backup to Cloud](#Kopia-backup-to-Cloud)
 
 # Purpose & Overview
 
@@ -552,3 +548,46 @@ The users are stored in the repo.
 * DNS issue, check `nslookup kopia.example.com` if on the machine
   is getting correct iP
 * Make sure you use port 443 in server address. 
+
+
+# Kopia backup to Cloud
+
+### Backblaze B2
+
+![backblaze_repo_pic](https://i.imgur.com/Yhi2BpM.png)
+
+Still cheapest I believe. 10GB free.
+
+[Official Kopia documentation](https://kopia.io/docs/repositories/#backblaze-b2)
+
+* Register.
+* Create a new bucket for kopia repository.
+  * note **bucket name**
+* Add a new application key with the access enabled to the new bucket.<br>
+  After filling the info the site one time shows `applicationKey`
+  * note **keyID**
+  * note **applicationKey**
+* in Kopia add new repository `Backblaze b2` fill in the required information:
+  Bucket Name, KeyID and the Key.
+* Set global policy.
+  * Recommend setting compression, `zstd-fastest`.
+  * Set schedule.
+  * Retention rules.
+* Pick what to backup.
+* Done.
+
+In few minutes one can have reliable cloud backup that compresses the data
+and deduplicates.<br>
+
+**Save the repo password set plus all the info used.**
+
+Might be worth to check bucket settings, Lifecycle. I think it should be set to
+`Keep only the last version of the file`
+
+For cli just follow the official documentation.
+
+To restore files go in to Snapshots > Time > Start time > Mount as Local Filesystem.<br>
+The snapshot will be mounted as `Y:`
+
+---
+---
