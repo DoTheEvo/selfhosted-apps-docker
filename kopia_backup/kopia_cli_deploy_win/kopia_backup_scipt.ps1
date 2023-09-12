@@ -1,4 +1,4 @@
-# Before using this script, create a repo
+# Before using this script, create a repo, note the setting of a password
 # kopia repo create filesystem --path C:\kopia_repo --password aaa --file-log-level=info --log-dir=C:\Kopia\Kopia_Logs
 
 # useful commands:
@@ -10,12 +10,13 @@
 # - net use - shows path that can be pasted to explorer or browser
 #   \\127.0.0.1@51295\DavWWWRoot
 
-# logs location when run by task scheduler as SYSTEM
+# logs location is set C:\Kopia\Kopia_Logs for every command
+# if it was not manually set then it would be
 # C:\Windows\System32\config\systemprofile\AppData
 
-# config below
-# example of $BACKUP_THIS with multiple paths
-# - [array]$BACKUP_THIS = 'C:\Test','C:\Test2','C:\Test3'
+#
+# to backup multiple targets/paths:
+# - [array]$BACKUP_THIS = 'C:\Test','C:\users','C:\blabla'
 
 $REPOSITORY_PATH = 'C:\kopia_repo'
 $KOPIA_PASSWORD = 'aaa'
