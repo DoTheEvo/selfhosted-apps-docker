@@ -552,11 +552,11 @@ The users are stored in the repo.
 
 # Kopia backup to Cloud
 
-### Backblaze B2
+## Backblaze B2
 
 ![backblaze_repo_pic](https://i.imgur.com/Yhi2BpM.png)
 
-Still cheapest I believe. 10GB free.
+Backblaze B2 is still cheapest I believe. 10GB free.
 
 [Official Kopia documentation](https://kopia.io/docs/repositories/#backblaze-b2)
 
