@@ -32,22 +32,24 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 * **cli** - Command line.<br>
   You call the kopia binary passing some commands, it executes stuff, done.<br>
   Deployment requires extra work - scripts with configs, scheduling.
-* **Kopia Server** - kopia binary runs in server mode.<br> 
-  Runs in the background, with its web server answering at url: `localhost:51515`<br>
-  Web GUI makes the management easier than using cli. Additionally in server mode
-  kopia can serve as a centralized repository for other machines that run kopia instances.<br>
-  Deployment requires extra work similar to cli, but actual use is through web GUI.
 * **KopiaUI** - GUI version.<br>
-  Kopia that comes packaged with electron to provide the feel of a standalone desktop app.<br>
+  Kopia that comes packaged with electron for GUI to provide the feel of a standalone desktop app.<br>
   Good for simple deployment where average user just wants to backup stuff.<br>
-  Benefits over cli or server is easier setup, management and multiple repo connecting at once.<br>
+  Benefits over cli is much easier setup, management and ability to connect to  multiple repos once.<br>
   Drawback is that it runs under one user and only when that user is logged in.
+* **Kopia Server** - kopia binary runs in a server mode.<br> 
+  Runs in the background, now with its web server answering at url: `localhost:51515`<br>
+  Web GUI at the url makes the management easy so it can replace KopiaUI.<br>
+  But the main purpose of server mode is that Kopia instance can now serve
+  as a centralized repository for other machines that run their Kopia instances
+  and select server's url as repository where to backup.<br>
+  Deployment requires extra work similar to cli, but actual use is through web GUI.
 * **Kopia in Docker** - Kopia Server running in docker<br>
   Can fulfill two needs:
+  * A centralized Kopia repository where other machines on the network,
+    that also use Kopia, backup their data.
   * Backup docker-host stuff to a cloud or a mounted network storage.
     Managed through webgui instead of cli.
-  * A centralized kopia repository where other machines on the network,
-    that also use kopia, backup their data.
 
 ![repo_first](https://i.imgur.com/rbqhmzZ.png)
 
