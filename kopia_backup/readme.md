@@ -298,7 +298,12 @@ or is not even viable when servers often run with no user logged in.
 
 ## Kopia Server in Windows
 
-Kopia always running in the background, but also webgui to manage it in.
+My go-to for windows use because it offers gui for easier managment and 
+the reliability of always running in the background as a service.
+
+This deployment does not make use of the main Kopia Server feature,
+to be a repository for other machines running Kopiam, just local deployment.
+Few edits of `kopia_server_start.cmd` can make it happen though.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
   delete everything except `kopia_backup/kopia_server_deploy_service_win` folder.
@@ -322,9 +327,6 @@ Be it creating backup jobs, mounting old snapshots to restore files,
 or just looking around if all works as it should.
 
 All relevant files are in `C:\Kopia`, from binaries, `repository.config`, to logs.
-
-Kopia server runs in insecure mode, so no https and no actual server for other
-machines on network to use, just local deployment. 
 
 Before shawl, task scheduler was used.<br>
 This [matushorvath/Kopia as Windows Service](https://gist.github.com/matushorvath/dd7148c201ceae03ddebc1b4bbef4d20)
