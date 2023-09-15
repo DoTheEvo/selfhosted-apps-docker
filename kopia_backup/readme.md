@@ -98,8 +98,10 @@ if planning serious use.
 
 ![list_snapshots_cli](https://i.imgur.com/lQ8W5yh.png)
 
-cli version of kopia will be used to periodically backup to a mounted network storage.<br>
-The backup script will be periodicly executed using systemd-timers.
+A script will be periodically executing cli version of kopia to connect to a repository,
+execute backup, and disconnect.<br>
+Systemd-timers are used to scheduling execution of the script.
+The repository is created on a network share, also mounted on boot using systemd.
 
 ### Install Kopia
 
@@ -267,7 +269,7 @@ WantedBy=multi-user.target
 
 # Kopia in Windows
 
-![windows_snapshot_history_gui](https://i.imgur.com/fI6uhdo.png)
+![windows_snapshot_history_gui](https://i.imgur.com/MI16Zp1.png)
 
 ## KopiaUI in Windows
 
@@ -598,7 +600,7 @@ The example of commands:<br>
 * `kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa`
 * `kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa --enable-actions`
 
-The backup script will need connect replaced 
+The backup script contains example commands, just commented out.
 
 
 ---
