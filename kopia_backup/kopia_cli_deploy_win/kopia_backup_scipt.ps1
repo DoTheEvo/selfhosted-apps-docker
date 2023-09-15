@@ -1,6 +1,9 @@
 # Before using this script, create a repo, note the setting of a password
 # kopia repo create filesystem --path C:\kopia_repo --password aaa --file-log-level=info --log-dir=C:\Kopia\Kopia_Logs
 
+# for backblaza b2
+# kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa
+
 # useful commands:
 # - kopia repo connect filesystem --path C:\kopia_repo -p aaa
 # - kopia snap list -all
@@ -26,6 +29,7 @@ $USE_SHADOW_COPY = $false
 # ----------------------------------------------------------------------------
 
 kopia repository connect filesystem --path $REPOSITORY_PATH --password $KOPIA_PASSWORD --file-log-level=info --log-dir=C:\Kopia\Kopia_Logs
+# kopia repository connect b2 --bucket=kopia-repo-rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
 
 kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3 --file-log-level=info --log-dir=C:\Kopia\Kopia_Logs
 

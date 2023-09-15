@@ -556,17 +556,20 @@ The users are stored in the repo.
 
 ![backblaze_repo_pic](https://i.imgur.com/Yhi2BpM.png)
 
-Backblaze B2 is still cheapest I believe. 10GB free.
+[Cheapest](https://www.backblaze.com/cloud-storage/pricing)
+cloud storage I believe.<br>
+It cost $6 annualy to store 100GB. Any download is charged extra,
+that 100GB would cost $1.
 
 [Official Kopia documentation](https://kopia.io/docs/repositories/#backblaze-b2)
 
-* Register.
+* [Register](https://www.backblaze.com/sign-up/s3).
 * Create a new bucket for kopia repository.
-  * note **bucket name**
+  * note **the bucket name**
 * Add a new application key with the access enabled to the new bucket.<br>
   After filling the info the site one time shows `applicationKey`
-  * note **keyID**
-  * note **applicationKey**
+  * note **the keyID**
+  * note **the applicationKey**
 * in Kopia add new repository `Backblaze b2` fill in the required information:
   Bucket Name, KeyID and the Key.
 * Set global policy.
@@ -576,18 +579,27 @@ Backblaze B2 is still cheapest I believe. 10GB free.
 * Pick what to backup.
 * Done.
 
-In few minutes one can have reliable cloud backup that compresses the data
-and deduplicates.<br>
+In few minutes one can have reliable encrypted cloud backup,
+that deduplicates and compresses the data.<br>
 
 **Save the repo password set plus all the info used.**
 
-Might be worth to check bucket settings, Lifecycle. I think it should be set to
-`Keep only the last version of the file`
-
-For cli just follow the official documentation.
+Might be worth to check bucket settings, [Lifecycle](https://www.backblaze.com/docs/cloud-storage-lifecycle-rules).
+I think it should be set to `Keep only the last version of the file`
 
 To restore files go in to Snapshots > Time > Start time > Mount as Local Filesystem.<br>
 The snapshot will be mounted as `Y:`
+
+### cli
+
+For cli just follow [the official documentation.](https://kopia.io/docs/repositories/#backblaze-b2)
+The example of commands:<br>
+
+* `kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa`
+* `kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa --enable-actions`
+
+The backup script will need connect replaced 
+
 
 ---
 ---
