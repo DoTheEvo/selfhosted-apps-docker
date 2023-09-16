@@ -159,7 +159,7 @@ So both `/home` and `/etc` are set to be backed up.
 # adjust global policy
 #   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
-REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
+REPOSITORY_PATH='/mnt/mirror333/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
 export KOPIA_PASSWORD='aaa'
 
@@ -172,11 +172,15 @@ kopia repository disconnect
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
   if [ ! -e "$path" ]; then
-    echo "Path '$path' does not exist."
+    echo "Error: Target '$path' does not exist."
     exit 1
   fi
 done
 
+if [ ! -d "$REPOSITORY_PATH" ]; then
+  echo "Error: Directory '$REPOSITORY_PATH' does not exist."
+  exit 1
+fi
 ```
 
 make the script executable<br>
