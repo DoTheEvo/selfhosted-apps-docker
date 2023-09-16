@@ -169,8 +169,9 @@ kopia repository disconnect
 
 # kopia does not interupts its run with an error if target or repository are missing
 # this makes systemd OnSuccess OnFailure not behaving as they should
-# below are checks of paths, so that the exit code can be error if they do not exists
-# they are at the end because some backup might be done, we just want error report
+# below are checks for paths, that results in immediate error exit code if they do not exist
+# they are at the end because some backup might get done even another is missing something
+# we just want the error exit code
 
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
