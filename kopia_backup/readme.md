@@ -245,6 +245,14 @@ WantedBy=timers.target
 * `systemctl status kopia-home-etc.timer`
 * `journalctl -u kopia-home-etc.timer` - see history
 
+### Troubleshooting
+
+![journaclt_output](https://i.imgur.com/46XIFFO.png)
+
+To see logs of last Kopia runs done by systemd
+
+* `sudo journalctl -ru kopia-home-etc.service`
+* `sudo journalctl -xru kopia-home-etc.service`
 
 <details>
 <summary><h3>Mounting network storage using systemd</h3></summary>
