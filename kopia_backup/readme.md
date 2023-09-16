@@ -175,13 +175,13 @@ kopia repository disconnect
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
   if [ ! -e "$path" ]; then
-    echo "Error: Target '$path' does not exist."
+    echo "ERROR: Backup target '$path' does not exist."
     exit 1
   fi
 done
 
 if [ ! -d "$REPOSITORY_PATH" ]; then
-  echo "Error: Directory '$REPOSITORY_PATH' does not exist."
+  echo "ERROR: Directory '$REPOSITORY_PATH' does not exist."
   exit 1
 fi
 ```
