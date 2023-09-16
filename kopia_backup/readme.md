@@ -167,9 +167,11 @@ kopia repository connect filesystem --path $REPOSITORY_PATH
 kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 
-# kopia does not ends with error if target of backup or repository are missing
-# this makes systemd OnSuccess OnFailure not behaving
-# below are checks if paths are reachable so that exit code is error if not
+# kopia does not interupts its run with an error if target or repository are missing
+# this makes systemd OnSuccess OnFailure not behaving as they should
+# below are checks of paths, so that the exit code can be error if they do not exists
+# they are at the end because some backup might be done, we just want error report
+
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
   if [ ! -e "$path" ]; then
