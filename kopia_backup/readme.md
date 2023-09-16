@@ -153,16 +153,30 @@ So both `/home` and `/etc` are set to be backed up.
 
 # initialize repository
 #   sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia
+# for cloud like backblaze
+#   sudo kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
+#   sudo kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
 # adjust global policy
 #   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
-KOPIA_PASSWORD='aaa'
+export KOPIA_PASSWORD='aaa'
 
-kopia repository connect filesystem --path $REPOSITORY_PATH --password $KOPIA_PASSWORD
+kopia repository connect filesystem --path $REPOSITORY_PATH
 kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
+
+# tests if paths in BACKUP_THIS exist, exit with error if any is missing
+# this makes systemd OnSuccess OnFailure behave how they should
+IFS=' ' read -ra paths <<< "$BACKUP_THIS"
+for path in "${paths[@]}"; do
+  if [ ! -e "$path" ]; then
+    echo "Path '$path' does not exist."
+    exit 1
+  fi
+done
+
 ```
 
 make the script executable<br>
@@ -588,7 +602,7 @@ that 100GB would cost $1.
 In few minutes one can have reliable encrypted cloud backup,
 that deduplicates and compresses the data.<br>
 
-**Save the repo password set plus all the info used.**
+**Save the repo password, plus all the info used!**
 
 Might be worth to check bucket settings, [Lifecycle](https://www.backblaze.com/docs/cloud-storage-lifecycle-rules).
 I think it should be set to `Keep only the last version of the file`
