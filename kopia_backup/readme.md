@@ -159,7 +159,7 @@ So both `/home` and `/etc` are set to be backed up.
 # adjust global policy
 #   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
-REPOSITORY_PATH='/mnt/mirror333/KOPIA/docker_host_kopia'
+REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
 export KOPIA_PASSWORD='aaa'
 
