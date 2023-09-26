@@ -102,7 +102,7 @@ if planning serious use.
 
 A script will be periodically executing cli version of kopia to connect to a repository,
 execute backup, and disconnect.<br>
-Systemd-timers are used to scheduling execution of the script.
+Systemd-timers are used to schedule execution of the script.
 The repository is created on a network share, also mounted on boot using systemd.
 
 ### Install Kopia
@@ -248,12 +248,12 @@ WantedBy=timers.target
 
 ### Troubleshooting
 
-![journaclt_output](https://i.imgur.com/46XIFFO.png)
-
 To see logs of last Kopia runs done by systemd
 
 * `sudo journalctl -ru kopia-home-etc.service`
 * `sudo journalctl -xru kopia-home-etc.service`
+
+![journaclt_output](https://i.imgur.com/46XIFFO.png)
 
 <details>
 <summary><h3>Mounting network storage using systemd</h3></summary>

@@ -1,0 +1,64 @@
+[global]
+ioengine=windowsaio
+#ioengine=libaio
+filesize=1g
+filename=.fio-diskmark
+direct=1  #use O_DIRECT IO (negates buffered)
+time_based  #keep running until runtime/timeout is met
+runtime=30 #stop workload when this amount of time has passed
+loops=1   #number of times to run the job
+#refill_buffers #always writes new random data in the buffer
+#randrepeat=0 #do not use repeatable random IO pattern
+thread    #use threads instead of processes
+stonewall #insert a hard barrier between this job and previous
+
+[Seq-Read-Q32T1]
+iodepth=32
+numjobs=1
+bs=1m
+rw=read
+
+[Seq-Write-Q32T1]
+iodepth=32
+numjobs=1
+bs=1m
+rw=write
+
+[Rand-Read-4K-Q8T8]
+iodepth=8
+numjobs=8
+openfiles=8
+bs=4k
+rw=randread
+
+[Rand-Write-4K-Q8T8]
+iodepth=8
+numjobs=8
+openfiles=8
+bs=4k
+rw=randwrite
+
+[Rand-Read-4K-Q32T1]
+iodepth=32
+numjobs=1
+bs=4k
+rw=randread
+
+[Rand-Write-4K-Q32T1]
+iodepth=32
+numjobs=1
+bs=4k
+rw=randwrite
+
+[Rand-Read-4K-Q1T1]
+iodepth=1
+numjobs=1
+bs=4k
+rw=randread
+
+[Rand-Write-4K-Q1T1]
+iodepth=1
+numjobs=1
+bs=4k
+rw=randwrite
+unlink=1
