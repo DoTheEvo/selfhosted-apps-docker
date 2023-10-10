@@ -18,8 +18,6 @@ version which is a fork of
 [Paper](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/)
  which is a fork of [Spigot](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
 Few plugings are used which allow to host multiple worlds on the same server.<br>
-Also [docker-rcon-web-admin](https://github.com/itzg/docker-rcon-web-admin) 
-container is runnig to be able to do basic console tasks from web interface.
 
 This setup is written in september 2022 with 1.19.2 being the latest build.
 
@@ -57,7 +55,6 @@ services:
     stdin_open: true
     ports:
       - 25565:25565     # minecraft server players connect
-      - 25575:25575     # rcon connection
       - 8100:8100       # bluemap
       - 8123:8123       # dynmap
     volumes:
@@ -67,18 +64,6 @@ services:
       options:
         max-size: "50m"
         max-file: "5"
-
-  minecraft-rcon:
-    image: itzg/rcon
-    container_name: minecraft-rcon
-    hostname: minecraft-rcon
-    restart: unless-stopped
-    env_file: .env
-    depends_on:
-      - minecraft
-    ports:
-      - 4326:4326
-      - 4327:4327
 
 networks:
   default:
@@ -104,16 +89,6 @@ MAX_MEMORY=3G
 MAX_PLAYERS=50
 ENABLE_COMMAND_BLOCK=TRUE
 ALLOW_NETHER=TRUE
-
-# ITZG RCON WEB ADMIN SPECIFIC
-RWA_ENV=TRUE
-RWA_USERNAME=admin
-RWA_PASSWORD=admin
-RWA_ADMIN=TRUE
-RWA_RCON_HOST=minecraft
-RWA_RCON_PASSWORD=minecraft
-RWA_WEBSOCKET_URL: "ws://rcon.example.com/ws"
-RWA_WEBSOCKET_URL_SSL: "wss://rcon.example.com/ws"
 ```
 
 # Port forwarding
@@ -126,20 +101,13 @@ if you want it world accessible.<br>
 Caddy v2 is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
 
-The minecraft server itself does not need this, but plugins do.
-
-First one is bluemap/dynmap, to see real time map of the world.<br>
-Second one is for rcon web admin, to be able to quickly manage server from anywhere.
+The minecraft server itself does not need this, but plugins might.<br>
+Like lets say dynmap would answer at `map.example.com`
 
 `Caddyfile`
 ```
 map.{$MY_DOMAIN} {
     reverse_proxy minecraft:8123
-}
-
-rcon.{$MY_DOMAIN} {
-  reverse_proxy /ws minecraft-rcon:4327
-  reverse_proxy minecraft-rcon:4326
 }
 ```
 
