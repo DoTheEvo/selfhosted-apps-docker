@@ -126,6 +126,9 @@ Like [this one](https://i.imgur.com/hDhZQ.png).
 
 # Plugins
 
+**Plugins installation** - place the downloaded jar files in to 
+  `~/docker/minecraft/minecraft_data/plugins` and restart the container.
+
 * [multiverse core](https://dev.bukkit.org/projects/multiverse-core)
 * [multiverse portals](https://dev.bukkit.org/projects/multiverse-portals)
 * [multiverse inventory](https://dev.bukkit.org/projects/multiverse-inventories)
@@ -146,9 +149,7 @@ Should they spawn in lobby on start,
 but also remember the position in the worlds when entering portals?<br>
 Well you need the rest of that shit, `EssentialsX` and `EssentialsX Spawn`.
 
-**Plugins installation** - place the downloaded jar files in to 
-  `~/docker/minecraft/minecraft_data/plugins`<br>
-restart the server
+
 
 # The setup
 
