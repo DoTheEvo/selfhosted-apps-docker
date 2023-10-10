@@ -19,7 +19,8 @@ version which is a fork of
  which is a fork of [Spigot](https://www.spigotmc.org/wiki/what-is-spigot-craftbukkit-bukkit-vanilla-forg/).
 Few plugings are used which allow to host multiple worlds on the same server.<br>
 
-This setup is written in september 2022 with 1.19.2 being the latest build.
+This setup is written in september 2022 with 1.19.2 being the latest build.<br>
+Small edits still go on as of october 2023.
 
 # Files and directory structure
 
