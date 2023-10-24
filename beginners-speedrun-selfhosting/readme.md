@@ -7,8 +7,7 @@ You know little and want to start somewhere, FAST!
 
 # Requirements
 
-* A **spare PC** that will be the server.<br>
-  Can be **virtualmachine**.. virtualbox, hyperv.
+* A **spare PC** that will be the server. Can be a **virtualmachine**.
 * **Google**.<br>
   If the guide says do X, and steps seem insuficient, 
   you google that shit and add the word **youtube**.
@@ -68,7 +67,7 @@ You know little and want to start somewhere, FAST!
 **Docker** - a thing that makes hosting super easy, people prepared *recipies*,
          you copy paste them, maybe edit a bit, run them
 
-* **install docker-compose** - `sudo pacman -S docker-compose`
+* **install docker-compose and ctop** - `sudo pacman -S docker-compose ctop`
 * **enable docker service** - `sudo systemctl enable --now docker`
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
@@ -80,8 +79,8 @@ You know little and want to start somewhere, FAST!
 Well, its time to learn how to create and edit files and copy paste shit
 in to them, IN LINUX!<br>
 Honestly could be annoying as fuck at first, but mobaXterm should make it easier
-with the right mouse click paste.<br>
-Nano editor is relatively simple and everywhere so that will be used.
+with that left directory pane and right mouse click.<br>
+Nano text editor is relatively simple and everywhere so that will be used.
 
 * be in your home directory, the command `cd` will always get you there
 * create directory `mkdir docker`
@@ -104,6 +103,10 @@ Nano editor is relatively simple and everywhere so that will be used.
 * save using `ctrl+s`; exit `ctrl+x`
 * run command `sudo docker compose up -d`<br>
   will say the container started
+* you can now run command `ctop`<br> a small [utility](https://github.com/bcicen/ctop)
+  for managing containers<br>
+  see their status, see their resource use, see their logs (arrow left),
+  see detailed info(arrow right)
 * on your windows machine go to your browser<br>
   in address bar put the ip of your server `192.168.1.8` bam<br>
 
