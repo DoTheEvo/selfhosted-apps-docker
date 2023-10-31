@@ -46,7 +46,7 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - ./wyl-data:/data     
+      - ./watchyourlan_data:/data     
 ```
 
 `.env`
