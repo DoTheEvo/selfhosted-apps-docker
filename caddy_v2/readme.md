@@ -307,6 +307,37 @@ violet.{$MY_DOMAIN} {
 }
 ```
 
+### Disable automatic TLS certificates and https
+
+One might want to use reverse proxy without buying a domain, and without opening
+ports to the world, just for general easier access to some services.<br>
+For this [auto_https](https://caddyserver.com/docs/caddyfile/options#auto-https)
+directive in global options section can be used.
+But also what's needed is explicitly state `http:\\` in the address,
+or explicitly state port `80`.<br>
+[This post](https://caddy.community/t/making-sense-of-auto-https-and-why-disabling-it-still-serves-https-instead-of-http/9761)
+well describes how it works.
+
+```
+{
+  auto_https off
+}
+
+http://example.com {
+  reverse_proxy server-blue:80
+}
+
+test.example.com:80 {
+  reverse_proxy 192.168.1.100:80
+}
+```
+
+What's also needed, is a way for your browser to be send to docker-host's
+ip address when `example.com` is entered as url.<br>
+So you need to either edit machines host file, or run DNS server on you
+network.<br>
+*extra info:* `nslookup example.com` shows to what IP address domain goes
+
 ### Redirect
 
 Here is an example of a redirect for the common case of switching anyone that
