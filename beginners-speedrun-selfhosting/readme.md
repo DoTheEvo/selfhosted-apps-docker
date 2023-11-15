@@ -19,7 +19,10 @@ You know little and want to start somewhere, FAST!
 [Some video.](https://www.youtube.com/watch?v=SyBuNZxzy_Y)
 
 * **download linux iso**. For noobs I picked [EndeavourOS \(2GB\)](https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive/EndeavourOS_Cassini_Nova-03-2023_R1.iso)
-  * why that linux and not xxx? Under the hood its Arch Linux.
+  * *why that linux and not xxx linux?*
+    * Under the hood its Arch Linux.
+  * *why arch then?*
+    * fuck you, thats why, I am not writing a novel here.
 * **make bootable usb** from the iso, recommend use [ventoy](https://www.ventoy.net/en/doc_start.html)
   * download; run; select usb; click install; exit; copy iso on to it
 * **boot from the usb**, maybe on newer machines need to disable secure boot in bios
@@ -79,7 +82,7 @@ You know little and want to start somewhere, FAST!
 Well, its time to learn how to create and edit files and copy paste shit
 in to them, IN LINUX!<br>
 Honestly could be annoying as fuck at first, but mobaXterm should make it easier
-with that left directory pane and right mouse click.<br>
+with that left directory pane and right/middle mouse click for paste.<br>
 Nano text editor is relatively simple and everywhere so that will be used.
 
 * be in your home directory, the command `cd` will always get you there
@@ -112,19 +115,19 @@ Nano text editor is relatively simple and everywhere so that will be used.
 
 ![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
 
-# undertanding what you just did 
+# understanding what you just did 
 
-* on linux server a docker container is running, its a webserver and it is
-  accessible for others.<br>
+* on a linux server a docker container is running, its a webserver and it is
+  accessible for others on your network.<br>
   Most of selfhosted stuff is just webserver with some database.
 * if this part is done that means that shit like hosting own netflix(jellyfin),
   or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
   or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
 * you could almost abandon terminal at this point, just start googling portainer
-  and you can be doing this shit through a webpage. I dont use it, but it
-  got good I heard.
+  and you can be doing this shit through a webpage. I dont use it,
+  but I heard it got good, though bit bothersome since its pushing subscriptions.
 
-# undertanding what you did not get done
+# understanding what you did not get done
 
 * this shit is on your own local network, not accessible from the outside.
   Cant call grandma and tell her to write `192.168.1.8` in to her browser
@@ -132,7 +135,7 @@ Nano text editor is relatively simple and everywhere so that will be used.
   She tells you that the dumb fuck you are, you do not have public IP and ports
   forwarded.<br>
   To get that working is bit challenging, probably deserves own page,
-  not realy speedrun, but thorough steps as shit gets sideways fast and people
+  not really speedrun, but thorough steps as shit gets sideways fast and people
   can dick around for hours trying wrong shit.
 * everything here is just basic setup that breaks easily,
   server got dynamic IP, turn it off for a weekend and it might get a different ip
@@ -144,4 +147,8 @@ Nano text editor is relatively simple and everywhere so that will be used.
 ## where to go from here
 
 Can check out [this repo](https://github.com/DoTheEvo/selfhosted-apps-docker)
-and stuff in it.
+
+It has tiny section for noobs, with few links to docker tutorials.<br>
+You should get some understanding of docker networks going,
+making sure you create custom named one and use that in your compose files.
+Then its time to start trying stuff like bookstack or jellyfin or minecraft.
