@@ -428,6 +428,127 @@ Must **enable logging** for a rule to be visible there.
 ---
 ---
 
+<details>
+<summary><h1>Grafana dashboard monitoring</h1></summary>
+
+![dashboard](https://i.imgur.com/SFd8773.png)
+
+[bsmithio/OPNsense-Dashboard](https://github.com/bsmithio/OPNsense-Dashboard)
+seems like amazingly well done thing that everyone would want.. if it was easy.
+
+Annoying thing is that I invested time and effort in to monitoring my
+[caddy reverse proxy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2#monitoring)
+and learning prometheus, loki, promtail,... and literaly the moment I was done
+I started to think about why not do that for firewall instead of reverse proxy
+and so I found now bsmithio project that uses completely different stack - 
+mongo, elasticsearch, graylog, influxdb.
+
+Well, [the documentation](https://github.com/bsmithio/OPNsense-Dashboard/blob/master/configure.md)
+seems to be excelent so lets try this shit out.
+
+Though still I learn best by step by step documenting shit as I try it,
+and make adjustments to my prefernce... so lets try again here.
+
+```
+services:
+
+  mongodb:
+    image: mongo:6.0.4
+    container_name: opns-mongo
+    hostname: opns-mongo
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./mongodb_data:/data/db
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    container_name: opns-elasticsearch
+    hostname: opns-elasticsearch
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./elasticsearch_data:/usr/share/elasticsearch/data
+
+  graylog:
+    image: graylog/graylog:5.0.2
+    container_name: opns-graylog
+    hostname: opns-graylog
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./graylog_data:/usr/share/graylog/data
+    depends_on:
+      - mongodb
+      - elasticsearch
+    ports:
+      - "9000:9000"      # Graylog web interface and REST API
+      - "1514:1514/udp"  # Syslog UDP
+      # - "1514:1514"      # Syslog TCP Optional
+  
+  influxdb:
+    image: influxdb:2.6.1
+    container_name: opns-influxdb
+    hostname: opns-influxdb
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb2
+
+  grafana:
+    image: grafana/grafana:9.4.3
+    container_name: opns-grafana
+    hostname: opns-grafana
+    user: root
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+    depends_on:
+      - influxdb
+    ports:
+      - '3003:3000'
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
+```
+
+```
+# GENERAL
+DOCKER_MY_NETWORK=caddy_net
+TZ=Europe/Bratislava
+
+# ELASTICSEARCH
+http.host=0.0.0.0
+transport.host=localhost
+network.host=0.0.0.0
+ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+# GRAYLOG
+ROOT_TIMEZONE=Europe/Bratislava
+GRAYLOG_TIMEZONE=Europe/Bratislava
+# CHANGE ME (must be at least 16 characters)! This is not your password, this is meant for salting the password below.
+GRAYLOG_PASSWORD_SECRET=ZicwMzt3NTE4ZzIwM
+# Username is "admin"
+# Password is "admin", change this to your own hashed password. 'echo -n "password" | sha256sum' 
+GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+
+# GRAFANA
+GF_SECURITY_ADMIN_USER=opnsense
+GF_SECURITY_ADMIN_PASSWORD=opnsense
+# GF_INSTALL_PLUGINS=grafana-worldmap-panel
+```
+
+</details>
+
+---
+---
+
 ### Extra info and encountered issues
 
 * Health check - `System: Firmware` Run an audit button, Health
@@ -441,3 +562,6 @@ Must **enable logging** for a rule to be visible there.
  
 zenarmor that was disabled caused an error notification<br>
   
+links 
+
+https://homenetworkguy.com/how-to/beginners-guide-to-set-up-home-network-using-opnsense/

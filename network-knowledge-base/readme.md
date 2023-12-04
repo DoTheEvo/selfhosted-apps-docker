@@ -49,3 +49,8 @@ Works same when pinging from archlinux or pinging from win8.1
 
 * https://dnsdumpster.com/<br>
   can check subdomains registered, ideal would be wildcard certificate
+
+
+OSI Model 
+
+* https://www.youtube.com/watch?v=2iFFRqzX3yE

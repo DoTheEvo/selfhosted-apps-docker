@@ -11,13 +11,13 @@
 * [caddy_v2](caddy_v2/) - reverse proxy
 * [vaultwarden](vaultwarden/) - password manager
 * [bookstack](bookstack/) - notes and documentation
+* [kopia](kopia_backup/) - backup utility replacing borg
 * [borg_backup](borg_backup/) - backup utility
 * [ddclient](ddclient/) - automatic DNS update
 * [dnsmasq](dnsmasq/) - DNS and DHCP server
 * [gotify / ntfy / signal](gotify-ntfy-signal/) - instant notifications apps
-* [homer](homer/) - homepage
+* [frigate](frigate/) - managing security cameras
 * [jellyfin](jellyfin/) - video and music streaming
-* [kopia](kopia_backup/) - backup utility replacing borg
 * [minecraft](minecraft/) - game server
 * [meshcrentral](meshcrentral/) - web based remote desktop, like teamviewer or anydesk
 * [rustdesk](rustdesk/) - remote desktop, like teamviewer or anydesk
@@ -29,6 +29,8 @@
 * [unifi](unifi/) - management utility for ubiquiti devices
 * [snipeit](snipeit/) - IT inventory management
 * [trueNAS scale](trueNASscale/) - network file sharing
+* [uptime kuma](uptime-kuma/) - uptime alerting tool 
+* [squid](squid/) - anonymize forward proxy
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [wg-easy](wg-easy/) - wireguard in docker with web gui
 * [zammad](zammad/) - ticketing system
@@ -171,17 +173,17 @@ now you can ctop anywhere.
 
 ---
 
-### Sendinblue
+### Brevo
 
 Services often need ability to send emails, for notification, registration,
 password reset and such... Sendinblue is free, offers 300 mails a day
 and is easy to setup.
 
 ```
-EMAIL_HOST=smtp-relay.sendinblue.com
+EMAIL_HOST=smtp-relay.brevo.com
 EMAIL_PORT=587
-EMAIL_HOST_USER=whoever_example@gmail.com>
-EMAIL_HOST_PASSWORD=xcmpwik-c31d9eykwewf2342df2fwfj04-FKLzpHgMjGqP23
+EMAIL_HOST_USER=whoever_example@gmail.com
+EMAIL_HOST_PASSWORD=xcmpwik-c31d9eykwef3342df2fwfj04-FKLzpHgMjGqP23
 EMAIL_USE_TLS=1
 ```
 

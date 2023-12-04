@@ -1,5 +1,7 @@
 # Port Forwarding
 
+https://www.reddit.com/r/selfhosted/comments/17tlvs7/i_suppose_im_too_stupid_for_port_forwarding/
+
 ###### guide-by-example
 
 You want to selfhost stuff.<br>

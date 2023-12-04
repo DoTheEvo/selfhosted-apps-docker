@@ -44,6 +44,7 @@ Install and manage software on windows through command line.
 ### Useful
 
 * search - `scoop search mpv`
+* `scoop install mpv --global`
 * search for avaialble pacakges - [scoop.sh](https://scoop.sh/)
 
 # Choco
