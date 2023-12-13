@@ -48,7 +48,7 @@ Open source, written in Python and JavaScript.
 ```
 
 * `frigate_storage/` - configuration 
-* `transcodes/` - transcoded video storage
+* `config.yml` - main frigate config file
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -63,8 +63,7 @@ This docker compose is based off the official one except few changes.<br>
 Using bind mounts instead of volumes, moved variables to the `.env` file,
 commented out privileged mode, increased shm_size,...
 
-Nothing special going on here,
-of note is use of `tmpfs` for ram temp storage
+Of note is use of `tmpfs` for ram temp storage
 and [shm_size](https://docs.frigate.video/frigate/installation/#calculating-required-shm-size).
 
 `docker-compose.yml`
@@ -160,6 +159,7 @@ and then secondary one in much smaller resolution and fps for observing.
 ### First basic config
 
 * [Official documentation for config.yml](https://docs.frigate.video/configuration/)
+* [Some youtube video on config adjustment](https://youtu.be/gRCtvRsTHm0)
 
 Example bare config that should shows camera stream once frigate is running.<br>
 This one has credentails contained in the url - `rtsp://username:password@ip:port/url`
@@ -218,6 +218,77 @@ cameras:
     motion:
         mask:
           - 0,480,186,480,174,226,173,0,0,0
+```
+
+### Current full config
+
+Got a tplink camara C440 and some rando aliexpress ptz camera
+
+```
+mqtt:
+  enabled: false
+detectors:
+  default_detector_for_all:
+    type: cpu
+objects:
+  track:
+    - person
+    - cat
+    - dog
+  filters:
+    cat:
+      min_area: 200
+      threshold: 0.5
+cameras:
+  K1-Brana:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    snapshots:
+      enabled: True
+      bounding_box: True
+    record:
+      enabled: True
+      retain:
+        days: 1
+    motion:
+        mask:
+          - 0,480,186,480,174,226,173,0,0,0
+
+  K2-Pergola:
+    ffmpeg:
+      inputs:
+        - path: rtsp://10.0.19.42:554/0/av1
+          roles:
+            - record
+        - path: rtsp://10.0.19.42:554/0/av1
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 352
+      fps: 8
+    snapshots:
+      enabled: True
+      bounding_box: True
+    record:
+      enabled: True
+      retain:
+        days: 1
+
+# Include all cameras by default in Birdseye view
+birdseye:
+  enabled: True
+  mode: continuous
 ```
 
 # First run
