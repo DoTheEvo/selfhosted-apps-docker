@@ -47,7 +47,7 @@ Open source, written in Python and JavaScript.
             └── 🗋 docker-compose.yml
 ```
 
-* `frigate_storage/` - configuration 
+* `frigate_storage/` - storage for frigate database, and video recordings
 * `config.yml` - main frigate config file
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
