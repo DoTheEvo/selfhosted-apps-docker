@@ -413,6 +413,14 @@ Must **enable logging** for a rule to be visible there.
   - OUT on LAN means its leaving firewall and heading to LAN 
   - OUT on WAN means its leaving firewall and heading to the WAN side
 
+### checking traffic from a local device
+
+* `Firewall: Rules: LAN`
+  * enable logging for the `Default allow LAN to any rule`
+* `Firewall: Log Files: Live View`
+  * set interface to lan
+  * set source for the desired ip 
+
 </details>
 
 ---
