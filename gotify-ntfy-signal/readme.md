@@ -2,11 +2,11 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/41WzW04.png)
+![logo](https://i.imgur.com/ZkGGeT5.png)
 
 # Purpose & Overview
 
-Instant notifications if email feels old timey and crowded
+Instant push notifications if email feels old timey and crowded
 
 * [gotify](https://github.com/gotify/server)
 * [ntfy](https://github.com/binwiederhier/ntfy)
@@ -20,11 +20,11 @@ Instant notifications if email feels old timey and crowded
   they need to share single account and so lack the ability to choose
   what to get and what not to get.
 * **ntfy** - simple original approach to just subscribing to "topics" without
-  authentification. Very simple single line push notification.
-  Support for multiple user, supports ios.
-* **signal-cli-rest-api** - no gui, need a sim card phone number registred,
-  notification are just send to phone numbers.
-  Signal wide spread might make it a winner, since you are not asking people
+  authentification. Simple single line code for push notification.
+  Support for multiple users, supports ios.
+* **signal-cli-rest-api** - no gui, needs a sim card, a phone number registred,
+  notification are send through that phone number.
+  Signal wider spread might make it a winner, since you are not asking people
   to install an another app.
 
 Afte few weeks of tinkering with these... **ntfy is the winner for me**, for now.<br>
@@ -82,7 +82,7 @@ ntfy.{$MY_DOMAIN} {
 ntfy uses "topics" for categorization, which creates a very handy disconnect from
 sender and receiver.<br>
 Lets say there's a minecraft server and there are notifications when someone 
-joins. These notifications are send to a `minecraft` topic, not to a specific users.
+joins. These notifications are send to `minecraft` topic, not to specified users.
 Users can subscribe to the topic if they want those notifications.
 This gives great flexibility and is the main reason why ntfy wins
 over other solutions.
