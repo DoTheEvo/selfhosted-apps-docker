@@ -53,8 +53,8 @@ Open source, written in Python and JavaScript.
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
-You only need to provide the three files.</br>
-The directory is created by docker compose on the first run.
+You need to create `frigate_config` directory and in it create `config.yml`.</br>
+Also you need to provide the compose file and the .env file.
 
 # docker-compose
 
