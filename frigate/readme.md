@@ -41,9 +41,10 @@ Open source, written in Python and JavaScript.
 └── ~/
     └── docker/
         └── frigate/
+            ├── 🗁 frigate_config/
+            |    └── 🗋 config.yml
             ├── 🗁 frigate_storage/
             ├── 🗋 .env
-            ├── 🗋 config.yml
             └── 🗋 docker-compose.yml
 ```
 
@@ -71,7 +72,7 @@ and [shm_size](https://docs.frigate.video/frigate/installation/#calculating-requ
 services:
 
   frigate:
-    image: ghcr.io/blakeblackshear/frigate:stable
+    image: ghcr.io/blakeblackshear/frigate:0.13.0-beta7
     container_name: frigate
     hostname: frigate
     restart: unless-stopped
@@ -80,7 +81,7 @@ services:
     shm_size: "256mb"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./config.yml:/config/config.yml
+      - ./frigate_config:/config
       - ./frigate_storage:/media/frigate
       - type: tmpfs # 1GB of memory
         target: /tmp/cache
@@ -125,8 +126,12 @@ cam.{$MY_DOMAIN} {
 }
 ```
 
-# Configuration - config.yml
+# Configuration - frigate_config/config.yml
 
+In version 13, docker compose deployment is in the way that entire
+directory is mounted in, not just config file. Make not of it.
+
+<details>
 <summary><h3>Terminology</h3></summary>
 
 * PoE - power over ethernet, camera is powered by the same cat cable that
@@ -136,6 +141,7 @@ cam.{$MY_DOMAIN} {
 * rtsp - a protocol for streams
 * ptz - Pan-Tilt-Zoom allows remote movement of a camera
 * mqtt - messaging protocol to communicate with home assistant
+</details>
 
 ### Preparation 
 
@@ -294,7 +300,64 @@ birdseye:
 # First run
 
 
+# Notifications
 
+Using ntfy, [gude here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal).
+
+Following [this guide](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
+where emqx is setup as middle man.
+
+`docker-compose.yml`
+```yml
+services:
+
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:0.13.0-beta7
+    container_name: frigate
+    hostname: frigate
+    restart: unless-stopped
+    env_file: .env
+    privileged: true
+    user: root
+    shm_size: "256mb"
+    devices:
+      - /dev/dri/renderD128 # for intel hwaccel, needs to be updated for your hardware
+    cap_add:
+      - CAP_PERFMON
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./frigate_config:/config
+      - /mnt/data-1/frigate_storage:/media/frigate
+      - type: tmpfs # 1GB of memory
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "5000:5000" # Web GUI
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+
+  emqx:
+    image: emqx/emqx:5.3.2
+    container_name: emqx
+    hostname: frigate
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./emqx_data:/opt/emqx/data
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8084:8084
+      - 8883:8883
+      - 18083:18083 # Web GUI
+
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
+```
 
 # Specifics of my setup
 
