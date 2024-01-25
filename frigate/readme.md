@@ -67,6 +67,9 @@ commented out privileged mode, increased shm_size,...
 Of note is use of `tmpfs` for ram temp storage
 and [shm_size](https://docs.frigate.video/frigate/installation/#calculating-required-shm-size).
 
+In version 13, docker compose deployment is in the way that entire
+directory is mounted in, not just config file. Make not of it.
+
 `docker-compose.yml`
 ```yml
 services:
@@ -128,9 +131,6 @@ cam.{$MY_DOMAIN} {
 
 # Configuration - frigate_config/config.yml
 
-In version 13, docker compose deployment is in the way that entire
-directory is mounted in, not just config file. Make not of it.
-
 <details>
 <summary><h3>Terminology</h3></summary>
 
@@ -170,7 +170,7 @@ and then secondary one in much smaller resolution and fps for observing.
 Example bare config that should shows camera stream once frigate is running.<br>
 This one has credentails contained in the url - `rtsp://username:password@ip:port/url`
 
-
+`frigate_config/config.yml`
 ```yml
 mqtt:
   enabled: false
