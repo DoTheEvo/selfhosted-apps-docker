@@ -6,11 +6,12 @@
 
 # Purpose & Overview
 
-Website uptime monitoring and notifications. 
+Uptime monitoring and notifications. 
 
 * [Github](https://github.com/louislam/uptime-kuma)
 
-Simple, modern, uptime monitoring, with rich notification system.
+Simple, modern, uptime monitoring of sites, hosts, ports, containers,
+with rich notification system.
 
 Written in javascript.
  
