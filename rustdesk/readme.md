@@ -222,8 +222,8 @@ that makes daily snapshot of the entire directory.
   
 #### Restore
 
-* down the bookstack containers `docker-compose down`</br>
-* delete the entire bookstack directory</br>
-* from the backup copy back the bookstack directory</br>
+* down the rustdesk containers `docker-compose down`</br>
+* delete the entire rustdesk directory</br>
+* from the backup copy back the rustdesk directory</br>
 * start the containers `docker-compose up -d`
 
