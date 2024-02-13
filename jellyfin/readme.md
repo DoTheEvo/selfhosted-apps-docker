@@ -6,10 +6,6 @@
 
 # Purpose & Overview
 
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-
 Stream movies/tv-shows/music to a browser, or a [large selection of devices and services.](https://jellyfin.org/clients/) 
 
 * [Official site](https://jellyfin.org/)
@@ -34,16 +30,16 @@ Starting point for me was [this viggy96 repo](https://github.com/viggy96/contain
 └── ~/
     └── docker/
         └── jellyfin/
-            ├── jellyfin-cache/
-            ├── jellyfin-config/
+            ├── jellyfin_cache/
+            ├── jellyfin_config/
             ├── transcodes/
             ├── .env
             └── docker-compose.yml
 ```
 
 * `/mnt/bigdisk/...` - a mounted media storage share
-* `jellyfin-cache/` - cache 
-* `jellyfin-config/` - configuration 
+* `jellyfin_cache/` - cache 
+* `jellyfin_config/` - configuration 
 * `transcodes/` - transcoded video storage
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
@@ -69,8 +65,8 @@ services:
       - /dev/dri
     volumes:
       - ./transcodes/:/transcodes
-      - ./jellyfin-config:/config
-      - ./jellyfin-cache:/cache
+      - ./jellyfin_config:/config
+      - ./jellyfin_cache:/cache
       - /mnt/bigdisk/serialy:/media/video:ro
       - /mnt/bigdisk/mp3/moje:/media/music:ro
     ports:
@@ -114,7 +110,8 @@ jellyfin.{$MY_DOMAIN} {
 
 # Specifics of my setup
 
-* no long term use yet
+* no real long term use
+* findroid app does not jump subtitles like official one
 * amd cpu and no gpu, so no experience with hw transcoding
 * media files are stored and shared on trunas scale VM
  and mounted directly on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
@@ -160,6 +157,10 @@ jellyfin.{$MY_DOMAIN} {
 If you encounter this, try opening the url in browsers private window.<br>
 If it works then clear the cookies in your browser.
 
+*No playback at all but GUI works fine*
+
+Might be no access to network share, for example if dockerhost boots up faster
+than NAS.
 
 # Update
 
