@@ -28,9 +28,13 @@ This detection is cpu heavy and to ease the load,
 [Google Coral TPU](https://docs.frigate.video/frigate/hardware#google-coral-tpu)
 is recommended if planning to run multiple cameras with detection.<br>
 Recently 
-[OpenVINO](https://docs.frigate.video/configuration/detectors/#openvino-detector)
+[OpenVINO](https://docs.frigate.video/configuration/object_detectors#openvino-detector)
 has been integrated, which should allow use of igpu of intel 6th+ gen cpus
-as a detector.
+as a detector. 
+
+Though my testing with intel igpu OpenVINO going by official docs results in
+miniPC that runs frigate freezing once a day.
+In comments there seems to be solution by switching to 
 
 Open source, written in Python and JavaScript.
 
@@ -228,25 +232,59 @@ cameras:
 
 ### Current full config
 
-Got a tplink camara C440 and some rando aliexpress ptz camera
+<details>
+<summary>with intel igpu openvino mqtt ntfy</summary>
+
+Previously when I tried openvino igpu hw acceleration I had the server daily freeze.
+Now I setup this config expecting freezes and getting ready to try
+[yolo model](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
+from github comments, but no freeze yet for few days..
 
 ```
 mqtt:
-  enabled: false
+  enabled: true
+  host: 10.0.19.40
+  port: 1883
+  user: frigate
+  password: ${FRIGATE_RTSP_PASSWORD}
+
 detectors:
-  default_detector_for_all:
-    type: cpu
+  ov:
+    type: openvino
+    device: AUTO
+    model:
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
 objects:
   track:
     - person
     - cat
     - dog
   filters:
+    person:
+      min_area: 1000
+      threshold: 0.70
     cat:
       min_area: 200
       threshold: 0.5
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detect:
+  max_disappeared: 2500
+
 cameras:
   K1-Brana:
+    birdseye:
+      order: 1
     ffmpeg:
       inputs:
         - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
@@ -268,15 +306,43 @@ cameras:
         days: 1
     motion:
         mask:
-          - 0,480,186,480,174,226,173,0,0,0
+          - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
 
   K2-Pergola:
+    birdseye:
+      order: 2
     ffmpeg:
       inputs:
-        - path: rtsp://10.0.19.42:554/0/av1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream1
           roles:
             - record
-        - path: rtsp://10.0.19.42:554/0/av1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    snapshots:
+      enabled: True
+      bounding_box: True
+    record:
+      enabled: True
+      retain:
+        days: 1
+    motion:
+      mask:
+        - 640,78,640,0,0,0,0,480,316,480,452,171
+
+  K3-Dvor:
+    birdseye:
+      order: 3
+    ffmpeg:
+      inputs:
+        - path: rtsp://10.0.19.43:554/0/av1
+          roles:
+            - record
+        - path: rtsp://10.0.19.43:554/0/av1
           roles:
             - detect
     detect:
@@ -289,13 +355,21 @@ cameras:
     record:
       enabled: True
       retain:
-        days: 1
-
+        days: 21
+    motion:
+        mask:
+          - 0,37,198,38,174,0,0,0
+          - 640,90,640,352,210,352
 # Include all cameras by default in Birdseye view
 birdseye:
   enabled: True
   mode: continuous
+
+ui:
+  time_format: 24hour
 ```
+
+</details>
 
 # First run
 
