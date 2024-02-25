@@ -15,7 +15,7 @@ You know little and want to start somewhere, FAST!
 
 # Install a Linux on the server
 
-![debian_logo](https://i.imgur.com/Us8cMDz.png)
+![debian_logo](https://i.imgur.com/kGILzNP.png)
 
 * **Download linux iso**. I picked [Debian\(650MB\)](https://www.debian.org/)
   * *Why that linux and not xxx linux?*<br>
