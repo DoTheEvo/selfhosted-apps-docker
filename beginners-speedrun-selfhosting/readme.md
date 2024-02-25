@@ -9,7 +9,7 @@ You know little and want to start somewhere, FAST!
 
 * A **spare PC** that will be the server. Can be a **virtualmachine**.
 * **Google** and **chatGPT**.<br>
-  If the guide says do X, and steps seem insuficient, 
+  If the guide says do X, and steps seem insufficient, 
   you google that shit and add the word **youtube**,
   or you ask chatGPT few questions.
 
@@ -43,7 +43,7 @@ You know little and want to start somewhere, FAST!
 **SSH** - a tiny application that allows you to execute commands from your comfy
 windows PC on the damn server.<br>
 During Debian install you should have had SSH server checked,
-so it would be installed automaticly.
+so it would be installed automatically.
 If you missed, install it - `sudo apt install ssh`
 
 Now to **find IP address** of the machine so we can remotely connect to it.
@@ -68,15 +68,15 @@ To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status ss
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
-**Docker** - a thing that makes hosting super easy, people prepared *recipies*,
+**Docker** - a thing that makes hosting super easy, people prepared *recipes*,
          you copy paste them, edit a bit, run them.
 
 * **install docker-compose** - `sudo apt install docker-compose`
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
 * log out - `exit`, log back in
-* intall [**ctop**](https://github.com/bcicen/ctop) to get some monitoring and managment.<br>
-  Unfortunetly ctop is not in debians repositories, so longer uglier two commands to install it:
+* intall [**ctop**](https://github.com/bcicen/ctop) to get some monitoring and management.<br>
+  Unfortunately ctop is not in debians repositories, so longer uglier two commands to install it:
   * `sudo curl -Lo /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-darwin-amd64`
   * `sudo chmod +x /usr/local/bin/ctop`
 
@@ -121,6 +121,10 @@ But now will be listed general commands in linux to move around and
   in address bar put the ip of your server `192.168.1.8` bam<br>
   You should see the pic above - **Welcome to nginx!**
 
+*extra info:* it should actually be`192.168.1.8:80`,
+with the port 80 we see in the compose being used in the url too.
+But since port 80 is the default http port, it is what browser tries by default.
+
 # Moving beyond terminal
 
 ![dockge_pic](https://i.imgur.com/Vh0JN5F.png)
@@ -132,7 +136,7 @@ Same as nginx example was deployed, we deploy dockge
 using slightly edited compose file from their
 [github page.](https://github.com/louislam/dockge/blob/master/compose.yaml)
 
-* Create new direcotry dockge `mkdir ~/docker/dockge`
+* Create new directory dockge `mkdir ~/docker/dockge`
 * Go in to the docker directory `cd ~/docker/dockge`
 * Create empty docker-compose.yml file `nano docker-compose.yml`
 * Paste in to it this *recipe*, spacing matters
@@ -167,9 +171,6 @@ Now you can setup new stuff from webgui, pasting compose and .env files.
 * if this part is done that means that shit like hosting own netflix(jellyfin),
   or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
   or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
-* you could almost abandon terminal at this point, just start googling portainer
-  and you can be doing this shit through a webpage. I dont use it,
-  but I heard it got good, though bit bothersome since its pushing subscriptions.
 
 # understanding what you did not get done
 
