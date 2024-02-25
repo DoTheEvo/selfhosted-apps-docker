@@ -8,51 +8,52 @@ You know little and want to start somewhere, FAST!
 # Requirements
 
 * A **spare PC** that will be the server. Can be a **virtualmachine**.
-* **Google**.<br>
+* **Google** and **chatGPT**.<br>
   If the guide says do X, and steps seem insuficient, 
-  you google that shit and add the word **youtube**.
+  you google that shit and add the word **youtube**,
+  or you ask chatGPT few questions.
 
-# Install a linux on the server
+# Install a Linux on the server
 
-![endeavouros_logo](https://i.imgur.com/DSMmaj8.png)
+![debian_logo](https://i.imgur.com/Us8cMDz.png)
 
-[Some video.](https://www.youtube.com/watch?v=SyBuNZxzy_Y)
-
-* **download linux iso**. For noobs I picked [EndeavourOS \(2GB\)](https://github.com/endeavouros-team/ISO/releases/download/1-EndeavourOS-ISO-releases-archive/EndeavourOS_Cassini_Nova-03-2023_R1.iso)
-  * *why that linux and not xxx linux?*
-    * Under the hood its Arch Linux.
-  * *why arch then?*
-    * fuck you, thats why, I am not writing a novel here.
-* **make bootable usb** from the iso, recommend use [ventoy](https://www.ventoy.net/en/doc_start.html)
-  * download; run; select usb; click install; exit; copy iso on to it
-* **boot from the usb**, maybe on newer machines need to disable secure boot in bios
-* **click through the installation**
-  * pick online installer when offered
-  * during install, there can be step called `Desktop` - pick `No Desktop`<br>
-    or whatever, does not really matter
-  * when picking disk layout choose wipe everything
-  * username lets say you pick `noob`
-* done
+* **Download linux iso**. I picked [Debian\(650MB\)](https://www.debian.org/)
+  * *Why that linux and not xxx linux?*<br>
+  * Fuck you, thats why. I am not writing a novel here.
+* Make a **bootable usb** from the iso, recommend using [ventoy](https://www.ventoy.net/en/doc_start.html)
+  * Download ventoy; run; select usb; click install; exit;
+  * Copy the iso on to the usb as you would any file.
+* **Boot from the usb**, maybe on newer machines need to disable secure boot in bios
+* **Click through the installation**
+  * [Theres plenty of youtube videos.](https://youtu.be/rf3EN7e-34g?t=419)
+  * Leave `root` password empty, so that sudo is installed automaticly
+    * this will disable root account, if you would want it, just set password for root<br>
+      `sudo passwd root`
+  * For username lets say `noob` with password `aaa`
+  * During software selection [uncheck everything](https://i.imgur.com/MKrPMx2.png)
+    except:
+      * SSH server
+      * standard system utilities<br>
+  * This means no graphical interface, just command line.
 
 # Basic setup of the linux server
 
 ![ssh](https://i.imgur.com/ElFrBog.png)
 
+**SSH** - a tiny application that allows you to execute commands from your comfy
+windows PC on the damn server.<br>
+During Debian install you should have had SSH server checked,
+so it would be installed automaticly.
+If you missed, install it - `sudo apt install ssh`
 
-**SSH** - a tiny application that allows you to execute commands
-      from your comfy windows PC on the damn server 
+Now to **find IP address** of the machine so we can remotely connect to it.
 
-* log in to the server and be in terminal
-* ssh is installed by default, but disabled
-* to check status - `systemctl status sshd`
-* to **enable it** `sudo systemctl enable --now sshd`
-* `ip a` or `ip r` - show [somewhere in there](https://www.cyberciti.biz/faq/linux-ip-command-examples-usage-syntax/#3)
-  what IP address the server got assigned<br>
-  lets say you got `192.168.1.8`,
+* Log in  `noob` / `aaa` and be in terminal.
+* `ip r` - shows [at the end the IP](https://i.imgur.com/eGkYmKB.png) of the machine<br>
+  lets say you got `192.168.1.8`<br>
   nope I am not explaining IP addresses
-* done
 
-*arrow up key in terminal will cycle through old comamnds in history*
+To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status sshd`
 
 # Remote connect to the server
 
@@ -60,39 +61,47 @@ You know little and want to start somewhere, FAST!
 
 * **install** [mobaXterm](https://mobaxterm.mobatek.net/) on your windows machine
 * use it to **connect** to the server using its ip address and username
-  * [have a pic](https://i.imgur.com/lhRGt1p.png)<br>
-* done
+  * [have a pic](https://i.imgur.com/lhRGt1p.png)
+  * [have a video](https://youtu.be/A7pHiPgW2u8&t=10s)
 
 # Install docker
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
 **Docker** - a thing that makes hosting super easy, people prepared *recipies*,
-         you copy paste them, maybe edit a bit, run them
+         you copy paste them, edit a bit, run them.
 
-* **install docker-compose and ctop** - `sudo pacman -S docker-compose ctop`
-* **enable docker service** - `sudo systemctl enable --now docker`
+* **install docker-compose** - `sudo apt install docker-compose`
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
-* log out, log back in
-* done
+* log out - `exit`, log back in
+* intall [**ctop**](https://github.com/bcicen/ctop) to get some monitoring and managment.<br>
+  Unfortunetly ctop is not in debians repositories, so longer uglier two commands to install it:
+  * `sudo curl -Lo /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-darwin-amd64`
+  * `sudo chmod +x /usr/local/bin/ctop`
 
-# Using docker
+# First docker compose
 
-Well, its time to learn how to create and edit files and copy paste shit
+![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
+
+Well, its time to learn how to create and **edit files** and copy paste shit
 in to them, IN LINUX!<br>
 Honestly could be annoying as fuck at first, but mobaXterm should make it easier
-with that left directory pane and right/middle mouse click for paste.<br>
-Nano text editor is relatively simple and everywhere so that will be used.
+with that left directory pane that lets you move around,
+and the right/middle mouse click for paste.<br>
+But now will be listed general commands in linux to move around and
+`nano` editor will be used as it is relatively simple and everywhere.
 
-* be in your home directory, the command `cd` will always get you there
-* create directory `mkdir docker`
-* go in to it `cd docker`
-* create directory `mkdir nginx`
-* go in to it `cd nginx`
+*extra info:* `arrow-up key` in terminal will cycle through old comamnds in history
+
+* Be in your home directory, the command `cd` will always get you there.
+* Create directory `mkdir docker`
+* Go in to it `cd docker`
+* Create directory `mkdir nginx`
+* Go in to it `cd nginx`
 * Oh look at you being all hacker in terminal, following simple directions
-* create empty docker-compose.yml file `nano docker-compose.yml`
-* paste in to it this *recipe*, spacing matters
+* Create empty docker-compose.yml file `nano docker-compose.yml`
+* Paste in to it this *recipe*, spacing matters
   ```
   services:
 
@@ -103,17 +112,52 @@ Nano text editor is relatively simple and everywhere so that will be used.
       ports:
       - "80:80"
   ```
-* save using `ctrl+s`; exit `ctrl+x`
-* run command `sudo docker compose up -d`<br>
-  will say the container started
-* you can now run command `ctop`<br> a small [utility](https://github.com/bcicen/ctop)
-  for managing containers<br>
-  see their status, see their resource use, see their logs (arrow left),
-  see detailed info(arrow right)
+* Save using `ctrl+s`; exit `ctrl+x`
+* Run command `sudo docker-compose up -d`<br>
+  [This is what it should look like](https://imgur.com/a/vtHYNr9)
+* You can run `ctop` to see container status, resource use, logs,
+  details, or to exec in to the container. [Like so.](https://imgur.com/a/ChGjk7i)
 * on your windows machine go to your browser<br>
   in address bar put the ip of your server `192.168.1.8` bam<br>
+  You should see the pic above - **Welcome to nginx!**
 
-![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
+# Moving beyond terminal
+
+![dockge_pic](https://i.imgur.com/Vh0JN5F.png)
+
+Beginners hate terminal.
+[Dockge](https://github.com/louislam/dockge) comes to rescue with its web interface.
+
+Same as nginx example was deployed, we deploy dockge
+using slightly edited compose file from their
+[github page.](https://github.com/louislam/dockge/blob/master/compose.yaml)
+
+* Create new direcotry dockge `mkdir ~/docker/dockge`
+* Go in to the docker directory `cd ~/docker/dockge`
+* Create empty docker-compose.yml file `nano docker-compose.yml`
+* Paste in to it this *recipe*, spacing matters
+  ```
+  services:
+    dockge:
+      image: louislam/dockge:1
+      container_name: dockge
+      hostname: dockge
+      restart: unless-stopped
+      ports:
+        - "5001:5001"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./data:/app/data
+        - /opt/stacks:/opt/stacks
+      environment:
+        - DOCKGE_STACKS_DIR=/opt/stacks
+  ```
+* Save using `ctrl+s`; exit `ctrl+x`
+* Run command `sudo docker-compose up -d`<br>
+* on your windows machine go to your browser<br>
+  in address bar put the ip of your server `192.168.1.8:5001` bam<br>
+
+Now you can setup new stuff from webgui, pasting compose and .env files.
 
 # understanding what you just did 
 
