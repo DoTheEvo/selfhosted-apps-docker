@@ -71,7 +71,7 @@ To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status ss
 **Docker** - a thing that makes hosting super easy, people prepared *recipes*,
          you copy paste them, edit a bit, run them.
 
-* **install docker-compose** - `sudo apt install docker-compose`
+* **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
 * log out - `exit`, log back in
@@ -113,7 +113,7 @@ But now will be listed general commands in linux to move around and
       - "80:80"
   ```
 * Save using `ctrl+s`; exit `ctrl+x`
-* Run command `sudo docker-compose up -d`<br>
+* Run command `sudo docker compose up -d`<br>
   [This is what it should look like](https://imgur.com/a/vtHYNr9)
 * You can run `ctop` to see container status, resource use, logs,
   details, or to exec in to the container. [Like so.](https://imgur.com/a/ChGjk7i)
@@ -157,7 +157,7 @@ using slightly edited compose file from their
         - DOCKGE_STACKS_DIR=/opt/stacks
   ```
 * Save using `ctrl+s`; exit `ctrl+x`
-* Run command `sudo docker-compose up -d`<br>
+* Run command `sudo docker compose up -d`<br>
 * on your windows machine go to your browser<br>
   in address bar put the ip of your server `192.168.1.8:5001` bam<br>
 
