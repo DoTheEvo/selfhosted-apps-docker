@@ -10,12 +10,123 @@ WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
 WORK IN PROGRESS<br>
 
-Home monitoring and automation system or some shit for cameras with frigate nvr.
+Home monitoring and automation system.
 
 * [Official site](https://www.home-assistant.io/)
 * [Github](https://github.com/home-assistant)
 
-Dunno
+HA is designed to be a central control platform for IoT - Internet of Things.
+You buy some sensors for movement, temperature, light, door, power consumption,...
+you buy some smart light switches, lighbulbs, locks, blinds, relays, microphones,...<br>
+And HA lets you automate. If movement happens in room X, switch on light Y,
+If temperature drops below X turn on relay Y. If doors X are open send push
+notification to user Z. 
+
+HA is open source, written in python.
+
+# Hardware
+
+I picked **Zigbee** for my main wireless protocol.
+
+* **Zigbee** - Cheap to get in to, widespread selection of devices. 
+  But uses 2.4Ghz same as wifi so there's chance for
+  [interference](https://www.metageek.com/training/resources/zigbee-wifi-coexistence/).
+* **Z-Wave** - 900Mhz means great penetration and no wifi interference.
+  More reliable compatibility between devices.
+  But several times more expensive and poorer selection of devices.
+* **Wifi** - Cheapest to get in to as people have wifi. But should not be long
+  term plan. It is though prefered for wireless devices that stream nonstop data,
+  like let's say a smart powerplug that reports power consumption.
+  It saves on limited bandwidth that Zigbee or Z-Wave have.
+
+I got:
+
+* [ZigStar UZG-01](https://uzg.zig-star.com/product/) as the zigbee coordinator, bought from elecrow.
+* 3x [Philips Hue Motion Sensor](https://www.philips-hue.com/en-gb/p/hue-hue-motion-sensor/8719514342125) (P/N: 929003067501)
+
+
+# Installation
+
+* [Official documentation](https://www.home-assistant.io/installation/)
+
+## Docker vs Virtual Machine
+
+Its not really a decision, you want to **go full Virtual Machine.**<br>
+Reason being that addons that are essential are installed as docker containers
+in to the HA, and there is no way to nest it inside HA when running as a container itself.
+
+I have ESXI hypervisor and I just followed the instructions.
+
+Some core steps.
+
+* [download vmdk](https://www.home-assistant.io/installation/windows)
+* Create a new VM - Linux; **Debian 11 x64**; 2 cpus; 4G ram<br>
+* Remove disk and dvdrom; add existing disk we dl; switch to IDE 0
+* Network adapter switch from VMXnet3 to E1000e
+* in VM Options switch from BIOS to EFI
+
+I had some issues when I did not get it right during creation and tried to change
+afterwards. The VM would not see the disk. But fresh creation worked
+with debian 11 x64 set.
+
+# The Initial Configuration
+
+### First login
+
+* Log in at the `<ipaddress-that-the-VM-got>:8123`
+* Create new user and password.
+* Set location.
+* Set either static IP address in Settings > System > Network<br>
+  or set IP reservation on your dhcp server.
+
+### User preferences
+
+change date format and first day of the week, enable advanced mode
+
+### SSH  
+
+* Install addon - Advanced SSH & Web Terminal
+* In the configuration set username and copy paste full public key from `.ssh/id_rsa.pub`
+
+### Useful addons
+
+* VSCode
+
+### Reverse proxy
+
+Caddy is used, details
+[here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
+
+`Caddyfile`
+```bash
+home.{$MY_DOMAIN} {
+    reverse_proxy homeassistant:8123
+}
+``` 
+
+adding to `configuration.yaml`, either by ssh and nano or VSCode addon
+
+```yml
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 10.0.19.4
+
+homeassistant:
+  external_url: "https://home.example.com:8123"
+```
+
+
+
+# old mess shit beyond this point
+
+---
+---
+---
+---
+---
+---
+
 
 # Files and directory structure
 
