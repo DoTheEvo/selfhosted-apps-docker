@@ -1,4 +1,4 @@
-# UniFi Controller
+# UniFi Network Application
 
 ###### guide-by-example
 
@@ -9,14 +9,50 @@
 Ubiquiti managment software for wifi access points and other ubiquiti hardware.<br>
 
 * [Official site](https://www.ui.com/software/)
-* [Manual](https://dl.ui.com/guides/UniFi/UniFi_Controller_V5_UG.pdf)
-* [linuxserver github](https://github.com/linuxserver/docker-unifi-controller)
+* [linuxserver github](https://github.com/linuxserver/docker-unifi-network-application)
 
 UniFi is a web based managment software for Ubiquiti devices.</br>
 It is written in Java, utilizing the Spring Framework
-and using MongoDB as a database.
+and using MongoDB as a database.<br>
+Docker image used here is provided by
+[linuxserver.io](https://www.linuxserver.io/)
 
-Docker image used here is provided by [linuxserver.io](https://www.linuxserver.io/)
+# Migration from UniFi Controller
+
+* Do the backup of your old instance through webgui settings.
+* Down the old container.
+* Spin the new stuff
+* Restore the backup
+
+<details>
+<summary>Extra Info & Rant</summary>
+
+Previously called [UniFi Controller](https://github.com/linuxserver/docker-unifi-controller)
+
+Ubiquiti morons decided to change the name to UniFi Network Application.
+Then also tried to go for name UniFi Network Server with claim that it is for 
+selfhosted version, when not on their hardware. In docks even in downloads they
+mostly use the `application` name.<br>
+Though love that inside the webgui version its just `Network 8.0.28`
+
+With this name change, linuxserver.io also changed the deployment so that
+mongo database is now a separate container.<br>
+Would not be a big issue, if mongo would not [suck big time](https://github.com/docker-library/mongo/issues/174)
+at initiating databases in new deployments, making it unnecessary complicated.
+Or if linuxserver.io could make a decision and write
+[cleaner instructions](https://github.com/linuxserver/docker-unifi-network-application/issues/13)
+instead of trying to teach to fish.<br>
+Also linuxserver.io official stance is to use older version of mongo 3.6 - 4.4<br>
+Raspberry Pi users need to go for that 3.6
+
+Big help to get this going cleanly was also [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks),
+from [this](https://www.reddit.com/r/Ubiquiti/comments/18stenb/unifi_network_application_easy_docker_deployment/)
+reddit post.<br>
+First time Ive seen configs used in compose this way, saved bother of doing
+a separate `mongo-init.js` file that for some reason did not work for me.
+I improved it a bit by using variables.
+
+</details>
 
 # Files and directory structure
 
@@ -25,12 +61,14 @@ Docker image used here is provided by [linuxserver.io](https://www.linuxserver.i
 └── ~/
     └── docker/
         └── unifi/
-            ├── config/
-            ├── .env
-            └── docker-compose.yml
+            ├── 🗁 mongo_db_data/
+            ├── 🗁 unifi_data/
+            ├── 🗋 .env
+            └── 🗋 docker-compose.yml
 ```
 
-* `config/` - a directory where unifi stores its coniguration data
+* `mongo_db_data/` - database data 
+* `unifi_data/` - unifi configuration and other data
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker
   how to run the containers
@@ -40,17 +78,40 @@ The directory is created by docker compose on the first run.
 
 # docker-compose
 
+Compose should not need any changes, theres `.env` file for that.
+
+Worth noting is use of [configs](https://docs.docker.com/compose/compose-file/08-configs/)
+to bypass the need for separate `mongo-init.js` file.<br>
+The use comes from [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks).
+
 `docker-compose.yml`
 ```yml
 services:
-  unifi:
-    image: linuxserver/unifi-controller
-    container_name: unifi
-    hostname: unifi
+
+  unifi-db:
+    image: mongo:4
+    container_name: unifi-db
+    hostname: unifi-db
     restart: unless-stopped
     env_file: .env
     volumes:
-      - ./config:/config
+      - ./mongo_db_data:/data
+    expose:
+      - 27017
+    configs:
+      - source: init-mongo.js
+        target: /docker-entrypoint-initdb.d/init-mongo.js
+
+  unifi-app:
+    image: lscr.io/linuxserver/unifi-network-application:8.0.28
+    container_name: unifi-app
+    hostname: unifi-app
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - unifi-db
+    volumes:
+      - ./unifi_data:/config
     ports:
       - 8443:8443
       - 3478:3478/udp
@@ -66,6 +127,12 @@ networks:
   default:
     name: $DOCKER_MY_NETWORK
     external: true
+
+configs:
+  init-mongo.js:
+    content: |
+      db.getSiblingDB("$MONGO_DBNAME").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "readWrite", db: "$MONGO_DBNAME"}]});
+      db.getSiblingDB("${MONGO_DBNAME}_stat").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "readWrite", db: "${MONGO_DBNAME}_stat"}]});
 ```
 
 `.env`
@@ -74,11 +141,18 @@ networks:
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
-#LINUXSERVER.IO
+#UNIFI LINUXSERVER.IO
 PUID=1000
 PGID=1000
 MEM_LIMIT=1024
 MEM_STARTUP=1024
+MONGO_USER=unifi
+MONGO_PASS=N9uHz2bt
+MONGO_HOST=unifi-db
+MONGO_PORT=27017
+MONGO_DBNAME=unifi_db
+# MONGO_TLS= #optional
+# MONGO_AUTHSOURCE= #optional
 ```
 
 # Reverse proxy
@@ -112,11 +186,14 @@ as `Override Inform Host`.
 
 # Some Settings
 
-* Old interface > Wifi > advanced settings > disable "High Performance Devices"<br>
-  When enabled it forces devices to ignore 2ghz band which obviously causes problems at range. 
-  Fucking monstrous stupidity.
-* DTIM sets to 3 for [apple devices](https://www.sniffwifi.com/2016/05/go-to-sleep-go-to-sleep-go-to-sleep.html)
-
+* **Disable "Connects high performance clients to 5 GHz only"**<br>
+  Old interface > Settings > Wireless Networks > Edit > Advanced Options<br>
+  When enabled it forces devices to ignore 2.4GHz which obviously causes problems at range. 
+  Fucking monstrous stupidity to be default on,
+  but I guess globaly they have power to cleanup 2.4GHz a bit.
+* **802.11 DTIM Period - sets to 3**<br>
+  Settings > Wifi > Edit > Advanced<br>
+  For [apple devices](https://www.sniffwifi.com/2016/05/go-to-sleep-go-to-sleep-go-to-sleep.html)<br>
 
 # Update
 
@@ -126,16 +203,3 @@ Manual image update:
 - `docker-compose up -d`</br>
 - `docker image prune`
 
-# Backup and restore
-
-#### Backup
-
-Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory.
-  
-#### Restore
-
-* down the unifi container `docker-compose down`</br>
-* delete the entire unifi directory</br>
-* from the backup copy back the unifi directory</br>
-* start the container `docker-compose up -d`
