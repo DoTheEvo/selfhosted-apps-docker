@@ -26,13 +26,13 @@ Docker image used here is provided by
 
 <details>
 <summary>Extra Info & Rant</summary>
-
 <br>
+
 Previously called [UniFi Controller](https://github.com/linuxserver/docker-unifi-controller)
 
 Ubiquiti morons decided to change the name to UniFi Network Application.
-Then also tried to go for name UniFi Network Server with claim that it is for 
-selfhosted version. In docks even in downloads they mostly use the `application`.<br>
+Then also tried to go for name UniFi Network Server with a claim that its for 
+selfhosted version. In docs and even in downloads they mostly use the `application`.<br>
 Though love that inside the webgui version its just `Network 8.0.28`
 
 With this name change, linuxserver.io also changed the deployment so that
@@ -42,15 +42,15 @@ at initiating databases in new deployments, making it unnecessary complicated.
 Or if linuxserver.io could make a decision and write
 [cleaner instructions](https://github.com/linuxserver/docker-unifi-network-application/issues/13)
 instead of trying to teach to fish.<br>
-Also linuxserver.io official stance is to use older version of mongo 3.6 - 4.4<br>
-Raspberry Pi users need to go for that 3.6
+Also linuxserver.io official stance is to use older version of mongo v3.6 - v4.4<br>
+Reports are that raspberry pi 4 users need to go for that v3.6
 
-Big help to get this going cleanly was also [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks),
+Big help to get this going cleanly was [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks),
 from [this](https://www.reddit.com/r/Ubiquiti/comments/18stenb/unifi_network_application_easy_docker_deployment/)
 reddit post.<br>
 First time Ive seen configs used in compose this way, saved bother of doing
 a separate `mongo-init.js` file that for some reason did not work for me.
-I improved it a bit by using variables.
+I improved it a bit by using variables so stuff can be set just in `.env`
 
 </details>
 
