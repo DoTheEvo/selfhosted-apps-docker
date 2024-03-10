@@ -166,7 +166,7 @@ Caddy v2 is used, details
 ```
 unifi.{$MY_DOMAIN} {
         encode gzip
-        reverse_proxy unifi:8443 {
+        reverse_proxy unifi-app:8443 {
                 transport http {
                         tls
                         tls_insecure_skip_verify
