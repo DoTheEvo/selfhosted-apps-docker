@@ -2,11 +2,11 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/xm6yo3I.png)
+![logo](https://i.imgur.com/tAEVBnp.png)
 
 # Purpose & Overview
 
-Ubiquiti managment software for wifi access points and other ubiquiti hardware.<br>
+Ubiquiti managment software for **wifi** access points and other ubiquiti hardware.<br>
 
 * [Official site](https://www.ui.com/software/)
 * [linuxserver github](https://github.com/linuxserver/docker-unifi-network-application)
@@ -19,7 +19,7 @@ Docker image used here is provided by
 
 # Migration from UniFi Controller
 
-* Do the backup of your old instance through webgui settings.
+* Do the manual **backup** of your old instance, through webgui settings.
 * Down the old container.
 * Spin the new stuff
 * Restore the backup
@@ -27,12 +27,12 @@ Docker image used here is provided by
 <details>
 <summary>Extra Info & Rant</summary>
 
+<br>
 Previously called [UniFi Controller](https://github.com/linuxserver/docker-unifi-controller)
 
 Ubiquiti morons decided to change the name to UniFi Network Application.
 Then also tried to go for name UniFi Network Server with claim that it is for 
-selfhosted version, when not on their hardware. In docks even in downloads they
-mostly use the `application` name.<br>
+selfhosted version. In docks even in downloads they mostly use the `application`.<br>
 Though love that inside the webgui version its just `Network 8.0.28`
 
 With this name change, linuxserver.io also changed the deployment so that
@@ -53,6 +53,8 @@ a separate `mongo-init.js` file that for some reason did not work for me.
 I improved it a bit by using variables.
 
 </details>
+
+![backup_restore](https://i.imgur.com/WYleMWj.png)
 
 # Files and directory structure
 
@@ -175,24 +177,26 @@ unifi.{$MY_DOMAIN} {
 
 # Adoption
 
+![override_pic](https://i.imgur.com/VyCqaCp.png)
+
 The controller might see your APs during initial setup,
 but it can not adopt them before you set your docker host IP
 as `Override Inform Host`.
 
-* *Settings > System > Other Configuration*<br>
-  `Override Inform Host` check the Enable checbox<br>
+* **Inform Host** check the **Override** checbox<br>
+  *Settings > System > Advanced*<br>
 * enter docker-host IP
 * adopt devices
 
 # Some Settings
 
 * **Disable "Connects high performance clients to 5 GHz only"**<br>
-  Old interface > Settings > Wireless Networks > Edit > Advanced Options<br>
+  *Old interface > Settings > Wireless Networks > Edit > Advanced Options*<br>
   When enabled it forces devices to ignore 2.4GHz which obviously causes problems at range. 
   Fucking monstrous stupidity to be default on,
   but I guess globaly they have power to cleanup 2.4GHz a bit.
 * **802.11 DTIM Period - sets to 3**<br>
-  Settings > Wifi > Edit > Advanced<br>
+  *Settings > Wifi > Edit > Advanced*<br>
   For [apple devices](https://www.sniffwifi.com/2016/05/go-to-sleep-go-to-sleep-go-to-sleep.html)<br>
 
 # Update
