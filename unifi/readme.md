@@ -48,9 +48,9 @@ Reports are that raspberry pi 4 users need to go for that v3.6
 Big help to get this going cleanly was [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks),
 from [this](https://www.reddit.com/r/Ubiquiti/comments/18stenb/unifi_network_application_easy_docker_deployment/)
 reddit post.<br>
-First time Ive seen configs used in compose this way, saved bother of doing
-a separate `mongo-init.js` file that for some reason did not work for me.
-I improved it a bit by using variables so stuff can be set just in `.env`
+First time Ive seen `configs` used in compose this way, saved a bother of doing
+a separate mounting of `mongo-init.js`, that for some reason did not work for me.
+Here it is improved a bit by using variables, so stuff can be set just in `.env`
 
 </details>
 
