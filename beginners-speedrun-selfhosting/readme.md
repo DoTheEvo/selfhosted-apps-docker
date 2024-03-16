@@ -21,19 +21,21 @@ You know little and want to start somewhere, FAST!
 * `sudo` - [executes](https://www.explainxkcd.com/wiki/images/b/b1/sandwich.png)
   command as root with all privilages
 
-# Install a Linux on the server
+# Install a Linux
 
 ![debian_logo](https://i.imgur.com/LHdGx2S.png)
 
 * **Download linux iso**. I picked [Debian\(650MB\)](https://www.debian.org/)
   * *Why that linux and not xxx linux?*<br>
   * Fuck you, thats why. I am not writing a novel here.
-* Make a **bootable usb** from the iso, recommend using [ventoy](https://www.ventoy.net/en/doc_start.html)
-  * Download ventoy; run; select usb; click install; exit;
+* Make a **bootable usb** from the iso, recommend using [ventoy](https://i.imgur.com/gODUfJm.png)
+  * [Download](https://www.ventoy.net/en/download.html) ventoy; run; select usb; click install; exit;
   * Copy the iso on to the usb as you would any file.
 * **Boot from the usb**, maybe on newer machines need to disable secure boot in bios
 * **Click through the installation**
-  * [Theres plenty of youtube videos.](https://youtu.be/rf3EN7e-34g?t=419)
+  * During first time install, would recommend actually reading whats written each step.<br>
+    Theres also plenty of [youtube videos,](https://www.youtube.com/results?search_query=installing+debian&sp=EgIIBQ%253D%253D)
+    which go in to [details](https://youtu.be/rf3EN7e-34g?t=419).
   * Leave `root` password **empty**, so that sudo is installed automatically
     * this will disable root account, if you would want it, just set password for root<br>
       `sudo passwd root`
@@ -44,12 +46,13 @@ You know little and want to start somewhere, FAST!
       * standard system utilities<br>
   * This means no graphical interface, just command line.
 
-# Basic setup of the linux server
+# SSH
 
-![ssh](https://i.imgur.com/ElFrBog.png)
+![ssh_pic](https://i.imgur.com/ElFrBog.png)
 
 **SSH** - a tiny application that allows you to execute commands from your comfy
-windows PC on the damn server.<br>
+windows PC on the damn server. [ChatGPT](https://i.imgur.com/vJjJxZT.png).
+
 During Debian install you should have had SSH server checked,
 so it would be installed automatically.
 If you missed it, install it with - `sudo apt install ssh`
@@ -59,22 +62,11 @@ Now to **find IP address** of the machine so we can remotely connect to it.
 * Log in  `noob` / `aaa` and be in terminal.
 * `ip r` - shows [at the end the IP](https://i.imgur.com/eGkYmKB.png) of the machine<br>
   lets say you got `192.168.1.8`<br>
-  nope I am not explaining IP addresses
+  Nope I am not explaining IP addresses.
 
 To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status sshd`
 
-### Install few additional packages
-
-Install some handy utilities, only **curl** is really needed.
-
-`sudo apt install curl fastfetch btop ncdu`
-
-* curl - utility to download stuff, useful in the next section
-* fastfetch - shows general info about the machine
-* btop - resource monitoring and task manager
-* ncdu - disk space use
-
-# Remote connect to the server
+### Remote connect to the server
 
 ![mobasterm_logo](https://i.imgur.com/aBL85Tr.png)
 
@@ -83,17 +75,29 @@ Install some handy utilities, only **curl** is really needed.
   * [have a pic](https://i.imgur.com/dHncQBv.png)
   * [have a video](https://youtu.be/A7pHiPgW2u8&t=10s)
 
+### Install few packages
+
+Onnce you are comfortably connected install some handy utilities,
+only **curl** is really needed.
+
+`sudo apt install curl neofetch btop ncdu`
+
+* curl - utility to download stuff, useful in the next section
+* [neofetch](https://i.imgur.com/VlSAr59.png) - shows general info about the machine
+* [btop](https://i.imgur.com/HS0gsYQ.png) - resource monitoring and task manager
+* [ncdu](https://i.imgur.com/P6fIonK.png) - disk space use
+
 # Install docker
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
 **Docker** - a thing that makes hosting super easy, people prepared *recipes*,
-         you copy paste them, edit a bit, run them.
+         you copy paste them, edit a bit, run them. [ChatGPT](https://i.imgur.com/eyWePqj.png).
 
 * **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
   The above method is called
   [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script)
-  cuz oldman Debian cant bet bothered to keep docker up to date in its repos.
+  cuz oldman Debian cant be bothered to keep docker up to date in its repos.
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
 * log out - `exit`, log back in
@@ -108,17 +112,18 @@ Install some handy utilities, only **curl** is really needed.
 ![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
 
 Well, its time to learn how to create and **edit files** and copy paste shit
-in to them, IN LINUX!<br>
+in to them, IN LINUX!
+
 Honestly could be annoying as fuck at first, but mobaXterm should make it easier
 with that left directory pane that lets you move around,
 and the right/middle mouse click for paste.<br>
-But used here are general linux commands to move around and
-`nano` editor will be used as it is relatively simple and everywhere.
+But used here are general linux commands to move around, with `nano` editor
+for editing files as it is simple and everywhere.
 
-*extra info:* `arrow-up key` in terminal will cycle through old comamnds in history
+*extra info:* `arrow-up key` in terminal will cycle through old commands in history
 
-* Be in your home directory, the command `cd` will always get you there.<br>
-  [What is cd.](https://i.imgur.com/i32So7T.png)
+* Be in your home directory, the command `cd` will always get you there.
+ [ChatGPT.](https://i.imgur.com/i32So7T.png)
 * Create directory `mkdir docker`
 * Go in to it `cd docker`
 * Create directory `mkdir nginx`
@@ -147,7 +152,7 @@ But used here are general linux commands to move around and
 
 *extra info:* it should actually be`192.168.1.8:80`,
 with the port 80 we see in the compose being used in the url too.
-But since port 80 is the default http port, it is what browser goes for by default.
+But since port 80 is the default http port, it is what browsers go for anyway.
 
 # Moving beyond terminal
 
@@ -185,21 +190,21 @@ using slightly edited compose file from their
 * on your windows machine go to your browser<br>
   in address bar put the ip of your server `192.168.1.8:5001` bam<br>
 
-Now you can setup new stuff from webgui, pasting compose and .env files.
+Now you can do stuff from webgui, pasting compose and .env files.
 
 # understanding what you just did 
 
-* on a linux server a docker container is running, its a webserver and it is
+* On a linux server a docker container is running, its a webserver and it is
   accessible for others on your network.<br>
   Most of selfhosted stuff is just webserver with some database.
-* if this part is done that means that shit like hosting own netflix(jellyfin),
+* If this part is done that means that shit like hosting own netflix(jellyfin),
   or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
   or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
 
 # understanding what you did not get done
 
 * this shit is on your own local network, not accessible from the outside.
-  Cant call grandma and tell her to write `192.168.1.8` in to her browser
+  Cant call the grandma and tell her to write `192.168.1.8` in to her browser
   to see your awesome nginx welcome running.
   She tells you that the dumb fuck you are, you do not have public IP and ports
   forwarded.<br>
@@ -208,10 +213,10 @@ Now you can setup new stuff from webgui, pasting compose and .env files.
   can dick around for hours trying wrong shit.
 * everything here is just basic setup that breaks easily,
   server got dynamic IP, turn it off for a weekend and it might get a different ip
-  assigned next time it starts. Container is not set to start on boot,... 
-* you dont understand how this shit works, fixing not working stuff be hard,
-  but now you can start to consume all the guides and tutorials on
-  docker compose and try stuff...
+  assigned next time it starts. Nginx container is not set to start on boot,... 
+* you dont understand how this shit works, deploying more complicated stuff,
+  fixing not working stuff be hard, but now you can start to consume all
+  the guides and tutorials on docker compose and try stuff...
 
 ## where to go from here
 
