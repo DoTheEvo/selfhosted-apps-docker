@@ -9,9 +9,17 @@ You know little and want to start somewhere, FAST!
 
 * A **spare PC** that will be the server. Can be a **virtualmachine**.
 * **Google** and **chatGPT**.<br>
-  If the guide says do X, and steps seem insufficient, 
+  If the guide says do X and the steps seem insufficient, 
   you google that shit and add the word **youtube**,
   or you ask chatGPT few questions.
+
+# Common terminology
+
+* `repository` - a place from which linux distro installs stuff
+* `root` - name for an administrator account in linux,
+  but also can be a place - top level path
+* `sudo` - [executes](https://www.explainxkcd.com/wiki/images/b/b1/sandwich.png)
+  command as root with all privilages
 
 # Install a Linux on the server
 
@@ -26,7 +34,7 @@ You know little and want to start somewhere, FAST!
 * **Boot from the usb**, maybe on newer machines need to disable secure boot in bios
 * **Click through the installation**
   * [Theres plenty of youtube videos.](https://youtu.be/rf3EN7e-34g?t=419)
-  * Leave `root` password empty, so that sudo is installed automaticly
+  * Leave `root` password **empty**, so that sudo is installed automatically
     * this will disable root account, if you would want it, just set password for root<br>
       `sudo passwd root`
   * For username lets say `noob` with password `aaa`
@@ -44,7 +52,7 @@ You know little and want to start somewhere, FAST!
 windows PC on the damn server.<br>
 During Debian install you should have had SSH server checked,
 so it would be installed automatically.
-If you missed, install it - `sudo apt install ssh`
+If you missed it, install it with - `sudo apt install ssh`
 
 Now to **find IP address** of the machine so we can remotely connect to it.
 
@@ -55,13 +63,24 @@ Now to **find IP address** of the machine so we can remotely connect to it.
 
 To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status sshd`
 
+### Install few additional packages
+
+Install some handy utilities, only **curl** is really needed.
+
+`sudo apt install curl fastfetch btop ncdu`
+
+* curl - utility to download stuff, useful in the next section
+* fastfetch - shows general info about the machine
+* btop - resource monitoring and task manager
+* ncdu - disk space use
+
 # Remote connect to the server
 
 ![mobasterm_logo](https://i.imgur.com/aBL85Tr.png)
 
 * **install** [mobaXterm](https://mobaxterm.mobatek.net/) on your windows machine
 * use it to **connect** to the server using its ip address and username
-  * [have a pic](https://i.imgur.com/lhRGt1p.png)
+  * [have a pic](https://i.imgur.com/dHncQBv.png)
   * [have a video](https://youtu.be/A7pHiPgW2u8&t=10s)
 
 # Install docker
@@ -72,12 +91,16 @@ To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status ss
          you copy paste them, edit a bit, run them.
 
 * **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
+  The above method is called
+  [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script)
+  cuz oldman Debian cant bet bothered to keep docker up to date in its repos.
 * add your user to docker group so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
 * log out - `exit`, log back in
-* intall [**ctop**](https://github.com/bcicen/ctop) to get some monitoring and management.<br>
-  Unfortunately ctop is not in debians repositories, so longer uglier two commands to install it:
-  * `sudo curl -Lo /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-darwin-amd64`
+* intall [**ctop**](https://github.com/bcicen/ctop) to get some basic monitoring and management.<br>
+  Unfortunately ctop is also not in debians repositories, so uglier
+  [two commands](https://github.com/bcicen/ctop?tab=readme-ov-file#linux-generic) to install it:
+  * `sudo wget https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64 -O /usr/local/bin/ctop`
   * `sudo chmod +x /usr/local/bin/ctop`
 
 # First docker compose
@@ -89,12 +112,13 @@ in to them, IN LINUX!<br>
 Honestly could be annoying as fuck at first, but mobaXterm should make it easier
 with that left directory pane that lets you move around,
 and the right/middle mouse click for paste.<br>
-But now will be listed general commands in linux to move around and
+But used here are general linux commands to move around and
 `nano` editor will be used as it is relatively simple and everywhere.
 
 *extra info:* `arrow-up key` in terminal will cycle through old comamnds in history
 
-* Be in your home directory, the command `cd` will always get you there.
+* Be in your home directory, the command `cd` will always get you there.<br>
+  [What is cd.](https://i.imgur.com/i32So7T.png)
 * Create directory `mkdir docker`
 * Go in to it `cd docker`
 * Create directory `mkdir nginx`
@@ -123,23 +147,23 @@ But now will be listed general commands in linux to move around and
 
 *extra info:* it should actually be`192.168.1.8:80`,
 with the port 80 we see in the compose being used in the url too.
-But since port 80 is the default http port, it is what browser tries by default.
+But since port 80 is the default http port, it is what browser goes for by default.
 
 # Moving beyond terminal
 
 ![dockge_pic](https://i.imgur.com/Vh0JN5F.png)
 
 Beginners hate terminal.
-[Dockge](https://github.com/louislam/dockge) comes to rescue with its web interface.
+[Dockge](https://github.com/louislam/dockge) comes to the rescue with its web interface.
 
 Same as nginx example was deployed, we deploy dockge
 using slightly edited compose file from their
 [github page.](https://github.com/louislam/dockge/blob/master/compose.yaml)
 
-* Create new directory dockge `mkdir ~/docker/dockge`
+* Create a new directory dockge `mkdir ~/docker/dockge`
 * Go in to the docker directory `cd ~/docker/dockge`
-* Create empty docker-compose.yml file `nano docker-compose.yml`
-* Paste in to it this *recipe*, spacing matters
+* Create an empty docker-compose.yml file `nano docker-compose.yml`
+* Paste the *recipe*, spacing matters
   ```
   services:
     dockge:
