@@ -28,12 +28,13 @@ You know little and want to start somewhere, FAST!
 * **Download linux iso**. I picked [Debian\(650MB\)](https://www.debian.org/)
   * *Why that linux and not xxx linux?*<br>
   * Fuck you, thats why. I am not writing a novel here.
-* Make a **bootable usb** from the iso, recommend using [ventoy](https://i.imgur.com/gODUfJm.png)
-  * [Download](https://www.ventoy.net/en/download.html) ventoy; run; select usb; click install; exit;
-  * Copy the iso on to the usb as you would any file.
+* Make a **bootable usb** from the iso, [ventoy](https://www.ventoy.net) is recommend. [ChatGPT](https://i.imgur.com/gODUfJm.png).
+  * [Download](https://www.ventoy.net/en/download.html) ventoy; extract;
+    run `Ventoy2Disk.exe`; select a usb; click install; exit;
+  * Copy the Debian iso on to the usb as you would any file.
 * **Boot from the usb**, maybe on newer machines need to disable secure boot in bios
 * **Click through the installation**
-  * During first time install, would recommend actually reading whats written each step.<br>
+  * During first time install, would recommend actually reading whats written on screen each step.<br>
     Theres also plenty of [youtube videos,](https://www.youtube.com/results?search_query=installing+debian&sp=EgIIBQ%253D%253D)
     which go in to [details](https://youtu.be/rf3EN7e-34g?t=419).
   * Leave `root` password **empty**, so that sudo is installed automatically
@@ -91,7 +92,7 @@ only **curl** is really needed.
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
-**Docker** - a thing that makes hosting super easy, people prepared *recipes*,
+**Docker** - a thing that makes hosting super easy. People prepared *recipes*,
          you copy paste them, edit a bit, run them. [ChatGPT](https://i.imgur.com/eyWePqj.png).
 
 * **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
@@ -114,10 +115,10 @@ only **curl** is really needed.
 Well, its time to learn how to create and **edit files** and copy paste shit
 in to them, IN LINUX!
 
-Honestly could be annoying as fuck at first, but mobaXterm should make it easier
+Honestly could be annoying, but mobaXterm should make it easier
 with that left directory pane that lets you move around,
 and the right/middle mouse click for paste.<br>
-But used here are general linux commands to move around, with `nano` editor
+But here are general linux commands to move around, using `nano` editor
 for editing files as it is simple and everywhere.
 
 *extra info:* `arrow-up key` in terminal will cycle through old commands in history
