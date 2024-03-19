@@ -24,7 +24,7 @@ Frigate offers powerful **AI object detection**, by using OpenCV and Tensorflow.
 In contrast to cameras of old time which just detect movement,
 Frigate can recognize if object in view is a cat, a car or a human.
 
-This detection is cpu heavy and to ease the load,
+This detection is cpu heavy and to ease the load
 [Google Coral TPU](https://docs.frigate.video/frigate/hardware#google-coral-tpu)
 is recommended if planning to run multiple cameras with detection.<br>
 Recently 
@@ -32,64 +32,121 @@ Recently
 has been integrated, which should allow use of igpu of intel 6th+ gen cpus
 as a detector. 
 
-Though my testing with intel igpu OpenVINO going by official docs results in
-miniPC that runs frigate freezing once a day.
-In comments there seems to be solution by switching to 
+But do not have too high expectations. False positives are plenty,
+especially when shadows are present. Same with not detecting a cat when
+one sits right there. Config allows for some improvements and the AI model will
+likely get better with time too.
 
 Open source, written in Python and JavaScript.
+
+<details>
+<summary><h5>Terminology</h5></summary>
+
+* **PoE** - Power over ethernet, camera is powered by the same cat cable that
+  carries data. You want POE(802.3af) or POE+(802.3at),
+  none of the passive poe by mikrotik or ubiquity.
+* **IR** - infrared light for night vision, attracts bugs that see it,
+  reflects off walls or shiny surfaces, loss of color information
+* **onvif** - It's a forum. It strives to maintain an industry standard
+  that allows stuff from different manufacturers to work.
+* **rtsp** - a protocol for controling remotely cameras and streaming
+* **ptz** - Pan-Tilt-Zoom allows remote movement of a camera
+* **IoT** - Internet of Things
+* **mqtt** - Messaging protocol widely used in IoT.
+  [Youtube playlist about it.](https://www.youtube.com/playlist?list=PLRkdoPznE1EMXLW6XoYLGd4uUaB6wB0wd)
+</details>
+
+# Cameras choice
+
+[Frigate got a page for that.](https://docs.frigate.video/frigate/hardware/)
+
+My opinion
+
+* **Dahua** - If you got decent budget, they have good stuff and very rich configuration.
+  Going for that 1/1.8" sensor for good low light performance with IR being off,
+  though dont expect magic. I also dealt with hikvision and sunell and dahua
+  felt most solid and modern.
+* The cameras I am actually playing with are cheap **TP-Link** 4MP cameras.<br>
+  I do not have issues with them. Followed frigates
+  [brand specific configuration](https://docs.frigate.video/configuration/camera_specific/#tp-link-vigi-cameras)
+  which says to **switch all streams to H264** and **turn off Smart Coding**.
+
+  * [VIGI C440](https://www.tp-link.com/my/business-networking/vigi-network-camera/vigi-c440/)
+    \- fuckup as its an interior camera and I did not notice when ordering.
+    It's stil outside as it's not directly on elements, survived one winter so far.
+  * [VIGI C240](https://www.tp-link.com/ae/business-networking/vigi-network-camera/vigi-c240/) 
+    \- cheap and exterior, enough settings to feel fine.
+    It actually decetnly see at night without IR, but you realize its kinda lie
+    as if something moves there its a smudge at best or invisible predator at worst.
+  * some random aliexpress camera with ptz
+
+Once I am running frigate and cameras for some real time... more than a year,
+I will decide which cameras to get long term.
 
 # Files and directory structure
 
 ```
+/mnt/
+└── 🗁 frigate_hdd/
+|   └── 🗁 frigate_media/
+|
 /home/
 └── ~/
     └── docker/
         └── frigate/
             ├── 🗁 frigate_config/
             |    └── 🗋 config.yml
-            ├── 🗁 frigate_storage/
             ├── 🗋 .env
             └── 🗋 docker-compose.yml
 ```
 
-* `frigate_storage/` - storage for frigate database, and video recordings
+* `frigate_media/` - storage for frigate recordings and jpg snapshots
+* `frigate_config/` - config and database directory
 * `config.yml` - main frigate config file
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
-You need to create `frigate_config` directory and in it create `config.yml`.</br>
-Also you need to provide the compose file and the .env file.
+You need to create `frigate_config` directory which gets mounted in to the container,
+and in to it place `config.yml`.</br>
+`frigate_media` directory should be placed on a HDD drive as nonstop writes
+would exhaust ssd drive writes, or would be eating in to network bandwith
+if storage would be NAS.
 
 # docker-compose
 
 * [Official compose file documentation.](https://docs.frigate.video/frigate/installation/#docker)
 
 This docker compose is based off the official one except few changes.<br>
-Using bind mounts instead of volumes, moved variables to the `.env` file,
-commented out privileged mode, increased shm_size,...
+Using **bind mounts** instead of volumes, moved variables to the **`.env` file**.<br>
+Increased [shm_size](https://docs.frigate.video/frigate/installation/#calculating-required-shm-size)
+which is a preset max **ram** for interprocess communication of the container.<br>
+**Privileged** mode is used, which allows access to the
+[gpu stats](https://docs.frigate.video/configuration/hardware_acceleration/#configuring-intel-gpu-stats-in-docker)
+and avoids issue with access to recordings and having to deal with permissions.
 
-Of note is use of `tmpfs` for ram temp storage
-and [shm_size](https://docs.frigate.video/frigate/installation/#calculating-required-shm-size).
-
-In version 13, docker compose deployment is in the way that entire
-directory is mounted in, not just config file. Make not of it.
+For hwaccel support theres **devices section** with renderD128 mapped in to the container.
+Check the `/dev/dri/` path to see what you got there.<br>
+The section can be deleted if planning to use just the cpu.
+Or [adjusted](https://docs.frigate.video/frigate/installation/#docker) for colar or pcie gpu.
 
 `docker-compose.yml`
 ```yml
 services:
 
   frigate:
-    image: ghcr.io/blakeblackshear/frigate:0.13.0-beta7
+    image: ghcr.io/blakeblackshear/frigate:0.13.2
     container_name: frigate
     hostname: frigate
     restart: unless-stopped
     env_file: .env
-    # privileged: true
+    privileged: true
     shm_size: "256mb"
+    devices:
+      - /dev/dri/renderD128 # for intel hwaccel, needs to be updated for your hardware
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./frigate_config:/config
-      - ./frigate_storage:/media/frigate
+      - /mnt/frigate_hdd/frigate_media:/media/frigate
       - type: tmpfs # 1GB of memory
         target: /tmp/cache
         tmpfs:
@@ -129,27 +186,41 @@ Caddy is used, details
 `Caddyfile`
 ```
 cam.{$MY_DOMAIN} {
-    reverse_proxy frigate:5000
+  reverse_proxy frigate:5000
 }
 ```
 
-# Configuration - frigate_config/config.yml
+To allow only traffic from LAN to have access to your Frigate.
 
-<details>
-<summary><h3>Terminology</h3></summary>
+`Caddyfile`
+```
+(LAN_only) {
+  @fuck_off_world {
+    not remote_ip private_ranges
+  }
+  respond @fuck_off_world 403
+}
 
-* PoE - power over ethernet, camera is powered by the same cat cable that
-  carries data. You want POE(802.3af) or POE+(802.3at),
-  none of the passive poe by mikrotik or ubiquity.
-* onvif - attempt at industry standard for security cameras, nvr,.. regardless of manufacturer
-* rtsp - a protocol for streams
-* ptz - Pan-Tilt-Zoom allows remote movement of a camera
-* mqtt - messaging protocol to communicate with home assistant
-</details>
+cam.{$MY_DOMAIN} {
+  import LAN_only
+  reverse_proxy frigate:5000
+}
+```
+
+# Configuration
+
+Configuration is done through singular file `config.yml`<br>
+Here we be in small steps adding to it, making sure stuff works
+before moving to a next thing.
+As dumping full `config.yml` is just too much for first time running.
+
+* [Official documentation for config.yml](https://docs.frigate.video/configuration/)
+* [Official full reference config](https://docs.frigate.video/configuration/reference)
+* [Some youtube video on config adjustment](https://youtu.be/gRCtvRsTHm0)
 
 ### Preparation 
 
-Connect camera to your network.
+Connect a camera to your network.
 
 Find url of your camera streams, either by googling your model, 
 or theres a handy windows utility - 
@@ -160,93 +231,151 @@ worked for me and passed virustotal at the time. There are also comments
 with some links at its sourceforge page.<br>
 Camera discovery of onvif-device-manager is almost instant, if the camera requires 
 credentials, set them in the top left corner.<br>
-In live view there should be stream url displayed. Like: "rtsp://10.0.19.171:554/stream1"
+In live view there should be stream url displayed. Like: "rtsp://10.0.19.41:554/stream1"
 
-Ideally your camera has several streams
+Ideally your camera has several streams.
 A primary one in full resolution full frame rate for recording,
 and then secondary one in much smaller resolution and fps for observing.
 
-### First basic config
+### First config - one camera
 
-* [Official documentation for config.yml](https://docs.frigate.video/configuration/)
-* [Some youtube video on config adjustment](https://youtu.be/gRCtvRsTHm0)
+Bare config that should show camera stream once frigate is running.<br>
+Credentails are contained in the url - `rtsp://username:password@ip:port/url`
 
-Example bare config that should shows camera stream once frigate is running.<br>
-This one has credentails contained in the url - `rtsp://username:password@ip:port/url`
+Disabled mqtt since no communication with home assistant or anything else.
+And a single camera stream that pulls credentials from environment variables.
 
-`frigate_config/config.yml`
+`config-1.yml`
 ```yml
 mqtt:
   enabled: false
 cameras:
-  C1-Whatever:
+  K1-Gate:
     ffmpeg:
       inputs:
-        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.171:554/stream1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
 ```
-
-All that is there is disabled mqtt since no home assistant yet
-and just single camera stream that pulls credentails from the `.env` file.
 
 ---
 
-Now to also record main stream and detect on substream.
+### Second config - detection, recording, two cameras
 
+<details>
+<summary><h3>config-2.yml</h3></summary>
 
 ```yml
 mqtt:
   enabled: false
+
 detectors:
   default_detector_for_all:
     type: cpu
+
 objects:
   track:
     - person
     - cat
     - dog
+
+record:
+  enabled: true
+  retain:
+    days: 60
+    mode: all
+  events:
+    retain:
+      default: 360
+      mode: motion
+
+snapshots:
+  enabled: true
+  crop: true
+  retain:
+    default: 360
+
+birdseye:
+  mode: continuous
+
 cameras:
-  K1-Brana:
+  K1-Gate:
     ffmpeg:
       inputs:
-        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.171:554/stream1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
           roles:
             - record
-        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.171:554/stream2
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream2
           roles:
             - detect
     detect:
       width: 640
       height: 480
       fps: 5
-    snapshots:
-      enabled: True
-      bounding_box: True
-    record:
-      enabled: True
-      retain:
-        days: 1
     motion:
-        mask:
-          - 0,480,186,480,174,226,173,0,0,0
+      mask:
+        - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
+
+  K2-Pergola:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    motion:
+      mask:
+        - 640,78,640,0,0,0,0,480,316,480,452,171
 ```
 
-### Current full config
+</details>
+
+---
+---
+
+If a camera is runnig and stream can be viewed, it's time to move to 
+core NVR functions like recording and basic detection.
+
+Settings in root of the config file, **global** - applicable for all cameras:
+
+* `detectors` - Could be omitted as the default is the cpu,
+  but its good to have this explicitly stated and  ready
+  as most people will be switching to non-cpu detection.
+* `objects` - What the detector will be looking for.
+  Later on this config can grow as more specific parameters are added.
+* `record` - Globally enabled record and set retention time on all cameras.
+* `snapshots` - If jpg pictures of detect events should be made and some of its options.
+* `birdseye` - Webgui section where one can see current view of all cameras.
+  It's enabled by default, but the default mode being `objects` means
+  it only shows cameras that detected something in the last 30s.
+  So it is switched to `continuous` mode.
+
+In **per camera** section:
+
+* `roles` - Added lower resolution stream and roles define which to record
+  and which to use for detection.
+* `detect` - Section defines resolution and fps for detect job, you want it to match
+  what camera is sending. This can be often [set directly on a camera](https://i.imgur.com/ifis9zH.png).
+  You can then check if its respected with `onvif-device-manager` in its
+  [profile section](https://i.imgur.com/1H6RZiO.png),
+  or in Frigate > System > [FFPROBE](https://i.imgur.com/IBhlKNt.png)
+* `Motion mask` - Defines which parts of the view to ignore. Watch the [youtube 
+  video](https://youtu.be/gRCtvRsTHm0?t=705).
+
+You might wanna run the 2nd config for a day or two to see how it behaves.
+
+### Third config - intel openvino and hardware acceleration
 
 <details>
-<summary>with intel igpu openvino mqtt ntfy</summary>
+<summary><h3>config-3.yml</h3></summary>
 
-Previously when I tried openvino igpu hw acceleration I had the server daily freeze.
-Now I setup this config expecting freezes and getting ready to try
-[yolo model](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
-from github comments, but no freeze yet for few days..
-
-```
+```yml
 mqtt:
-  enabled: true
-  host: 10.0.19.40
-  port: 1883
-  user: frigate
-  password: ${FRIGATE_RTSP_PASSWORD}
+  enabled: false
 
 detectors:
   ov:
@@ -262,29 +391,39 @@ model:
   input_pixel_format: bgr
   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
-objects:
-  track:
-    - person
-    - cat
-    - dog
-  filters:
-    person:
-      min_area: 1000
-      threshold: 0.70
-    cat:
-      min_area: 200
-      threshold: 0.5
-
 ffmpeg:
   hwaccel_args: preset-vaapi
 
 detect:
   max_disappeared: 2500
 
+objects:
+  track:
+    - person
+    - cat
+    - dog
+
+record:
+  enabled: true
+  retain:
+    days: 60
+    mode: all
+  events:
+    retain:
+      default: 360
+      mode: motion
+
+snapshots:
+  enabled: true
+  crop: true
+  retain:
+    default: 360
+
+birdseye:
+  mode: continuous
+
 cameras:
-  K1-Brana:
-    birdseye:
-      order: 1
+  K1-Gate:
     ffmpeg:
       inputs:
         - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
@@ -297,20 +436,11 @@ cameras:
       width: 640
       height: 480
       fps: 5
-    snapshots:
-      enabled: True
-      bounding_box: True
-    record:
-      enabled: True
-      retain:
-        days: 1
     motion:
-        mask:
-          - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
+      mask:
+        - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
 
   K2-Pergola:
-    birdseye:
-      order: 2
     ffmpeg:
       inputs:
         - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream1
@@ -323,58 +453,45 @@ cameras:
       width: 640
       height: 480
       fps: 5
-    snapshots:
-      enabled: True
-      bounding_box: True
-    record:
-      enabled: True
-      retain:
-        days: 1
     motion:
       mask:
         - 640,78,640,0,0,0,0,480,316,480,452,171
-
-  K3-Dvor:
-    birdseye:
-      order: 3
-    ffmpeg:
-      inputs:
-        - path: rtsp://10.0.19.43:554/0/av1
-          roles:
-            - record
-        - path: rtsp://10.0.19.43:554/0/av1
-          roles:
-            - detect
-    detect:
-      width: 640
-      height: 352
-      fps: 8
-    snapshots:
-      enabled: True
-      bounding_box: True
-    record:
-      enabled: True
-      retain:
-        days: 21
-    motion:
-        mask:
-          - 0,37,198,38,174,0,0,0
-          - 640,90,640,352,210,352
-# Include all cameras by default in Birdseye view
-birdseye:
-  enabled: True
-  mode: continuous
-
-ui:
-  time_format: 24hour
 ```
 
 </details>
 
-# First run
+---
+---
 
+Only two changes in the 3rd config.
 
-# Notifications
+* Detector is switched from the cpu to intel igpu using openvino.<br>
+  Just copy/paste from [the official documentation.](https://docs.frigate.video/configuration/object_detectors/#openvino-detector)
+* [Hardware acceleration](https://docs.frigate.video/configuration/hardware_acceleration/)
+  is enabled for ffmpeg, using vaapi.<br>
+  It's globaly set for all streams by just two lines in the config.
+
+I started to have daily freezes first time I switched to hwaccl and igpu detection.
+I was ready to tackle it based on some
+[github disscussion,](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
+but once I started from scratch with latest version I had no more freezes.
+
+But maybe it will comes, as I had mqtt and ntfy working at that time.
+
+### Fourth config - notifications with mqtt and ntfy
+
+WORK IN PROGRESS
+WORK IN PROGRESS
+WORK IN PROGRESS
+
+Now is the time to get some push notifications about events happenig on cameras.
+
+Will be using [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
+for notifications.
+
+The first result when googling for "frigate ntfy" is [this guide.](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
+But EMQX had major interface change since emqx:5.3.2 that is used in the guide.
+
 
 Using ntfy, [gude here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal).
 
@@ -386,22 +503,19 @@ where emqx is setup as middle man.
 services:
 
   frigate:
-    image: ghcr.io/blakeblackshear/frigate:0.13.0-beta7
+    image: ghcr.io/blakeblackshear/frigate:0.13.2
     container_name: frigate
     hostname: frigate
     restart: unless-stopped
     env_file: .env
     privileged: true
-    user: root
     shm_size: "256mb"
     devices:
       - /dev/dri/renderD128 # for intel hwaccel, needs to be updated for your hardware
-    cap_add:
-      - CAP_PERFMON
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./frigate_config:/config
-      - /mnt/data-1/frigate_storage:/media/frigate
+      - /mnt/frigate_hdd/frigate_media:/media/frigate
       - type: tmpfs # 1GB of memory
         target: /tmp/cache
         tmpfs:
@@ -418,6 +532,7 @@ services:
     hostname: frigate
     restart: unless-stopped
     env_file: .env
+    user: root
     volumes:
       - ./emqx_data:/opt/emqx/data
     ports:
@@ -432,13 +547,29 @@ networks:
     name: $DOCKER_MY_NETWORK
     external: true
 ```
+</details>
 
-# Specifics of my setup
+  
+### Current full config
 
+<details>
+<summary><h2>with intel igpu openvino mqtt ntfy</h2></summary>
 
+Previously when I tried openvino igpu hw acceleration I had the server daily freeze.
+Now I setup this config expecting freezes and getting ready to try
+[yolo model](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
+from github comments, but no freeze yet for few days..
 
-# Troubleshooting
+```
 
+```
+
+---
+---
+
+</details>
+
+# Notifications
 
 
 
@@ -449,10 +580,3 @@ Manual image update:
 - `docker-compose pull`</br>
 - `docker-compose up -d`</br>
 - `docker image prune`
-
-# Backup and restore
-
-#### Backup
-
-#### Restore
-
