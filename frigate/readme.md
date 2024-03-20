@@ -480,25 +480,35 @@ But maybe it will comes, as I had mqtt and ntfy working at that time.
 
 ### Fourth config - notifications with mqtt and ntfy
 
-WORK IN PROGRESS
-WORK IN PROGRESS
-WORK IN PROGRESS
+Time for push **notifications** about events happenig in front of cameras.<br>
+I use **ntfy** and the first result when googling for "frigate ntfy" is
+[this guide.](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
+It works so that is what will be used.<br>
 
-Now is the time to get some push notifications about events happenig on cameras.
+The idea is:
 
-Will be using [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-for notifications.
+* An event worthy of notification happens.
+* Frigate sends mqtt to the mqtt broker - EMQX.
+* EMQX receives it and has a [webhook](https://www.emqx.io/docs/en/latest/dashboard/bridge.html)
+  set for your ntfy instance.
+* ntfy receives it and sends push notification to your phone/browser with snapshot of detection.
 
-The first result when googling for "frigate ntfy" is [this guide.](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
-But EMQX had major interface change since emqx:5.3.2 that is used in the guide.
+EMQX had a major interface changes since version used in the guide,
+but as I was unable to make it work...
+the *"older"* version will be used, which was relased Nov 30, 2023.
 
+#### 1. Have ntfy working
 
-Using ntfy, [gude here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal).
+[ntfy guide here.](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)<br>
+I run without authentification on ntfy.
 
-Following [this guide](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
-where emqx is setup as middle man.
+#### 2. Edit the compose, adding emqx container
 
-`docker-compose.yml`
+For some reason EMQX needs to be run as root user on my setup.
+
+<details>
+<summary>docker-compose.yml</summary>
+
 ```yml
 services:
 
@@ -546,11 +556,143 @@ networks:
   default:
     name: $DOCKER_MY_NETWORK
     external: true
+
 ```
 </details>
 
+#### 3. Edit the Frigate's config.yml
+
+All that is done in this **fourth config** version is enabling mqtt.
+Set IP address and port of the mqtt broker.
+If your broker has authentification, set `FRIGATE_MQTT_USER` and
+`FRIGATE_MQTT_PASSWORD` in the `.env` file.
+
+<details>
+<summary>config-4.yml</summary>
+
+```yml
+mqtt:
+  enabled: true
+  host: 10.0.19.40
+  port: 1883
+
+detectors:
+  ov:
+    type: openvino
+    device: AUTO
+    model:
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detect:
+  max_disappeared: 2500
+
+objects:
+  track:
+    - person
+    - cat
+    - dog
+
+record:
+  enabled: true
+  retain:
+    days: 60
+    mode: all
+  events:
+    retain:
+      default: 360
+      mode: motion
+
+snapshots:
+  enabled: true
+  crop: true
+  retain:
+    default: 360
+
+birdseye:
+  mode: continuous
+
+cameras:
+  K1-Gate:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    motion:
+      mask:
+        - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
+
+  K2-Pergola:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    motion:
+      mask:
+        - 640,78,640,0,0,0,0,480,316,480,452,171
+```
+
+</details>
+
+#### 4. Follow emqx -> ntfy guide
+
+[The guide](https://beneaththeradar.blog/frigate-portainer-and-notifications-using-ntfy/)
+
+* Login to emqx at the \<ip\>:18083
+* Integration > Data Bridges > Create > HTTP Server
+* Name - `frigate-ntfy`
+* Method - `POST`
+* URL - `https://ntfy.example.com/frigate`
+* Key
+  * `content-type` - `application/json`
+  * `Actions` - `view, Picture, https://cam.example.com/api/events/${id}/snapshot.jpg, clear=true;view, Video, https://cam.example.com/api/events/${id}/clip.mp4, clear=true;`
+  * `Attach` - `https://cam.example.com/api/events/${id}/thumbnail.jpg?format=android`
+  * `Tags` - `camera_flash`
+  * `Title` - `Motion Detected`
+* Body - `${message}`
+
+[Picture](https://i.imgur.com/SbohgYI.png) from the guide, this setup skips
+Authentification.<br>
+Test conectivity, it should be successful, then Create.
+A question pops up Would you like to create a rule using this data bridge?
+You do so - create.
+
+```
+SELECT
+  payload.after.id as id, payload.after.label + ' detected on ' + payload.after.camera as message
+FROM
+  "frigate/events"
+WHERE
+  payload.type='new' and payload.after.has_snapshot = true and payload.after.has_clip = true
+```
   
-### Current full config
+### T
+
 
 <details>
 <summary><h2>with intel igpu openvino mqtt ntfy</h2></summary>
@@ -559,10 +701,6 @@ Previously when I tried openvino igpu hw acceleration I had the server daily fre
 Now I setup this config expecting freezes and getting ready to try
 [yolo model](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
 from github comments, but no freeze yet for few days..
-
-```
-
-```
 
 ---
 ---
