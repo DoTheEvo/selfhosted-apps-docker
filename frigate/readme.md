@@ -39,8 +39,9 @@ likely get better with time too.
 
 Open source, written in Python and JavaScript.
 
+
 <details>
-<summary><h5>Terminology</h5></summary>
+<summary><b><font size="+1">Terminology</font></b></summary>
 
 * **PoE** - Power over ethernet, camera is powered by the same cat cable that
   carries data. You want POE(802.3af) or POE+(802.3at),
@@ -54,7 +55,7 @@ Open source, written in Python and JavaScript.
 * **IoT** - Internet of Things
 * **mqtt** - Messaging protocol widely used in IoT.
   [Youtube playlist about it.](https://www.youtube.com/playlist?list=PLRkdoPznE1EMXLW6XoYLGd4uUaB6wB0wd)
-  
+
 </details>
 
 # Cameras choice
@@ -262,7 +263,7 @@ cameras:
 ### Second config - detection, recording, two cameras
 
 <details>
-<summary><h3>config-2.yml</h3></summary>
+<summary><b><font size="+1">config-2.yml</font></b></summary>
 
 ```yml
 mqtt:
@@ -372,7 +373,7 @@ You might wanna run the 2nd config for a day or two to see how it behaves.
 ### Third config - intel openvino and hardware acceleration
 
 <details>
-<summary><h3>config-3.yml</h3></summary>
+<summary><b><font size="+1">config-3.yml</font></b></summary>
 
 ```yml
 mqtt:
@@ -569,7 +570,7 @@ If your broker has authentification, set `FRIGATE_MQTT_USER` and
 `FRIGATE_MQTT_PASSWORD` in the `.env` file.
 
 <details>
-<summary>config-4.yml</summary>
+<summary><b><font size="+1">config-4.yml</font></b></summary>  
 
 ```yml
 mqtt:
