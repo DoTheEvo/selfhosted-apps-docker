@@ -54,6 +54,7 @@ Open source, written in Python and JavaScript.
 * **IoT** - Internet of Things
 * **mqtt** - Messaging protocol widely used in IoT.
   [Youtube playlist about it.](https://www.youtube.com/playlist?list=PLRkdoPznE1EMXLW6XoYLGd4uUaB6wB0wd)
+  
 </details>
 
 # Cameras choice
