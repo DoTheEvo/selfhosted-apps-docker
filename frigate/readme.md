@@ -84,7 +84,7 @@ to a manufacturer and the hardware used can be repurposed at any time.
 
 # Cameras choice
 
-![cameras_pic](https://i.imgur.com/bJZL2jV.jpeg)
+![cameras_pic](https://i.imgur.com/7BQbmPr.png)
 
 
 [Frigate got a page for that.](https://docs.frigate.video/frigate/hardware/)
