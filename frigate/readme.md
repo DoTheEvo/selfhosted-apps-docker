@@ -415,6 +415,8 @@ In **per camera** section:
 
 You might wanna run the 2nd config for a day or two to see how it behaves.
 
+---
+
 ### Third config - intel openvino and hardware acceleration
 
 <details>
@@ -523,6 +525,8 @@ The first time I switched to hwaccl and igpu openvino detection I had daily free
 I was ready to tackle it based on some
 [github disscussion,](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
 but once I started from scratch with latest version I had no more freezes.
+
+---
 
 ### Fourth config - notifications with mqtt and ntfy
 
@@ -744,7 +748,9 @@ FROM
 WHERE
   payload.type='new' and payload.after.has_snapshot = true and payload.after.has_clip = true
 ```
-  
+
+---
+ 
 # My current config
 
 <details>
