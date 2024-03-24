@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/40qhwix.png)
+![logo](https://i.imgur.com/cPBDFxi.png)
 
 # Purpose & Overview
 
@@ -13,33 +13,34 @@ Managing security cameras - recording, detection, notifications.
 * [Official site](https://frigate.video/)
 * [Github](https://github.com/blakeblackshear/frigate)
 
-Frigate is a software NVR - network video recorder.<br>
+Frigate is a software **NVR** - network video recorder.<br>
 Simple, clean web-based interface with possible integration in to home assistant
 and its app.
 
-Frigate offers powerful **AI object detection**, by using OpenCV and Tensorflow.
-In contrast to cameras of old time which just detect movement,
-Frigate can recognize if object in view moving is a cat, a car or a human.
-
-This detection is cpu heavy and to ease the load
-[Google Coral TPU](https://docs.frigate.video/frigate/hardware#google-coral-tpu)
-is recommended if planning to run multiple cameras with detection.<br>
-Recently 
-[OpenVINO](https://docs.frigate.video/configuration/object_detectors#openvino-detector)
-has been integrated, which should allow use of igpu of intel 6th+ gen cpus
-as a detector. 
-
-But do not have too high expectations. False positives are plenty,
-especially when shadows are present. Same with not detecting a cat when
-one sits right there. Config allows for some improvements and the AI model will
-likely get better with time too.<br>
-
 Open source, written in Python and JavaScript.
 
+---
+
+#### Object detection
+
+Frigate offers powerful **AI object detection**, by using OpenCV and Tensorflow.
+In contrast to cameras of old which just detected movement,
+Frigate can recognize in realtime if object in view moving is a cat, a car, or a human.
+
+[Detectors](https://docs.frigate.video/configuration/object_detectors) - There
+are several ways to run the deep learning models for the object detection.
+
+This guide will use cpu at first and then **OpenVINO** intel igpu detector.<br>
+But do not have too high expectations. False positives are plenty, especially
+when shadows are present. Cutting down on false possitives requires plenty
+of playing with the configuration, trials and errors.
+
+---
 
 <details>
 <summary><b><font size="+1">Terminology</font></b></summary>
 
+* **NVR** - network video recorder, often a box with disks and build-in poe switch for cameras
 * **PoE** - Power over ethernet, camera is powered by the same cat cable that
   carries data. You want POE(802.3af) or POE+(802.3at),
   none of the passive poe by mikrotik or ubiquity.
@@ -54,6 +55,10 @@ Open source, written in Python and JavaScript.
   [Youtube playlist about it.](https://www.youtube.com/playlist?list=PLRkdoPznE1EMXLW6XoYLGd4uUaB6wB0wd)
 
 </details>
+
+---
+---
+
 
 ### To consider...
 
@@ -74,7 +79,7 @@ Frigate and a separate poe switch to keep the 24/7 cameras traffic away from you
 main LAN and Coral TPU... and whatnot.
 
 On the other hand, setting Frigate up provides knowledge and the feeling of
-being more in control, with more flexibility, when it does not tight you
+being more in control, with more flexibility, when it does not tie you
 to a manufacturer and the hardware used can be repurposed at any time.
 
 # Cameras choice
@@ -131,15 +136,16 @@ I will decide which cameras to get long term.
 
 You need to create `frigate_config` directory which gets mounted in to the container,
 and in to it place `config.yml`.</br>
-`frigate_media` directory should be placed on a HDD drive as nonstop writes
-would exhaust ssd drive writes, or would be eating in to network bandwith
-if storage would be NAS.
+`frigate_media` directory should be placed on a **HDD** drive. As nonstop writes
+would exhaust an ssd lifespan. If a NAS would be used it would be eating
+in to your LAN bandwith and NAS I/O with constant 24/7 traffic that cameras generate.<br>
+If recording **just detected events** then I guess those other options are viable.
 
 # docker-compose
 
 * [Official compose file documentation.](https://docs.frigate.video/frigate/installation/#docker)
 
-This docker compose is based off the official one except few changes.<br>
+This docker compose is based off the official one except for few changes.<br>
 Using **bind mounts** instead of volumes, moved variables to the **`.env` file**.<br>
 Increased [shm_size](https://docs.frigate.video/frigate/installation/#calculating-required-shm-size)
 which is a preset max **ram** for interprocess communication of the container.<br>
@@ -215,7 +221,7 @@ cam.{$MY_DOMAIN} {
 }
 ```
 
-To allow only traffic from LAN to have access to your Frigate.
+To allow traffic **only from LAN** to have access to your Frigate.
 
 `Caddyfile`
 ```
@@ -231,6 +237,19 @@ cam.{$MY_DOMAIN} {
   reverse_proxy frigate:5000
 }
 ```
+# Frigate UI overview 
+
+![system_pic](https://i.imgur.com/mm7e8jZ.png)
+
+Simple and clean, but few pointers can help.
+
+* **Cameras** - Managing cameras, see recordings, events.
+* **Birdview** - Live view from cameras, maybe set bookmark here.
+* **Events** - All past events, from all cameras.
+* **Storage** - Great info on storage used and statistics how much is used per hour.
+* **System** - Great info on cpu and ram usage, can also do ffprobe per camera.
+* **Config** - Can edit config right here, no need to ssh.
+* **Logs** - Logs since last restart.
 
 # Configuration
 
@@ -249,12 +268,12 @@ Connect a camera to your network.
 
 Find url of your camera streams, either by googling your model, 
 or theres a handy windows utility - 
-[onvif-device-manager](https://sourceforge.net/projects/onvifdm/).
+[**onvif-device-manager**](https://sourceforge.net/projects/onvifdm/).
 Unfortunately all official urls seem dead,
 [this](https://softradar.com/onvif-device-manager/)
 worked for me and passed virustotal at the time. There are also comments
 with some links at its sourceforge page.<br>
-Camera discovery of onvif-device-manager is almost instant, if the camera requires 
+Camera discovery of onvif-device-manager works great. If the camera requires 
 credentials, set them in the top left corner.<br>
 In live view there should be stream url displayed. Like: "rtsp://10.0.19.41:554/stream1"
 
@@ -270,7 +289,7 @@ Bare config that should show camera stream once frigate is running.<br>
 Credentails are contained in the url - `rtsp://username:password@ip:port/url`
 
 Disabled mqtt since no communication with home assistant or anything else.
-And a single camera stream that pulls credentials from environment variables.
+And a single camera stream that pulls credentials you set in the `.env` file.
 
 `config-1.yml`
 ```yml
@@ -316,6 +335,7 @@ record:
 
 snapshots:
   enabled: true
+  bounding_box: true
   crop: true
   retain:
     default: 360
@@ -442,6 +462,7 @@ record:
 
 snapshots:
   enabled: true
+  bounding_box: true
   crop: true
   retain:
     default: 360
@@ -643,6 +664,7 @@ record:
 
 snapshots:
   enabled: true
+  bounding_box: true
   crop: true
   retain:
     default: 360
@@ -725,9 +747,8 @@ WHERE
   
 # My current config
 
-
 <details>
-<summary><b><font size="+1">config.yml</font></b></summary>
+<summary><b><font size="+1">current_config.yml</font></b></summary>
 
 ```
 mqtt:
@@ -760,13 +781,11 @@ objects:
     - person
     - cat
     - dog
+    - sheep
   filters:
     person:
       min_area: 1000
       threshold: 0.82
-    cat:
-      min_area: 200
-      threshold: 0.5
 
 record:
   enabled: true
@@ -819,6 +838,11 @@ cameras:
       width: 640
       height: 480
       fps: 5
+    objects:
+      filters:
+        cat:
+          min_score: 0.3
+          threshold: 0.5
     motion:
       mask:
         - 640,78,640,0,0,0,0,480,316,480,452,171
@@ -838,17 +862,10 @@ cameras:
       width: 640
       height: 352
       fps: 8
-    snapshots:
-      enabled: True
-      bounding_box: True
-    record:
-      enabled: True
-      retain:
-        days: 21
     motion:
         mask:
-          - 0,37,198,38,174,0,0,0
-          - 640,90,640,352,210,352
+          - 0,37,179,30,174,0,0,0
+          - 591,108,570,0,640,0,640,352,344,352
 ```
 
 </details>
@@ -856,6 +873,12 @@ cameras:
 ---
 ---
 
+Not much different from the 4th config at this moment.<br>
+
+* person detection threshold increased globaly
+* cat detection treshold and [min_score](https://github.com/blakeblackshear/frigate/issues/6795#issuecomment-1591076029)
+  decreased for the 2nd camera, testing phase
+* 3rd crappy ptz camera is present
 
 # Update
 
