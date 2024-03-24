@@ -4,12 +4,9 @@
 
 ![logo](https://i.imgur.com/40qhwix.png)
 
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-WORK IN PROGRESS<br>
-
 # Purpose & Overview
 
+![frigate_web_gui](https://i.imgur.com/q1zSyVZ.jpeg)
 
 Managing security cameras - recording, detection, notifications.
 
@@ -22,7 +19,7 @@ and its app.
 
 Frigate offers powerful **AI object detection**, by using OpenCV and Tensorflow.
 In contrast to cameras of old time which just detect movement,
-Frigate can recognize if object in view is a cat, a car or a human.
+Frigate can recognize if object in view moving is a cat, a car or a human.
 
 This detection is cpu heavy and to ease the load
 [Google Coral TPU](https://docs.frigate.video/frigate/hardware#google-coral-tpu)
@@ -35,7 +32,7 @@ as a detector.
 But do not have too high expectations. False positives are plenty,
 especially when shadows are present. Same with not detecting a cat when
 one sits right there. Config allows for some improvements and the AI model will
-likely get better with time too.
+likely get better with time too.<br>
 
 Open source, written in Python and JavaScript.
 
@@ -58,7 +55,32 @@ Open source, written in Python and JavaScript.
 
 </details>
 
+### To consider...
+
+Is it worth investing time and hardware?
+
+Modern commercial camera systems offer similar AI aided objects 
+detection, while maintaining the configurability. Phone apps are also often
+far better.<br>
+Meanwhile Frigate lacks even proper ptz control.
+One should view it as a few people hobby project on github,
+though exceptionally well done.
+
+An NVR, for example Dahua `DHI-NVR2108HS-8P-S3` costs less than 200€,
+and it comes with **POE for 8 cameras**.<br>
+It might be worth considering to just get an NVR that you lock out of
+the internet with VLANs or firewall rules... than buying a separate PC for
+Frigate and a separate poe switch to keep the 24/7 cameras traffic away from your
+main LAN and Coral TPU... and whatnot.
+
+On the other hand, setting Frigate up provides knowledge and the feeling of
+being more in control, with more flexibility, when it does not tight you
+to a manufacturer and the hardware used can be repurposed at any time.
+
 # Cameras choice
+
+![cameras_pic](https://i.imgur.com/bJZL2jV.jpeg)
+
 
 [Frigate got a page for that.](https://docs.frigate.video/frigate/hardware/)
 
@@ -66,21 +88,20 @@ My opinion
 
 * **Dahua** - If you got decent budget, they have good stuff and very rich configuration.
   Going for that 1/1.8" sensor for good low light performance with IR being off,
-  though dont expect magic. I also dealt with hikvision and sunell and dahua
-  felt most solid and modern.
-* The cameras I am actually playing with are cheap **TP-Link** 4MP cameras.<br>
-  I do not have issues with them. Followed frigates
+  though dont expect magic.
+* **TP-Link** are the cameras I am actually playing with, cheap 4MP.<br>
+  No issues with them. Followed frigates
   [brand specific configuration](https://docs.frigate.video/configuration/camera_specific/#tp-link-vigi-cameras)
   which says to **switch all streams to H264** and **turn off Smart Coding**.
 
   * [VIGI C440](https://www.tp-link.com/my/business-networking/vigi-network-camera/vigi-c440/)
-    \- fuckup as its an interior camera and I did not notice when ordering.
+    \- A fuckup as its an interior camera and I did not notice when ordering.
     It's stil outside as it's not directly on elements, survived one winter so far.
   * [VIGI C240](https://www.tp-link.com/ae/business-networking/vigi-network-camera/vigi-c240/) 
-    \- cheap and exterior, enough settings to feel fine.
-    It actually decetnly see at night without IR, but you realize its kinda lie
+    \- Cheap and outdoor, enough settings to feel fine.
+    It actually decently see at night without IR, but you realize its kinda lie
     as if something moves there its a smudge at best or invisible predator at worst.
-  * some random aliexpress camera with ptz
+  * Some random aliexpress camera given to me, it has ptz.
 
 Once I am running frigate and cameras for some real time... more than a year,
 I will decide which cameras to get long term.
@@ -172,8 +193,10 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # FRIGATE
-FRIGATE_RTSP_USER: "admin"
-FRIGATE_RTSP_PASSWORD: "dontlookatmekameras"
+FRIGATE_RTSP_USER=admin
+FRIGATE_RTSP_PASSWORD=dontlookatmekameras
+# FRIGATE_MQTT_USER=
+# FRIGATE_MQTT_PASSWORD=
 ```
 
 **All containers must be on the same network**.</br>
@@ -238,6 +261,8 @@ In live view there should be stream url displayed. Like: "rtsp://10.0.19.41:554/
 Ideally your camera has several streams.
 A primary one in full resolution full frame rate for recording,
 and then secondary one in much smaller resolution and fps for observing.
+
+![config_pic](https://i.imgur.com/Z7fQjb0.png)
 
 ### First config - one camera
 
@@ -473,14 +498,14 @@ Only two changes in the 3rd config.
   is enabled for ffmpeg, using vaapi.<br>
   It's globaly set for all streams by just two lines in the config.
 
-I started to have daily freezes first time I switched to hwaccl and igpu detection.
+The first time I switched to hwaccl and igpu openvino detection I had daily freezes.
 I was ready to tackle it based on some
 [github disscussion,](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
 but once I started from scratch with latest version I had no more freezes.
 
-But maybe it will comes, as I had mqtt and ntfy working at that time.
-
 ### Fourth config - notifications with mqtt and ntfy
+
+![mqtt_pic](https://i.imgur.com/TyhAaCH.png)
 
 Time for push **notifications** about events happenig in front of cameras.<br>
 I use **ntfy** and the first result when googling for "frigate ntfy" is
@@ -506,7 +531,9 @@ I run without authentification on ntfy.
 
 #### 2. Edit the compose, adding emqx container
 
-For some reason EMQX needs to be run as root user on my setup.
+EMQX default login is `admin` / `public` and its webgui is  on port `18083` <br>
+For some reason EMQX needs to be run as root or it does not have
+access to its own folder set to be bindmounted.
 
 <details>
 <summary>docker-compose.yml</summary>
@@ -570,7 +597,7 @@ If your broker has authentification, set `FRIGATE_MQTT_USER` and
 `FRIGATE_MQTT_PASSWORD` in the `.env` file.
 
 <details>
-<summary><b><font size="+1">config-4.yml</font></b></summary>  
+<summary><b><font size="+1">config-4.yml</font></b></summary>
 
 ```yml
 mqtt:
@@ -678,6 +705,9 @@ cameras:
   * `Title` - `Motion Detected`
 * Body - `${message}`
 
+Obviously change all the instances of the `cam.example.com` and `ntfy.example.com`
+to whatever you got going.
+
 [Picture](https://i.imgur.com/SbohgYI.png) from the guide, this setup skips
 Authentification.<br>
 Test conectivity, it should be successful, then Create.
@@ -693,24 +723,138 @@ WHERE
   payload.type='new' and payload.after.has_snapshot = true and payload.after.has_clip = true
 ```
   
-### T
+# My current config
 
 
 <details>
-<summary><h2>with intel igpu openvino mqtt ntfy</h2></summary>
+<summary><b><font size="+1">config.yml</font></b></summary>
 
-Previously when I tried openvino igpu hw acceleration I had the server daily freeze.
-Now I setup this config expecting freezes and getting ready to try
-[yolo model](https://github.com/blakeblackshear/frigate/issues/8470#issuecomment-1823556062)
-from github comments, but no freeze yet for few days..
+```
+mqtt:
+  enabled: true
+  host: 10.0.19.40
+  port: 1883
 
----
----
+detectors:
+  ov:
+    type: openvino
+    device: AUTO
+    model:
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detect:
+  max_disappeared: 2500
+
+objects:
+  track:
+    - person
+    - cat
+    - dog
+  filters:
+    person:
+      min_area: 1000
+      threshold: 0.82
+    cat:
+      min_area: 200
+      threshold: 0.5
+
+record:
+  enabled: true
+  retain:
+    days: 60
+    mode: all
+  events:
+    retain:
+      default: 360
+      mode: motion
+
+snapshots:
+  enabled: true
+  bounding_box: true
+  crop: true
+  retain:
+    default: 360
+
+birdseye:
+  mode: continuous
+
+cameras:
+  K1-Gate:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.41:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    motion:
+      mask:
+        - 640,480,640,0,0,0,0,480,316,480,308,439,179,422,162,121,302,114,497,480
+
+  K2-Pergola:
+    ffmpeg:
+      inputs:
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream1
+          roles:
+            - record
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.42:554/stream2
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    motion:
+      mask:
+        - 640,78,640,0,0,0,0,480,316,480,452,171
+
+  K3-Dvor:
+    birdseye:
+      order: 3
+    ffmpeg:
+      inputs:
+        - path: rtsp://10.0.19.43:554/0/av1
+          roles:
+            - record
+        - path: rtsp://10.0.19.43:554/0/av1
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 352
+      fps: 8
+    snapshots:
+      enabled: True
+      bounding_box: True
+    record:
+      enabled: True
+      retain:
+        days: 21
+    motion:
+        mask:
+          - 0,37,198,38,174,0,0,0
+          - 640,90,640,352,210,352
+```
 
 </details>
 
-# Notifications
-
+---
+---
 
 
 # Update
