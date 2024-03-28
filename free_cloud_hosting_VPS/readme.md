@@ -7,9 +7,8 @@
 Free virtual private server hosting on a cloud.<br>
 Here are github repos with details on various providers:
 
-* [Cloud Service Providers Free Tier Overview](https://github.com/cloudcommunity/Cloud-Free-Tier-Comparison)
 * [Stack on a budget](https://github.com/255kb/stack-on-a-budget)
-
+* [Cloud Service Providers Free Tier Overview](https://github.com/cloudcommunity/Cloud-Free-Tier-Comparison)
 So far I only run Oracle Cloud.<br>
 Will add others if I will deal with them, or if Oracle fucks me over.
 
@@ -169,3 +168,51 @@ Some youtube videos and articles
 * [youtube-1](https://youtu.be/NKc3k7xceT8)
 * [youtube-2](https://youtu.be/zWeFD4NNF5o)
 * [ryanharrison - oracle-cloud-free-server](https://ryanharrison.co.uk/2023/01/28/oracle-cloud-free-server.html)
+
+# GCE - Google Compute Engine
+
+![logo-gce](https://i.imgur.com/Eau2Hm5.png)
+
+
+### What Free Tier Offers
+
+[Official docs](https://cloud.google.com/free/docs/free-cloud-features#compute)
+
+As of 2023.
+
+* 1 e2-micro VM instance; 0.25-2 vCPU (1 shared core); 1GB ram
+* 30 GB disk storage (default 10GB)
+* 600/300 Mbps bandwidth  
+* 1 GB per month outbound data transfer
+
+### Registration
+
+Credit card is required.<br>
+Otherwise it's smooth process as you likely have google account,
+and if you have credit card tight to, its just few yes clicks.
+
+### New VM instance in Free Tier
+
+On the GCE console web
+
+* Create a new project named whatever lowercase.
+* Add your SSH key to be able to ssh in<br>
+  left pane > metadata > SSH Keys > Edit > Add Item<br>
+* Create a new virtual machine<br>
+  left pane > Compute Engine > VM instances > Create new instance
+  * it asks to enable Compute Engine API, enable it
+  * Name
+  * Region - must be one the three: `us-west1`, `us-central1`, `us-east1`
+  * Zone - default
+  * Machine series - `E2`
+  * Machine type - e2-micro(2vCPU, 1 core, 1GB memory)
+  * stuff left on default
+  * Boot disk > Change
+    * debian 12 (latest)
+    * disk increase if desired, up to 30GB should be free
+  * Firewall > allow both `http` and `https` traffic
+  * CREATE
+
+After few minutes new one with public IP listed should be listed.<br>
+Test ssh in to it from your terminal.
+

@@ -170,16 +170,6 @@ Manual image update:
 - `docker-compose up -d`</br>
 - `docker image prune`
 
-# Backup and restore
+# Useful
 
-#### Backup
-
-Using [borg](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/borg_backup)
-that makes daily snapshot of the entire directory.
-  
-#### Restore
-
-* down the bookstack containers `docker-compose down`</br>
-* delete the entire bookstack directory</br>
-* from the backup copy back the bookstack directory</br>
-* start the containers `docker-compose up -d`
+* https://www.reddit.com/r/selfhosted/comments/1bit5xr/livetv_on_jellyfin_2024/

@@ -222,29 +222,22 @@ or enable freshly discovered feature for all future deployments.
 
 ### For docker noobs
 
-Docker is easy. Really.<br>
+* [Beginners speedrun to selfhosting](beginners-speedrun-selfhosting/)
 
-There are two main uses.
 
-* For developers who daily work on apps and docker eases everything about it,
-  from setting up environment, to testing and deployment.
-* A hosting approach, where you mostly care about getting containers, that are
-  prepared for you by developers, up and running.
+### YouTube channels
 
-This repo is about the second use. So be careful that you wont
-spend time on resources used to educate developers. Sure, if you get through
-that you will know docker better, but theres the danger that after sinking
-4 hours reading and watching videos you still cant get a plain nginx web server
-up and running and loses motivation.<br>
+Maybe list of some youtube channels to follow would not be bad idea.
 
-So when googling for guides, look for **docker compose**
-rather than just **docker** tutorials.
+* [Fireship](https://www.youtube.com/@Fireship/videos) - funny news and tips
+* [TechnoTim](https://www.youtube.com/@TechnoTim/videos) - general homeserver selfhosting
+* [Craft Computing](https://www.youtube.com/@CraftComputing/videos) - general homeserver, bit more focus on hw and building
+* [Wolfgang's Channel](https://www.youtube.com/@WolfgangsChannel/videos) - general homeserver selfhosting, power consumption priority
+* [Lawrence Systems](https://www.youtube.com/@LAWRENCESYSTEMS/videos) - general homeserver selfhosting
+* [Christian Lempa](https://www.youtube.com/@christianlempa/videos) -  general homeserver selfhosting
+* [NASCompares](https://www.youtube.com/@nascompares) - Nas builds / home servers
+* [Awesome Open Source](https://www.youtube.com/@AwesomeOpenSource/videos)
+  \- open source software insight
+* [Hardware Haven](https://www.youtube.com/@HardwareHaven/videos) - nas, servers, miniPCs focused
+* [ServeTheHome](https://www.youtube.com/@ServeTheHomeVideo/videos) - hardware, miniPCs, switches,.
 
-[Beginners speedrun to selfhosting something in docker](beginners-speedrun-selfhosting/)
-
-* [Good stuff](https://adamtheautomator.com/docker-compose-tutorial/)
-* [https://devopswithdocker.com/getting-started](https://devopswithdocker.com/getting-started)
-* [This](https://youtu.be/DM65_JyGxCo) one is pretty good. That entire channel
-has good stuff. 
-
-Will add shit I encounter and like.

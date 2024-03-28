@@ -5,21 +5,22 @@
 You want to selfhost stuff.<br>
 You know little and want to start somewhere, FAST!
 
-# Requirements
+#### Requirements
 
-* A **spare PC** that will be the server. Can be a **virtualmachine**.
+* A **spare PC** that will be the server, can be a **virtualmachine**.
 * **Google** and **chatGPT**.<br>
   If the guide says do X and the steps seem insufficient, 
   you google that shit and add the word **youtube**,
   or you ask chatGPT few questions.
 
-# Common terminology
+#### Common terminology
 
-* `repository` - a place from which linux distro installs stuff
-* `root` - name for an administrator account in linux,
-  but also can be a place - top level path
+* `repository` - a place on the internet from which linux distro installs stuff.
+* `root` - a name for an administrator account in linux.
+  Can also mean a place - top level path, like `c:\` is top in windows,
+  root - `\` is top level in linux.
 * `sudo` - [executes](https://www.explainxkcd.com/wiki/images/b/b1/sandwich.png)
-  command as root with all privilages
+  command as root with all privilages.
 
 # Install a Linux
 
@@ -45,7 +46,8 @@ You know little and want to start somewhere, FAST!
     except:
       * SSH server
       * standard system utilities<br>
-  * This means no graphical interface, just command line.
+  
+This linux will have no graphical interface, just command line.
 
 # SSH
 
@@ -76,34 +78,23 @@ To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status ss
   * [have a pic](https://i.imgur.com/dHncQBv.png)
   * [have a video](https://youtu.be/A7pHiPgW2u8&t=10s)
 
-### Install few packages
-
-Onnce you are comfortably connected install some handy utilities,
-only **curl** is really needed.
-
-`sudo apt install curl neofetch btop ncdu`
-
-* curl - utility to download stuff, useful in the next section
-* [neofetch](https://i.imgur.com/VlSAr59.png) - shows general info about the machine
-* [btop](https://i.imgur.com/HS0gsYQ.png) - resource monitoring and task manager
-* [ncdu](https://i.imgur.com/P6fIonK.png) - disk space use
-
 # Install docker
 
 ![docker_logo](https://i.imgur.com/6SS5lFj.png)
 
-**Docker** - a thing that makes hosting super easy. People prepared *recipes*,
-         you copy paste them, edit a bit, run them. [ChatGPT](https://i.imgur.com/eyWePqj.png).
+**Docker** - a thing that makes hosting easier. People prepared *recipes*,
+  you copy paste them, edit a bit, run them. Bam a container is running
+  and answering at some IP. [ChatGPT](https://i.imgur.com/eyWePqj.png).
 
-* **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
+* **install docker** - `sudo wget -O- https://get.docker.com | bash`<br>
   The above method is called
-  [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script)
+  [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
   cuz oldman Debian cant be bothered to keep docker up to date in its repos.
-* add your user to docker group so you dont need to sudo all the time<br>
+* **add your user to docker group** so you dont need to sudo all the time<br>
   `sudo gpasswd -a noob docker`
-* log out - `exit`, log back in
-* intall [**ctop**](https://github.com/bcicen/ctop) to get some basic monitoring and management.<br>
-  Unfortunately ctop is also not in debians repositories, so uglier
+* log out - `exit`, log back in so the group change takes effect
+* **install [ctop](https://github.com/bcicen/ctop)** to get some basic monitoring and management.<br>
+  Unfortunately ctop is also not in Debians repositories, so uglier
   [two commands](https://github.com/bcicen/ctop?tab=readme-ov-file#linux-generic) to install it:
   * `sudo wget https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64 -O /usr/local/bin/ctop`
   * `sudo chmod +x /usr/local/bin/ctop`
@@ -155,7 +146,109 @@ for editing files as it is simple and everywhere.
 with the port 80 we see in the compose being used in the url too.
 But since port 80 is the default http port, it is what browsers go for anyway.
 
-# Moving beyond terminal
+### understanding what you just did 
+
+* On a linux server a docker container is running, its a webserver and it is
+  accessible for others on your network.<br>
+  Most of selfhosted stuff is just webserver with some database.
+* If this part is done that means that shit like hosting own netflix(jellyfin),
+  or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
+  or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
+
+### understanding what you did not get done
+
+* this shit is on your own local network, not accessible from the outside.
+  Cant call the grandma and tell her to write `192.168.1.8` in to her browser
+  to see your awesome nginx welcome running.
+  She tells you that the dumb fuck you are, you do not have public IP and ports
+  forwarded.<br>
+  To get that working is bit challenging, probably deserves own page,
+  not really speedrun, but thorough steps as shit gets sideways fast and people
+  can dick around for hours trying wrong shit.
+* everything here is just basic setup that breaks easily,
+  server got dynamic IP, turn it off for a weekend and it might get a different ip
+  assigned next time it starts. Nginx container is not set to start on boot,... 
+* you dont understand how this shit works, deploying more complicated stuff,
+  fixing not working stuff be hard, but now you can start to consume all
+  the guides and tutorials on docker compose and try stuff...
+
+# WebGUI
+
+* *my recommendation is to not abandon the ssh + terminal. Persevere.
+  Use it, make it comfortable, natural, not foreign and bothersome.
+  This is what gets you proficiency and ability to solve problems...
+   but I understand*
+
+Several options to manage docker using a website.
+
+* Portainer CE - the most popular, deployed as a container, they started to push hard
+  their paid version so fuck em
+* **CasaOS** - simple install, seems nice and growing in popularity
+* **Dockge** - a very new one, but seems nice and simple
+* TrueNAS SCALE - NAS operating systems with docker managment
+* openmediavault - NAS operating systems with docker managment
+* Unraid - paid NAS operating systems with docker managment
+
+# CasaOS
+
+[The official site](https://casaos.io)
+
+Easy to also create public shares, easy to deploy docker popular docker
+containers from their *"app store"*
+
+#### Installation
+
+* `docker compose down` any containers you run, or remove them in ctop, or
+  do clean Debian install again
+* To install CasaOS execute:<br>
+  `sudo wget -O- https://get.casaos.io | sudo bash`
+* Afterwards, it tells the ip to visit.
+* First login set credentials
+
+---
+
+<details>
+<summary><b><font size="+1">Create a network share </font></b></summary>
+
+test
+
+</details>
+
+---
+---
+
+<details>
+<summary><b><font size="+1">Deploy Crafty - Minecraft server manager</font></b></summary>
+
+test
+
+</details>
+
+---
+---
+
+<details>
+<summary><b><font size="+1">Deploy Jellyfin - selfhosted netflix</font></b></summary>
+
+test
+
+</details>
+
+---
+---
+
+<details>
+<summary><b><font size="+1">Deploy something not in the app store</font></b></summary>
+
+test
+
+</details>
+
+---
+---
+
+
+# Dockge
 
 ![dockge_pic](https://i.imgur.com/Vh0JN5F.png)
 
@@ -193,37 +286,26 @@ using slightly edited compose file from their
 
 Now you can do stuff from webgui, pasting compose and .env files.
 
-# understanding what you just did 
-
-* On a linux server a docker container is running, its a webserver and it is
-  accessible for others on your network.<br>
-  Most of selfhosted stuff is just webserver with some database.
-* If this part is done that means that shit like hosting own netflix(jellyfin),
-  or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
-  or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
-
-# understanding what you did not get done
-
-* this shit is on your own local network, not accessible from the outside.
-  Cant call the grandma and tell her to write `192.168.1.8` in to her browser
-  to see your awesome nginx welcome running.
-  She tells you that the dumb fuck you are, you do not have public IP and ports
-  forwarded.<br>
-  To get that working is bit challenging, probably deserves own page,
-  not really speedrun, but thorough steps as shit gets sideways fast and people
-  can dick around for hours trying wrong shit.
-* everything here is just basic setup that breaks easily,
-  server got dynamic IP, turn it off for a weekend and it might get a different ip
-  assigned next time it starts. Nginx container is not set to start on boot,... 
-* you dont understand how this shit works, deploying more complicated stuff,
-  fixing not working stuff be hard, but now you can start to consume all
-  the guides and tutorials on docker compose and try stuff...
 
 ## where to go from here
 
-Can check out [this repo](https://github.com/DoTheEvo/selfhosted-apps-docker)
+Google and consume docker tutorials and videos and try to spinning up
+some containers.<br>
+Heres some stuff I encountered and liked.
 
-It has tiny section for noobs, with few links to docker tutorials.<br>
-You should get some understanding of docker networks going,
-making sure you create custom named one and use that in your compose files.
-Then its time to start trying stuff like bookstack or jellyfin or minecraft.
+* [8 min video on docker](https://www.youtube.com/watch?v=rIrNIzy6U_g)
+* [docker compose cheat sheet](https://devopscycle.com/blog/the-ultimate-docker-compose-cheat-sheet/)
+* [Good stuff](https://adamtheautomator.com/docker-compose-tutorial/)
+* [https://devopswithdocker.com/getting-started](https://devopswithdocker.com/getting-started)
+* [NetworkChuck](https://www.youtube.com/@NetworkChuck/videos)
+  \- youtube channel
+  has some decent stuff, specificly [this docker networking](https://youtu.be/bKFMS5C4CG0)
+  video is fucking great and the general
+  [introduction to docker compose](https://youtu.be/DM65_JyGxCo) is good too.
+* [Christian Lempa](https://www.youtube.com/@christianlempa/search?query=docker)
+  \- lot of videos about docker
+
+
+Check of course [this github repo you are in right](https://github.com/DoTheEvo/selfhosted-apps-docker)
+for some stuff to deploy.
+
