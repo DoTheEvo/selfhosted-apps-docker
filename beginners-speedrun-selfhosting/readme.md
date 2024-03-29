@@ -210,7 +210,7 @@ containers from their *"app store"*
 <details>
 <summary><b><font size="+1">Create a network share </font></b></summary>
 
-test
+[share.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/c640665f-9400-4cf2-949b-07753ad8a86c)
 
 </details>
 
@@ -220,7 +220,7 @@ test
 <details>
 <summary><b><font size="+1">Deploy Crafty - Minecraft server manager</font></b></summary>
 
-test
+[crafty.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/ea163089-5329-4530-8361-83bb526fbe2d)
 
 </details>
 
@@ -230,7 +230,7 @@ test
 <details>
 <summary><b><font size="+1">Deploy Jellyfin - selfhosted netflix</font></b></summary>
 
-test
+[jellyfin.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/0dac601a-f159-4745-abc1-1279b25875dd)
 
 </details>
 
