@@ -18,7 +18,7 @@ You know little and want to start somewhere, FAST!
 * `repository` - a place on the internet from which linux distro installs stuff.
 * `root` - a name for an administrator account in linux.
   Can also mean a place - top level path, like `c:\` is top in windows,
-  root - `\` is top level in linux.
+  root - `/` is top level in linux.
 * `sudo` - [executes](https://www.explainxkcd.com/wiki/images/b/b1/sandwich.png)
   command as root with all privilages.
 
@@ -77,6 +77,8 @@ To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status ss
 * use it to **connect** to the server using its ip address and username
   * [have a pic](https://i.imgur.com/dHncQBv.png)
   * [have a video](https://youtu.be/A7pHiPgW2u8&t=10s)
+
+Now you should be able to execute commands on the server from your main PC.
 
 # Install docker
 
@@ -193,8 +195,8 @@ Several options to manage docker using a website.
 
 [The official site](https://casaos.io)
 
-Easy to also create public shares, easy to deploy docker popular docker
-containers from their *"app store"*
+Easy to also create public shares, easy to deploy docker containers
+from their *"app store"*
 
 #### Installation
 
