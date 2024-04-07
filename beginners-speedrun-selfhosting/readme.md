@@ -60,6 +60,8 @@ During Debian install you should have had SSH server checked,
 so it would be installed automatically.
 If you missed it, install it with - `sudo apt install ssh`
 
+*extra info:* to [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status sshd`
+
 Now to **find IP address** of the machine so we can remotely connect to it.
 
 * Log in  `noob` / `aaa` and be in terminal.
@@ -67,7 +69,7 @@ Now to **find IP address** of the machine so we can remotely connect to it.
   lets say you got `192.168.1.8`<br>
   Nope I am not explaining IP addresses.
 
-To [check status](https://i.imgur.com/frlyy6P.png) of ssh - `systemctl status sshd`
+Beware, IP address can change between reboots.
 
 ### Remote connect to the server
 
@@ -88,9 +90,7 @@ Now you should be able to execute commands on the server from your main PC.
   you copy paste them, edit a bit, run them. Bam a container is running
   and answering at some IP. [ChatGPT](https://i.imgur.com/eyWePqj.png).
 
-* **install curl** - `sudo apt install curl`<br>
-  curl is a utility that downloads stuff from the internet
-* **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
+* **install docker** - `sudo wget -qO- https://get.docker.com | bash`<br>
   The above method is called
   [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
   cuz oldman Debian cant be bothered to keep docker up to date in its repos.
@@ -113,8 +113,8 @@ in to them, IN LINUX!
 Honestly could be annoying, but mobaXterm should make it easier
 with that left directory pane that lets you move around,
 and the right/middle mouse click for paste.<br>
-But here are general linux commands to move around, using `nano` editor
-for editing files as it is simple and everywhere.
+But here are general linux commands to move around amd to edit files using
+`nano` editor.
 
 *extra info:* `arrow-up key` in terminal will cycle through old commands in history
 
@@ -154,15 +154,15 @@ But since port 80 is the default http port, it is what browsers go for anyway.
 
 * On a linux server a docker container is running, its a webserver and it is
   accessible for others on your network.<br>
-  Most of selfhosted stuff is just webserver with some database.
+  Most of selfhosted stuff is just a webserver with some database.
 * If this part is done that means that shit like hosting own netflix(jellyfin),
   or google drive/calendar/photos(nextcloud), or own password manager(vaultwarden)
-  or own minecraft server(minecraft server) is just one `docker-compose.yml` away.
+  or own minecraft server(crafty) is just one `docker-compose.yml` away.
 
 ### understanding what you did not get done
 
-* this shit is on your own local network, not accessible from the outside.
-  Cant call the grandma and tell her to write `192.168.1.8` in to her browser
+* this shit is on your own local network, not accessible from the *"outside"*.
+  Cant call grandma and tell her to write `192.168.1.8` in to her browser
   to see your awesome nginx welcome running.
   She tells you that the dumb fuck you are, you do not have public IP and ports
   forwarded.<br>
@@ -205,7 +205,7 @@ from their *"app store"*
 * `docker compose down` any containers you run, or remove them in ctop, or
   do clean Debian install again
 * To install CasaOS execute:<br>
-  `sudo wget -O- https://get.casaos.io | sudo bash`
+  `wget -qO- https://get.casaos.io | sudo bash`
 * Afterwards, it tells the ip to visit.
 * First login set credentials
 
