@@ -195,7 +195,9 @@ Several options to manage docker from a browser.
 
 # CasaOS
 
-[The official site](https://casaos.io)
+![casa_logo](https://i.imgur.com/rFo7L9k.png)
+
+* [The official site](https://casaos.io)
 
 Easy to also create public shares, easy to deploy docker containers
 from their *"app store"*
