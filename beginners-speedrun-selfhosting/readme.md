@@ -88,7 +88,9 @@ Now you should be able to execute commands on the server from your main PC.
   you copy paste them, edit a bit, run them. Bam a container is running
   and answering at some IP. [ChatGPT](https://i.imgur.com/eyWePqj.png).
 
-* **install docker** - `sudo wget -O- https://get.docker.com | bash`<br>
+* **install curl** - `sudo apt install curl`<br>
+  curl is a utility that downloads stuff from the internet
+* **install docker** - `sudo curl -fsSL https://get.docker.com | bash`<br>
   The above method is called
   [Install using the convenience script](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
   cuz oldman Debian cant be bothered to keep docker up to date in its repos.
@@ -179,9 +181,9 @@ But since port 80 is the default http port, it is what browsers go for anyway.
 * *my recommendation is to not abandon the ssh + terminal. Persevere.
   Use it, make it comfortable, natural, not foreign and bothersome.
   This is what gets you proficiency and ability to solve problems...
-   but I understand*
+   but I understand...*
 
-Several options to manage docker using a website.
+Several options to manage docker from a browser.
 
 * Portainer CE - the most popular, deployed as a container, they started to push hard
   their paid version so fuck em
