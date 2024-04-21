@@ -10,9 +10,10 @@
 # - kopia repo connect filesystem --path C:\kopia_repo -p aaa
 # - kopia snap list --all
 # - kopia mount all K:
-# mounting should be used as non-admin user, weird windows thing
-# or one does not see the drive, in that case:
-# - net use - shows path that can be pasted to explorer or browser
+
+# mounting might need be executed as non-admin user, weird windows thing
+# if one does not see the drive:
+# - 'net use' shows path that can be pasted to explorer or browser
 #   \\127.0.0.1@51295\DavWWWRoot
 
 # logs location is set C:\Kopia\Kopia_Logs for every command
@@ -25,7 +26,7 @@
 
 $REPOSITORY_PATH = 'C:\kopia_repo'
 $KOPIA_PASSWORD = 'aaa'
-[array]$BACKUP_THIS = 'C:\Test'
+[array]$BACKUP_THIS = 'C:\test'
 $LOG_PATH = 'C:\Kopia\Kopia_Logs'
 $USE_SHADOW_COPY = $false
 
