@@ -2,6 +2,8 @@
 
 ###### guide-by-example
 
+*Last update april 2024 kopia v0.17.0*
+
 ![logo](https://i.imgur.com/A2mosM6.png)
 
 # Content
@@ -30,21 +32,21 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 ### Ways to use Kopia
 
 * **cli** - Command line.<br>
-  You call the kopia binary passing some commands, it executes stuff, done.<br>
+  You execute kopia binary passing some commands, it does stuff, done.<br>
   Deployment requires extra work - scripts with configs, scheduling.
 * **KopiaUI** - GUI version.<br>
   Kopia that comes packaged with electron for GUI to provide the feel of a standalone desktop app.<br>
   Good for simple deployment where average user just wants to backup stuff.<br>
-  Benefits over cli is much easier setup, management and ability to connect to  multiple repos once.<br>
+  Benefits over cli is much easier setup, management.<br>
   Drawback is that it runs under one user and only when that user is logged in.
 * **Kopia Server** - kopia binary runs in a server mode.<br> 
   Runs in the background, now with its web server answering at url: `localhost:51515`<br>
   Web GUI at the url makes the management easy so it can replace KopiaUI.<br>
-  But the main purpose of server mode is that Kopia instance can now serve
+  But the intended purpose of the server mode is that Kopia instance can now serve
   as a centralized repository for other machines that run their Kopia instances
-  and select server's url as repository where to backup.<br>
+  and select server's url as a repository where to backup.<br>
   Deployment requires extra work similar to cli, but actual use is through web GUI.
-* **Kopia in Docker** - Kopia Server running in docker<br>
+* **Kopia in Docker** - Kopia Server running as a docker container<br>
   Can fulfill two needs:
   * A centralized Kopia repository where other machines on the network,
     that also use Kopia, backup their data.
@@ -92,8 +94,8 @@ if planning serious use.
   Useful command: `kopia content stats`
 * During snapshots Kopia uses local **cache**, location varies depending on the OS.
   Default max size is 5GB. Cache gets swept periodically every few minutes.<br>
-  Useful commands are `kopia cache info` and `kopia cache clear`.
-* Increase [considerably the max cache size](https://github.com/kopia/kopia/issues/3059#issuecomment-1663479603)
+  Useful commands are `kopia cache info` and `kopia cache clear`.<br>
+  Increase [considerably the max cache size](https://github.com/kopia/kopia/issues/3059#issuecomment-1663479603)
   if planning to use cloud storage as the maintenance could eat into egress cost
   when kopia redownloads files.
 * ...
