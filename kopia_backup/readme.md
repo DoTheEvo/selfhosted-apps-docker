@@ -56,7 +56,7 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 # Some aspects of Kopia
 
 [Official Getting Started Guide](https://kopia.io/docs/getting-started/)<br>
-[Official Features](https://kopia.io/docs/features/)<br>
+[Features](https://kopia.io/docs/features/)<br>
 [Advanced Topics](https://kopia.io/docs/advanced/)
 
 The above linked documentation is well written and worth a look
@@ -84,17 +84,20 @@ if planning serious use.
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
   history and duration then has to be find in logs
-* **Logs** rotate with max age 30 days or max 1000 log files, 5000 content log files<br>
-  Useful to search in cli-logs are the terms `kopia/server snapshotting` and
-  `kopia/server finished` 
+* **Logs** are creted on every execution of kopia binary.<br>
+  They rotate by default with max age 30 days, but still can grow hundreds of MB.
 * [Compression](https://kopia.io/docs/advanced/compression/) is good and 
   should be set before backup starts. My go-to is `zstd-fastest`. If backups
   feel slow `s2-default` is less cpu heavy but with worse compression.
   Useful command: `kopia content stats`
 * During snapshots Kopia uses local **cache**, location varies depending on the OS.
-  Default max size is 5GB, but it gets swept periodically every few minutes.<br>
-  Useful commands are `kopia cache info` and `kopia cache clear`
-* ..
+  Default max size is 5GB. Cache gets swept periodically every few minutes.<br>
+  Useful commands are `kopia cache info` and `kopia cache clear`.
+* Increase [considerably the max cache size](https://github.com/kopia/kopia/issues/3059#issuecomment-1663479603)
+  if planning to use cloud storage as the maintenance could eat into egress cost
+  when kopia redownloads files.
+* ...
+
 
 # Kopia in Linux
 
@@ -125,7 +128,7 @@ After creation the repo is connected, so connnect command is just demonstration.
 
 `sudo kopia policy list`<br>
 `sudo kopia policy show --global`<br>
-`sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3`<br>
+`sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3`<br>
 
 * **manual backup run**
 
@@ -151,13 +154,14 @@ So both `/home` and `/etc` are set to be backed up.
 ```bash
 #!/bin/bash
 
+# v0.2
 # initialize repository
 #   sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia
 # for cloud like backblaze
 #   sudo kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
 #   sudo kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
 # adjust global policy
-#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=8 --keep-daily=14 --keep-hourly=0 --keep-latest=3
+#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
@@ -167,10 +171,11 @@ kopia repository connect filesystem --path $REPOSITORY_PATH
 kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 
+# --------------  ERROR EXIT CODES  --------------
 # kopia does not interupts its run with an error if target or repository are missing
-# this makes systemd OnSuccess OnFailure not behaving as they should
-# below are checks for paths, that results in immediate error exit code if they do not exist
-# they are at the end because some backup might get done even another is missing something
+# this makes systemd OnSuccess OnFailure not behaving as one might expect
+# below are checks for paths, that result in immediate error exit code if they do not exist
+# they are at the end because some backup might get done even if another is missing something
 # we just want the error exit code
 
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
@@ -368,6 +373,8 @@ Also use of [nssm](https://nssm.cc/) is popular.
 
 ![windows_scoop_install_kopia](https://i.imgur.com/UPZFImh.png)
 
+At the moment **cli is the only way to use VSS snapshots**.
+
 All relevant files are in `C:\Kopia`, from binaries, `repository.config`, to logs.
 A scheduled task is imported that executes a powershell script
 `C:\Kopia\kopia_backup_scipt.ps1` at 21:19.
@@ -375,28 +382,26 @@ The script connects to a set repo and backup set targets.
 
 This approach is bit more hands on than having a gui, but for daily use one
 can easily get by with the commands: `kopia snap list -all` and `kopia mount all K:`<br>
-Note that mount command should be executed in non admin terminal. Weird
-windows thing. 
-
-Also at the moment cli is the only way I know how to make kopia actions work,
-so that VSS snapshots can be used.
+Note that if mount command is not working, try executing it in non admin terminal. Weird
+windows thing. Or you need to enable/install `WebClient` service.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip),
   delete everything except `kopia_cli_deploy_win` folder.
 * Run `DEPLOY.cmd`
   * Removes powershell scripts restriction.
   * Creates folder `C:\Kopia` and kopies there<br>
-    `kopia.exe`, `kopia_backup_scipt.ps1` and the VSS ps1 before and after files.
+    `kopia.exe`, `kopia_backup_scipt.ps1`.
   * Adds `C:\Kopia` to the system env variable PATH.
-  * imports a task schedule
+  * imports a scheduled task.
 * Read `kopia_backup_scipt.ps1` and follow the instructions there.<br>
   Which should be to just to create repo before running the script.
 * edit the scheduled task to the prefered time, default is daily at 21:19
 * run scheduled task manually
 * check if it worked
+  * `kopia repo status`
   * `kopia snap list --all`
 
-The script is set to save logs in to `C:\Kopia`.
+The script is set to save logs in to `C:\Kopia\Kopia_Logs\`.
 
 ### VSS snapshots
 
@@ -408,11 +413,13 @@ This is what allows backup of open files that are in use.<br>
 To make use of this feature edit `kopia_backup_scipt.ps1` changing
 `$USE_SHADOW_COPY = $false` to `$USE_SHADOW_COPY = $true`
 
-Note the use of `--enable-actions` which is required for before/after actions
-to work.
+To check if it's set: `kopia policy show --global`,
+should see there: *OS-level snapshot support: Volume Shadow Copy: when-available*
 
-To test if its working, one can execute command `vssadmin list shadows`
-to see current VSS snapshots and then execute it again during the backup.
+Can also check log files, any named snapshot-creat in cli folder, and see 
+entries about *volume shadow copy*. Or also one might execute command
+`vssadmin list shadows` to see current VSS snapshots and then execute
+it again during the backup.
 
 ### Kopia install using scoop, machine-wide
 
@@ -632,7 +639,7 @@ For cli just follow [the official documentation.](https://kopia.io/docs/reposito
 The example of commands:<br>
 
 * `kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa`
-* `kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa --enable-actions`
+* `kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password aaa`
 
 The backup script contains example commands, just commented out.
 
