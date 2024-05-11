@@ -70,7 +70,7 @@ if planning serious use.
 * Before any action, Kopia needs to be **connected to a repo** as repos store most of 
   the settings(policies), and commands are executed in their context.
   Multiple machines can be connected simultaneously.
-* **Snapshots**, is the term used by Kopia for targets(paths) that are being backed up.
+* **Snapshots** are the backups created by kopia stored in a repository.
 * **Policy** - settings for repo/backup behaviour, stuff like backups retention,
   what to ignore, logging, scheduling(server/UI), actions before and after backup,...
 * **Policies** are stored inside a repo and can apply at various levels and
@@ -96,7 +96,7 @@ if planning serious use.
   Default max size is 5GB. Cache gets swept periodically every few minutes.<br>
   Useful commands are `kopia cache info` and `kopia cache clear`.<br>
   Increase [considerably the max cache size](https://github.com/kopia/kopia/issues/3059#issuecomment-1663479603)
-  if planning to use cloud storage as the maintenance could eat into egress cost
+  if planning to use cloud storage, as the maintenance could eat into egress cost
   when kopia redownloads files.
 * ...
 
