@@ -67,7 +67,7 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 #WG-EASY
-WG_HOST=vpn.example.com
+WG_HOST=vpn.example.com           # can also be just public IP
 PASSWORD=supersecretpassword
 WG_PORT=51820
 WG_DEFAULT_ADDRESS=10.221.221.x
