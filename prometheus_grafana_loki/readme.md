@@ -6,7 +6,7 @@
 
 # Purpose
 
-Monitoring of a docker host and cointaners.
+Monitoring of machines, containers, services, logs, ...
 
 * [Official Prometheus](https://prometheus.io/)
 * [Official Grafana](https://grafana.com/)
