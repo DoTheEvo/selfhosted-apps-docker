@@ -25,7 +25,8 @@ Most of the prometheus stuff here is based off the magnificent
 
 # Chapters
 
-* **[Core prometheus+grafana](#Overview)** - nice dashboards with metrics of docker host and containers
+* **[Core prometheus+grafana](#Overview)** - nice dashboards with metrics
+  of a docker host and containers
 * **[Pushgateway](#Pushgateway)** - push data to prometheus from anywhere
 * **[Alertmanager](#Alertmanager)** - setting alerts and getting notifications
 * **[Loki](#Loki)** - prometheus for logs
