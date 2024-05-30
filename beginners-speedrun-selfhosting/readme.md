@@ -17,8 +17,6 @@ You know little and want to start somewhere, FAST!
 
 * `repository` - a place on the internet from which linux distro installs stuff.
 * `root` - a name for an administrator account in linux.
-  Can also mean a place - top level path, like `c:\` is top in windows,
-  root - `/` is top level in linux.
 * `sudo` - [executes](https://www.explainxkcd.com/wiki/images/b/b1/sandwich.png)
   command as root with all privilages.
 
@@ -69,7 +67,8 @@ Now to **find IP address** of the machine so we can remotely connect to it.
   lets say you got `192.168.1.8`<br>
   Nope I am not explaining IP addresses.
 
-Beware, IP address can change between reboots.
+Beware, an IP address can change if the server is shutdown for a while.
+Lookup `static IP` or `IP reservation`.
 
 ### Remote connect to the server
 
@@ -113,7 +112,7 @@ in to them, IN LINUX!
 Honestly could be annoying, but mobaXterm should make it easier
 with that left directory pane that lets you move around,
 and the right/middle mouse click for paste.<br>
-But here are general linux commands to move around amd to edit files using
+But here are general linux commands to move around and to edit files using
 `nano` editor.
 
 *extra info:* `arrow-up key` in terminal will cycle through old commands in history
@@ -166,9 +165,7 @@ But since port 80 is the default http port, it is what browsers go for anyway.
   to see your awesome nginx welcome running.
   She tells you that the dumb fuck you are, you do not have public IP and ports
   forwarded.<br>
-  To get that working is bit challenging, probably deserves own page,
-  not really speedrun, but thorough steps as shit gets sideways fast and people
-  can dick around for hours trying wrong shit.
+  To get that working can be a bit challenging - [port forwarding guide](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/network-knowledge-base/port_forwarding.md)
 * everything here is just basic setup that breaks easily,
   server got dynamic IP, turn it off for a weekend and it might get a different ip
   assigned next time it starts. Nginx container is not set to start on boot,... 
@@ -185,13 +182,13 @@ But since port 80 is the default http port, it is what browsers go for anyway.
 
 Several options to manage docker from a browser.
 
-* Portainer CE - the most popular, deployed as a container, they started to push hard
-  their paid version so fuck em
+* Portainer CE - the most popular, deployed as a container,
+  they started to be bothersome with the paid version so fuck em
 * **CasaOS** - simple install, seems nice and growing in popularity
 * **Dockge** - a very new one, but seems nice and simple
 * TrueNAS SCALE - NAS operating systems with docker managment
 * openmediavault - NAS operating systems with docker managment
-* Unraid - paid NAS operating systems with docker managment
+* Unraid - paid NAS operating systems with docker and VMs managment
 
 # CasaOS
 
@@ -199,7 +196,7 @@ Several options to manage docker from a browser.
 
 * [The official site](https://casaos.io)
 
-Easy to also create public shares, easy to deploy docker containers
+Easy to create public shares, easy to deploy docker containers
 from their *"app store"*
 
 #### Installation
@@ -224,16 +221,6 @@ from their *"app store"*
 ---
 
 <details>
-<summary><b><font size="+1">Deploy Crafty - Minecraft server manager</font></b></summary>
-
-[crafty.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/ea163089-5329-4530-8361-83bb526fbe2d)
-
-</details>
-
----
----
-
-<details>
 <summary><b><font size="+1">Deploy Jellyfin - selfhosted netflix</font></b></summary>
 
 [jellyfin.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/0dac601a-f159-4745-abc1-1279b25875dd)
@@ -244,9 +231,19 @@ from their *"app store"*
 ---
 
 <details>
+<summary><b><font size="+1">Deploy Crafty - Minecraft server manager</font></b></summary>
+
+[crafty.webm](https://github.com/DoTheEvo/selfhosted-apps-docker/assets/1690300/ea163089-5329-4530-8361-83bb526fbe2d)
+
+</details>
+
+---
+---
+
+<details>
 <summary><b><font size="+1">Deploy something not in the app store</font></b></summary>
 
-test
+will add something later
 
 </details>
 
@@ -300,6 +297,7 @@ some containers.<br>
 Heres some stuff I encountered and liked.
 
 * [8 min video on docker](https://www.youtube.com/watch?v=rIrNIzy6U_g)
+* [Docker Fundamentals Course](https://www.youtube.com/playlist?list=PLTk5ZYSbd9Mg51szw21_75Hs1xUpGObDm)
 * [docker compose cheat sheet](https://devopscycle.com/blog/the-ultimate-docker-compose-cheat-sheet/)
 * [Good stuff](https://adamtheautomator.com/docker-compose-tutorial/)
 * [https://devopswithdocker.com/getting-started](https://devopswithdocker.com/getting-started)
