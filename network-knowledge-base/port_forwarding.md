@@ -11,17 +11,17 @@ Can be choosen at random, can be hard set.
 
 ![pic_port_header](https://i.imgur.com/TM0pOQN.png)
 
-# How NAT / firewall works
+# How Router's NAT works
 
-* By default, it **allows outgoing** communication on any port.
-* But **drops incoming** traffic unless it is a response to communication
+* **Allows outgoing** traffic on any port.
+* **Drops incoming** traffic unless it is a response to communication
   initialized from the inside.
 
 This is not really some security effort, the router just literally has no idea
 where to send it...
 
 <details>
-<summary><b>More details</b></summary>
+<summary><b>More unnecessary details</b></summary>
 
 NAT is implemented in your router.<br>
 It makes your **LAN side** devices able to connect with the
