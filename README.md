@@ -224,6 +224,7 @@ or enable freshly discovered feature for all future deployments.
 
 * [Beginners speedrun to selfhosting](beginners-speedrun-selfhosting/)
 
+---
 
 ### YouTube channels
 
@@ -233,7 +234,6 @@ Maybe list of some youtube channels to follow would not be bad idea.
 * [TechnoTim](https://www.youtube.com/@TechnoTim/videos) - general homeserver selfhosting
 * [Craft Computing](https://www.youtube.com/@CraftComputing/videos) - general homeserver, bit more focus on hw and building
 * [Wolfgang's Channel](https://www.youtube.com/@WolfgangsChannel/videos) - general homeserver selfhosting, power consumption priority
-* [Lawrence Systems](https://www.youtube.com/@LAWRENCESYSTEMS/videos) - general homeserver selfhosting
 * [Christian Lempa](https://www.youtube.com/@christianlempa/videos) -  general homeserver selfhosting
 * [NASCompares](https://www.youtube.com/@nascompares) - Nas builds / home servers
 * [Awesome Open Source](https://www.youtube.com/@AwesomeOpenSource/videos)

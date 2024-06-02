@@ -70,7 +70,7 @@ if planning serious use.
 * Before any action, Kopia needs to be **connected to a repo** as repos store most of 
   the settings(policies), and commands are executed in their context.
   Multiple machines can be connected simultaneously.
-* **Snapshots** are the backups created by kopia stored in a repository.
+* **Snapshots** are the backups created by kopia, stored in a repository.
 * **Policy** - settings for repo/backup behaviour, stuff like backups retention,
   what to ignore, logging, scheduling(server/UI), actions before and after backup,...
 * **Policies** are stored inside a repo and can apply at various levels and

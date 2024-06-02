@@ -116,7 +116,10 @@ homeassistant:
   external_url: "https://home.example.com:8123"
 ```
 
+# guides, tips, resources
 
+* [How To Build a Stable and Robust Zigbee Network](https://smarthomescene.com/guides/how-to-build-a-stable-and-robust-zigbee-network/)
+* [Zigbee Smart home - best buy tips](https://vdbrink.github.io/buy/smart_home_best_buy_tips)
 
 # old mess shit beyond this point
 

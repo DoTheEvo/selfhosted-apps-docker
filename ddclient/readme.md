@@ -4,6 +4,8 @@
 
 # Purpose & Overview
 
+* Note - learned about [ddns-updater](https://github.com/qdm12/ddns-updater)
+
 Automatic DNS entries update. 
 
 * [Official site](https://sourceforge.net/p/ddclient/wiki/usage/)

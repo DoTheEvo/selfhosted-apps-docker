@@ -572,4 +572,5 @@ zenarmor that was disabled caused an error notification<br>
   
 links 
 
-https://homenetworkguy.com/how-to/beginners-guide-to-set-up-home-network-using-opnsense/
+* [12 Ways to Secure Access to OPNsense and Your Home Network](https://homenetworkguy.com/how-to/ways-to-secure-access-to-opnsense-and-your-home-network/)
+* [Beginner's Guide to Set Up a Home Network Using OPNsense](https://homenetworkguy.com/how-to/beginners-guide-to-set-up-home-network-using-opnsense/)
