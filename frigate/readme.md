@@ -67,7 +67,7 @@ Is it worth investing time and hardware?
 Modern commercial camera systems offer similar AI aided objects 
 detection, while maintaining the configurability. Phone apps are also often
 far better.<br>
-Meanwhile Frigate lacks even proper ptz control.
+Meanwhile Frigate just recently got even basic ptz control.
 One should view it as a few people hobby project on github,
 though exceptionally well done.
 
@@ -106,7 +106,9 @@ My opinion
     \- Cheap and outdoor, enough settings to feel fine.
     It actually decently see at night without IR, but you realize its kinda lie
     as if something moves there its a smudge at best or invisible predator at worst.
-  * Some random aliexpress camera given to me, it has ptz.
+  * [VIGI C540V](https://www.tp-link.com/us/business-networking/vigi-network-camera/vigi-c540v/)
+    \- A recent addition. A PTZ camera with zoom, frigate yet does not support zoom.
+    PTZ setup is seen in the very last config.
 
 Once I am running frigate and cameras for some real time... more than a year,
 I will decide which cameras to get long term.
@@ -753,6 +755,9 @@ WHERE
  
 # My current config
 
+3rd camera has ptz enabled by having onvif section. [Documentation](https://docs.frigate.video/configuration/autotracking/).<br>
+Unfortunately env variables dont work there yet so plaintext values need to be set.
+
 <details>
 <summary><b><font size="+1">current_config.yml</font></b></summary>
 
@@ -796,11 +801,11 @@ objects:
 record:
   enabled: true
   retain:
-    days: 60
+    days: 30
     mode: all
   events:
     retain:
-      default: 360
+      default: 60
       mode: motion
 
 snapshots:
@@ -812,6 +817,8 @@ snapshots:
 
 birdseye:
   mode: continuous
+  layout:
+      scaling_factor: 1.0
 
 cameras:
   K1-Gate:
@@ -847,31 +854,31 @@ cameras:
     objects:
       filters:
         cat:
-          min_score: 0.3
-          threshold: 0.5
+          min_score: 0.2
+          threshold: 0.4
     motion:
       mask:
         - 640,78,640,0,0,0,0,480,316,480,452,171
 
   K3-Dvor:
-    birdseye:
-      order: 3
     ffmpeg:
       inputs:
-        - path: rtsp://10.0.19.43:554/0/av1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.43:554/stream1
           roles:
             - record
-        - path: rtsp://10.0.19.43:554/0/av1
+        - path: rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@10.0.19.43:554/stream2
           roles:
             - detect
     detect:
       width: 640
-      height: 352
-      fps: 8
-    motion:
-        mask:
-          - 0,37,179,30,174,0,0,0
-          - 591,108,570,0,640,0,640,352,344,352
+      height: 480
+      fps: 5
+
+    onvif:
+      host: 10.0.19.43
+      port: 2020
+      user: admin
+      password: plaintextpasswordhere
 ```
 
 </details>
@@ -884,7 +891,6 @@ Not much different from the 4th config at this moment.<br>
 * person detection threshold increased globaly
 * cat detection treshold and [min_score](https://github.com/blakeblackshear/frigate/issues/6795#issuecomment-1591076029)
   decreased for the 2nd camera, testing phase
-* 3rd crappy ptz camera is present
 
 # Update
 
