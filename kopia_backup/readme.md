@@ -112,7 +112,8 @@ The repository is created on a network share, also mounted on boot using systemd
 
 ### Install Kopia
 
-For arch linux, kopia is on AUR `yay kopia-bin`
+For arch linux, kopia is on AUR `yay kopia-bin`<br>
+[For other distros](https://kopia.io/docs/installation/#linux-installation-using-apt-debian-ubuntu)
 
 ### The initial steps and general use commands
 
