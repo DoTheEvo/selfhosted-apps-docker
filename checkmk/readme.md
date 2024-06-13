@@ -73,7 +73,7 @@ of a reverse proxy and accessing the services by hostname, not ip and port.
 ```yml
 services:
   checkmk:
-    image: checkmk/check-mk-raw
+    image: checkmk/check-mk-cloud
     container_name: checkmk
     hostname: checkmk
     restart: unless-stopped
@@ -104,7 +104,6 @@ DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # CMK
-
 CMK_SITE_ID=dom
 CMK_PASSWORD=WUx666yd0qCWh
 ```
@@ -125,18 +124,13 @@ cmk.{$MY_DOMAIN} {
 }
 ```
 
+# First run 
 
-
----
----
-
-
+# Agents 
 
 # Push
 
-
 # Alerts
-
 
 # Logs
 
