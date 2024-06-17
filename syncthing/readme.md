@@ -12,7 +12,7 @@ Synchronize folders between devices.<br>
 * [Github](https://github.com/syncthing/syncthing)
 
 Simple and elegant solution for Synchronizing folders.<br>
-Clients are installed on devices, and paired with the Syncthing server.
+Clients are installed on devices, and paired using the Syncthing servers.
 There are Windows, MacOs, Linux, Android clients, and 3rd party Möbius Sync for iOS.
 
 Written in Go.

@@ -339,6 +339,7 @@ Links
 * [Why are Prometheus queries hard?](https://fiberplane.com/blog/why-are-prometheus-queries-hard)
 * [Prometheus Cheat Sheet - Basics \(Metrics, Labels, Time Series, Scraping\)](https://iximiuz.com/en/posts/prometheus-metrics-labels-time-series/)
 * [Learning Prometheus and PromQL - Learning Series](https://iximiuz.com/en/series/learning-prometheus-and-promql/)
+* [Prometheus from A to Y](https://a-cup-of.coffee/blog/prometheus/)
 * [The official](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 
 </details>

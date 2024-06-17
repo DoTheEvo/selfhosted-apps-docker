@@ -106,7 +106,11 @@ Now you should be able to execute commands on the server from your main PC.
 
 ![nging_welcome](https://i.imgur.com/Iv0B6bN.png)
 
-Well, its time to learn how to create and **edit files** and copy paste shit
+Time to spin up some simple docker container. Let's go with nginx - a web server.
+It's just a tiny application that waits for a browser trying to connect to serve
+a web page.
+
+It is also time to learn how to create and **edit files** and copy paste shit
 in to them, IN LINUX!
 
 Honestly could be annoying, but mobaXterm should make it easier
@@ -263,7 +267,7 @@ using slightly edited compose file from their
 [github page.](https://github.com/louislam/dockge/blob/master/compose.yaml)
 
 * Create a new directory dockge `mkdir ~/docker/dockge`
-* Go in to the docker directory `cd ~/docker/dockge`
+* Go in to the dockge directory `cd ~/docker/dockge`
 * Create an empty docker-compose.yml file `nano docker-compose.yml`
 * Paste the *recipe*, spacing matters
   ```

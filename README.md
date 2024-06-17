@@ -223,6 +223,8 @@ or enable freshly discovered feature for all future deployments.
 ### For docker noobs
 
 * [Beginners speedrun to selfhosting](beginners-speedrun-selfhosting/)
+* [How to setup Windows 11 as a Home Server/NAS](https://www.youtube.com/watch?v=5pZu35hTipo)
+* [Docke rTechnical Deep Dive](https://medium.com/@furkan.turkal/how-does-docker-actually-work-the-hard-way-a-technical-deep-diving-c5b8ea2f0422)
 
 ---
 
@@ -234,8 +236,10 @@ Maybe list of some youtube channels to follow would not be bad idea.
 * [TechnoTim](https://www.youtube.com/@TechnoTim/videos) - general homeserver selfhosting
 * [Craft Computing](https://www.youtube.com/@CraftComputing/videos) - general homeserver, bit more focus on hw and building
 * [Wolfgang's Channel](https://www.youtube.com/@WolfgangsChannel/videos) - general homeserver selfhosting, power consumption priority
+* [Lawrence Systems](https://www.youtube.com/@LAWRENCESYSTEMS/videos) - general homeserver selfhosting
 * [Christian Lempa](https://www.youtube.com/@christianlempa/videos) -  general homeserver selfhosting
 * [NASCompares](https://www.youtube.com/@nascompares) - Nas builds / home servers
+* [Peter Brockie](https://www.youtube.com/@PeterBrockie/videos) - Nas builds / home servers
 * [Awesome Open Source](https://www.youtube.com/@AwesomeOpenSource/videos)
   \- open source software insight
 * [Hardware Haven](https://www.youtube.com/@HardwareHaven/videos) - nas, servers, miniPCs focused
