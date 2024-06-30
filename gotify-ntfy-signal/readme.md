@@ -16,15 +16,14 @@ Instant push notifications if email feels old timey and crowded
 
 # Overview
 
-* **gotify** - great for single person use, but the moment theres more people
-  they need to share single account and so lack the ability to choose
+* **gotify** - great for a single person use, but the moment theres more people
+  they need to share a single account and so lack the ability to choose
   what to get and what not to get.
-* **ntfy** - simple original approach to just subscribing to "topics" without
-  authentification. Simple single line code for push notification.
-  Support for multiple users, supports ios.
+* **ntfy** - simple original approach to just subscribing to "topics".
+  Single line of code to send a push notification. Support for multiple users, supports ios.
 * **signal-cli-rest-api** - no gui, needs a sim card, a phone number registred,
-  notification are send through that phone number.
-  Signal wider spread might make it a winner, since you are not asking people
+  notifications are send through that phone number.
+  Signal's wider spread might make it a winner, since you are not asking people
   to install an another app.
 
 Afte few weeks of tinkering with these... **ntfy is the winner for me**, for now.<br>
@@ -85,7 +84,7 @@ Lets say there's a minecraft server and there are notifications when someone
 joins. These notifications are send to `minecraft` topic, not to specified users.
 Users can subscribe to the topic if they want those notifications.
 This gives great flexibility and is the main reason why ntfy wins
-over other solutions.
+over other solutions. In this setup there is also no authentification.
 
 #### Linux
 
