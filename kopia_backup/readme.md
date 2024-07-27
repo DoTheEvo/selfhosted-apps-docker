@@ -143,7 +143,11 @@ all that is needed is target that should be backed up.
 
 * **mounting backups**
 
-`sudo kopia mount all /mnt/tmp &` - mounts all snapshots<br>
+Be aware of sudo.<br>
+If you connect with sudo, and mount with sudo, 
+you will need to be root to browse the backups.
+
+`sudo kopia mount all /mnt/tmp` - mounts all snapshots<br>
 `sudo kopia snapshot list`<br> 
 `sudo kopia mount k7e2b0a503edd7604ff61c68655cd5ad7 /mnt/tmp &`<br>
 `sudo umount /mnt/tmp`<br>
@@ -175,11 +179,12 @@ kopia snapshot create $BACKUP_THIS
 kopia repository disconnect
 
 # --------------  ERROR EXIT CODES  --------------
-# kopia does not interupts its run with an error if target or repository are missing
-# this makes systemd OnSuccess OnFailure not behaving as one might expect
-# below are checks for paths, that result in immediate error exit code if they do not exist
-# they are at the end because some backup might get done even if another is missing something
-# we just want the error exit code
+# Kopia does not interrupts its run with an error exit code if a target or a repository are missing.
+# This hides errors and  makes systemd OnFailure event ineffective.
+# Below are the checks for the paths existence,
+# resulting in an immediate error exit code any of them do not exist.
+# They are at the end because some backup might still get done even if something is missing
+# We just want exit code 1 to let systemd know there was a failure.
 
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
