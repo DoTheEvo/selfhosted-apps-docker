@@ -86,6 +86,8 @@ Worth noting is use of [configs](https://docs.docker.com/compose/compose-file/08
 to bypass the need for separate `mongo-init.js` file.<br>
 The use comes from [this repo](https://github.com/GiuseppeGalilei/Ubiquiti-Tips-and-Tricks).
 
+latest unifi version tag - [here](https://github.com/linuxserver/docker-unifi-network-application/releases)
+
 `docker-compose.yml`
 ```yml
 services:
@@ -105,7 +107,7 @@ services:
         target: /docker-entrypoint-initdb.d/init-mongo.js
 
   unifi-app:
-    image: lscr.io/linuxserver/unifi-network-application:8.1.127
+    image: lscr.io/linuxserver/unifi-network-application:8.3.32
     container_name: unifi-app
     hostname: unifi-app
     restart: unless-stopped
@@ -198,6 +200,16 @@ as `Override Inform Host`.
 * **802.11 DTIM Period - sets to 3**<br>
   *Settings > Wifi > Edit > Advanced*<br>
   For [apple devices](https://www.sniffwifi.com/2016/05/go-to-sleep-go-to-sleep-go-to-sleep.html)<br>
+
+# Migration
+
+* old controller - settings - system - somewhere backup - just settings - you get a `unf` file
+* new controller - on the first run theres an option to restore from backup, pick the file
+* done
+
+# Config autobackup
+
+config files should be in `~/unifi/unifi_data/data/backup`
 
 # Update
 
