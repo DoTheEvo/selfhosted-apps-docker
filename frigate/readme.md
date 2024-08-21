@@ -165,7 +165,7 @@ Or [adjusted](https://docs.frigate.video/frigate/installation/#docker) for colar
 services:
 
   frigate:
-    image: ghcr.io/blakeblackshear/frigate:0.13.2
+    image: ghcr.io/blakeblackshear/frigate:0.14.0
     container_name: frigate
     hostname: frigate
     restart: unless-stopped
