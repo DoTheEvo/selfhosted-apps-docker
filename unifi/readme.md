@@ -213,6 +213,14 @@ as `Override Inform Host`.
 
 config files should be in `~/unifi/unifi_data/data/backup`
 
+# Encountered issues
+
+Because I had `./mongo_db_data:/data` as bind mount
+instead of `./mongo_db_data:/data/db`, there was an issue.
+Everything worked fine for weeks, even shutdown of the docker host
+or sudden power outage... but on downing of the container and then upping,
+login would stop working with the notice "invalid username and/or password".
+
 # Update
 
 Manual image update:
