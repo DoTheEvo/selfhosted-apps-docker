@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - ./mongo_db_data:/data
+      - ./mongo_db_data:/data/db
     expose:
       - 27017
     configs:
