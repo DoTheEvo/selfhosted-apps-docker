@@ -107,7 +107,7 @@ services:
         target: /docker-entrypoint-initdb.d/init-mongo.js
 
   unifi-app:
-    image: lscr.io/linuxserver/unifi-network-application:8.3.32
+    image: lscr.io/linuxserver/unifi-network-application:8.4.59
     container_name: unifi-app
     hostname: unifi-app
     restart: unless-stopped
