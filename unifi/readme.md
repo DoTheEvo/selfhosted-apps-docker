@@ -135,8 +135,8 @@ networks:
 configs:
   init-mongo.js:
     content: |
-      db.getSiblingDB("$MONGO_DBNAME").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "readWrite", db: "$MONGO_DBNAME"}]});
-      db.getSiblingDB("${MONGO_DBNAME}_stat").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "readWrite", db: "${MONGO_DBNAME}_stat"}]});
+      db.getSiblingDB("$MONGO_DBNAME").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "$MONGO_ROLE", db: "$MONGO_DBNAME"}]});
+      db.getSiblingDB("${MONGO_DBNAME}_stat").createUser({user: "$MONGO_USER", pwd: "$MONGO_PASS", roles: [{role: "$MONGO_ROLE", db: "${MONGO_DBNAME}_stat"}]});
 ```
 
 `.env`
@@ -151,12 +151,14 @@ PGID=1000
 MEM_LIMIT=1024
 MEM_STARTUP=1024
 MONGO_USER=unifi
-MONGO_PASS=N9uHz2bt
+MONGO_PASS=N9uHz2ct
 MONGO_HOST=unifi-db
 MONGO_PORT=27017
 MONGO_DBNAME=unifi_db
+MONGO_ROLE=dbOwner
 # MONGO_TLS= #optional
 # MONGO_AUTHSOURCE= #optional
+
 ```
 
 # Reverse proxy
