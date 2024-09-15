@@ -66,7 +66,7 @@ lets put here also vlan stuff
   as you would need to deal with extra cables, extra interfaces, extra hardware..
 * **Tag based**<br>
   The real deal vlan. At layer2 a **vlan tag** is added to frames.
-  It contains a **vlan ID** which is a number between 0 and 4095.
+  It contains a **vlan ID** which is a number between 1 and 4094.
   These are used to create virtual networks that are separate
   from each other but share same hardware, same cables.<br>
   The standard is called **802.1Q**.
@@ -79,8 +79,8 @@ Some aspects:
   when entering or leaving switch.
 * A tag is 4 bytes in size, contains [several pieces of info](https://i.imgur.com/86zeYgG.png),
   the most important being vlan ID.
-* **Vlan ID** (VID) is just a number between 0-4095, often picked as
-  multiplies of ten - 10, 20, 30, 40, ... with the ip address of that VLAN
+* **Vlan ID** (VID) is just a number between 1-4094, often picked as
+  multiplies of ten - 10, 20, 30, 40, ... with the ip address pool on that VLAN
   having it somewhere too.<br>
   Like vlan30 would be set as 192.168.30.0/24 or 10.30.30.0/24. 
 * Tagged frames **get dropped** if they would arrive to a regular machine,
