@@ -35,6 +35,8 @@ Two physical network cards - NICs
 * create new virtual switch - `vSwitch1-WAN`
 * create new port group - `WAN Network`, assign to it `vSwitch1-WAN`
 
+If plannig VLANs port groups need them assigned, trunk needs vlan 4095 set.
+
 #### Virtual machine creation
 
 * Guest OS family - Other
@@ -159,7 +161,12 @@ So I guess its living with this.
   * LAN - set network and mask, I prefer 10.0.X.1
   * root password
 * Update
-* 
+
+
+* `System: Settings: Miscellaneous` - `Periodic NetFlow Backup` - `Disabled`<br>
+  avoids long wait time on restart / shutdown
+
+ 
 
 </details>
 
@@ -385,6 +392,16 @@ Services: Unbound DNS: General
 ---
 
 <details>
+<summary><h1>VLANs</h1></summary>
+
+[written on it here](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/_knowledge-base/vlans.md)
+
+</details>
+
+---
+---
+
+<details>
 <summary><h1>Monitoring</h1></summary>
 
 ### ARP table
@@ -428,6 +445,8 @@ Must **enable logging** for a rule to be visible there.
 
 <details>
 <summary><h1>Plugins</h1></summary>
+
+[zenarmor](https://www.zenarmor.com/docs/guides/best-practices-for-zenarmor-deployment)
 
 * os-vnstat to have some general idea about traffic
 
