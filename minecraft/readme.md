@@ -20,7 +20,13 @@ version which is a fork of
 Few plugings are used which allow to host multiple worlds on the same server.<br>
 
 This setup is written in september 2022 with 1.19.2 being the latest build.<br>
-Small edits still go on as of october 2023.
+Small edits still go on as of september 2024.
+
+Worth note is that [Crafty](https://craftycontrol.com/) exists,
+and seems pretty damn good.<br>
+[This video](https://youtu.be/bAGTwBURBXc) is what made me interested,
+but did not try it yet beyond just simple spin and try when playing with
+[casaOS](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/beginners-speedrun-selfhosting).
 
 # Files and directory structure
 
@@ -96,6 +102,7 @@ ALLOW_NETHER=TRUE
 
 You **must forward port 25565** on your firewall to your docker host
 if you want it world accessible.<br>
+[Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/_knowledge-base/port_forwarding.md) a detailed guide.
 
 # Reverse proxy
 
