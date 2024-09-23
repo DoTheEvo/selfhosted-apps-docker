@@ -639,15 +639,19 @@ Inside create a file named `Dockerfile`.
 
 `Dockerfile`
 ```Dockerfile
-FROM caddy:2.6.2-builder AS builder
+FROM caddy:2.8.4-builder AS builder
 
 RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare
 
-FROM caddy:2.6.2
+FROM caddy:2.8.4
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ```
+
+of note - if making changes in the Dockerfile after running, 
+use command `docker compose down --rmi local`
+to remove localy built containers and force rebuild on the next compose up.
 
 ### - Edit docker-compose.yml
 
