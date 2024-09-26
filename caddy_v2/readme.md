@@ -208,15 +208,16 @@ networks:
 ---
 ---
 
-<details>
-<summary><h3>Editing hosts file</h3></summary>
+<details open>
+<summary><h3>Dealing with access from LAN side</h3></summary>
 
 If the docker host is with you on your local network then you need to deal
 with bit of an issue.
 When you write that `a.example.com` in to your browser, you are asking 
 internet DNS server for IP address of `a.example.com`.
 DNS servers will reply with your own public IP, and most consumer routers
-wont allow this loopback, where your requests should go out and then right back.
+wont allow this loopback, where your requests should go out
+and then right back in.
 
 So just [edit](https://support.rackspace.com/how-to/modify-your-hosts-file/)
 `hosts` as root/administrator,
