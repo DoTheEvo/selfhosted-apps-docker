@@ -68,14 +68,22 @@ TZ=Europe/Bratislava
 
 #WG-EASY
 WG_HOST=vpn.example.com           # can also be just public IP
-PASSWORD=supersecretpassword
+# PASSWORD=supersecretpassword
+PASSWORD_HASH=$$2a$$12$$52a84HoSf99aLL7lmt9NsO0hlhZmGuJnyBK.bToiSdbQhTvMjV3ce
 WG_PORT=51820
 WG_DEFAULT_ADDRESS=10.221.221.x
 WG_ALLOWED_IPS=192.168.1.0/24
 WG_DEFAULT_DNS=
 ```
 
-DNS is set to null, otherwise issues.
+In version 14 `PASSWORD` as env variable is no longer allowed
+and `PASSWORD_HASH` must be used.<br>
+It is [a bcrypt hash](https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md)
+of the password and in compose it must be without quotation marks
+and any `$` symbol needs to be doubled - replaced with `$$`.
+
+DNS is set to null as I had issues with it set, but it should be tried,
+set it to ip address where at port 53 dns server answers. Test then with nslookup.
 
 # Reverse proxy
 
