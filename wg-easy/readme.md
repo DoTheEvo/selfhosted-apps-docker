@@ -37,7 +37,7 @@ Written in javascript.
 services:
 
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:13
+    image: ghcr.io/wg-easy/wg-easy:14
     container_name: wg-easy
     hostname: wg-easy
     restart: unless-stopped
