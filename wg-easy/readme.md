@@ -8,7 +8,7 @@
 
 Web GUI for Wireguard VPN.<br>
 
-* [Github](https://github.com/WeeJeWel/wg-easy)
+* [Github](https://github.com/wg-easy/wg-easy)
 
 Wireguard is the best VPN solution right now. But its not noob friendly or easy.<br>
 WG-easy tries to solve this.
