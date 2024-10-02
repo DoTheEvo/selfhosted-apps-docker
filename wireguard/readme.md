@@ -232,4 +232,5 @@ Replace the content of the config file with the one from the backup.
 
 # Links
 
-[Site to Site config](https://www.procustodibus.com/blog/2020/12/wireguard-site-to-site-config/)
+* [pirate-wireguard-docs](https://github.com/pirate/wireguard-docs)
+* [Site to Site config](https://www.procustodibus.com/blog/2020/12/wireguard-site-to-site-config/)
