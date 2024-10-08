@@ -82,6 +82,8 @@ if planning serious use.
 * **Maintenance** is automatic.
 * **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
   how it works under the hood.<br>
+  [Here](https://kopia.discourse.group/t/kopia-snapshot-retention-policies-demystified/2941)
+  is more in-depth, it is quite important to read and understand.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
@@ -376,6 +378,70 @@ This [matushorvath/Kopia as Windows Service](https://gist.github.com/matushorvat
 guide helped move beyond that. It contains more info if one would want to 
 actually run as server repository for other machines.<br>
 Also use of [nssm](https://nssm.cc/) is popular.
+
+### Problem with access to password protected network shares
+
+Kopia as a service runs under SYSTEM user.<br>
+This makes accessing network shares that need credentials problematic.
+They need to be somehow mounted on the system for kopia to do its thing.
+
+Solution that works for me is to mount the shares using powershell `New-SmbGlobalMapping`
+
+<details>
+  <summary>mount-nas-shares.ps1</summary>
+  
+  ```
+  # Check if the script is running with elevated privileges
+  if (-Not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+      # Relaunch the script as administrator
+      Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+      exit
+  }
+
+  $user = "nas2\iamuser"
+  $password = "suppersecretpassword"
+
+  # Create a PSCredential object
+  $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+  $creds = New-Object System.Management.Automation.PSCredential($user, $securePassword)
+
+  # Mount each shared folder using the provided credentials
+  New-SmbGlobalMapping -LocalPath "Z:" -RemotePath "\\NAS2\blabla" -Credential $creds
+  New-SmbGlobalMapping -LocalPath "Y:" -RemotePath "\\NAS2\haha" -Credential $creds
+  New-SmbGlobalMapping -LocalPath "X:" -RemotePath "\\NAS2\zzz" -Credential $creds
+
+  # Restart Explorer
+  $explorer = Get-Process explorer -ErrorAction SilentlyContinue
+  if ($explorer) {
+      Stop-Process -Id $explorer.Id -Force
+      Start-Process explorer.exe
+  }
+
+  ```
+</details>
+
+<details>
+  <summary>umount-nas-shares.ps1</summary>
+
+  ```
+  # Check if the script is running with elevated privileges
+  if (-Not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+      # Relaunch the script as administrator
+      Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+      exit
+  }
+
+
+  # Disconnect each mapped network drive
+  Remove-SmbGlobalMapping -LocalPath "Z:" -Force
+  Remove-SmbGlobalMapping -LocalPath "Y:" -Force
+  Remove-SmbGlobalMapping -LocalPath "X:" -Force
+
+  # Restart Explorer
+  Stop-Process -Name explorer -ErrorAction SilentlyContinue; Start-Process explorer.exe
+
+  ```
+</details>
 
 ## Kopia cli in Windows
 
