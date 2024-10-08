@@ -412,7 +412,6 @@ Solution that works for me is to mount the shares using powershell `New-SmbGloba
 
   # Restart Explorer
   Stop-Process -Name explorer -ErrorAction SilentlyContinue; Start-Process explorer.exe
-
   ```
 </details>
 
@@ -435,7 +434,6 @@ Solution that works for me is to mount the shares using powershell `New-SmbGloba
 
   # Restart Explorer
   Stop-Process -Name explorer -ErrorAction SilentlyContinue; Start-Process explorer.exe
-  
   ```
 </details>
 
