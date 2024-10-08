@@ -411,11 +411,7 @@ Solution that works for me is to mount the shares using powershell `New-SmbGloba
   New-SmbGlobalMapping -LocalPath "X:" -RemotePath "\\NAS2\zzz" -Credential $creds
 
   # Restart Explorer
-  $explorer = Get-Process explorer -ErrorAction SilentlyContinue
-  if ($explorer) {
-      Stop-Process -Id $explorer.Id -Force
-      Start-Process explorer.exe
-  }
+  Stop-Process -Name explorer -ErrorAction SilentlyContinue; Start-Process explorer.exe
 
   ```
 </details>
@@ -439,7 +435,7 @@ Solution that works for me is to mount the shares using powershell `New-SmbGloba
 
   # Restart Explorer
   Stop-Process -Name explorer -ErrorAction SilentlyContinue; Start-Process explorer.exe
-
+  
   ```
 </details>
 
