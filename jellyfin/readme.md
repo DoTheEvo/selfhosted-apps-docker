@@ -32,15 +32,13 @@ Starting point for me was [this viggy96 repo](https://github.com/viggy96/contain
         └── jellyfin/
             ├── jellyfin_cache/
             ├── jellyfin_config/
-            ├── transcodes/
             ├── .env
             └── docker-compose.yml
 ```
 
 * `/mnt/bigdisk/...` - a mounted media storage share
-* `jellyfin_cache/` - cache 
+* `jellyfin_cache/` - cache, includes transcodes
 * `jellyfin_config/` - configuration 
-* `transcodes/` - transcoded video storage
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -49,7 +47,14 @@ The directories are created by docker compose on the first run.
 
 # docker-compose
 
-The media are mounted in read only mode.
+Relatively simple compose.<br>
+The only special thing being the passthrough of the graphic card
+for hardware accelerated transcoding.
+This is done in the `devices` section along with permissions in `group_add`.
+
+This basic setup worked for me with modern intel and amd cpus with igpu,
+but how to setup things might change over time so one should check
+[the official documentation](https://jellyfin.org/docs/general/administration/hardware-acceleration/intel#configure-with-linux-virtualization)
 
 `docker-compose.yml`
 ```yml
@@ -61,14 +66,17 @@ services:
     hostname: jellyfin
     restart: unless-stopped
     env_file: .env
-    devices:
-      - /dev/dri
+    devices:   
+      - /dev/dri/renderD128:/dev/dri/renderD128  # ls /dev/dri
+    group_add:
+      - "989"  # match output of: getent group render | cut -d: -f3
     volumes:
-      - ./transcodes/:/transcodes
       - ./jellyfin_config:/config
       - ./jellyfin_cache:/cache
-      - /mnt/bigdisk/serialy:/media/video:ro
-      - /mnt/bigdisk/mp3/moje:/media/music:ro
+      - /mnt/smb_share/filmy_1:/media/filmy_1:ro
+      - /mnt/smb_share/filmy_2:/media/filmy_2:ro
+      - /mnt/smb_share/filmy_3:/media/filmy_3:ro
+      - /mnt/smb_share/shows:/media/shows:ro
     ports:
       - "8096:8096"
       - "1900:1900/udp"
@@ -89,6 +97,8 @@ TZ=Europe/Bratislava
 **All containers must be on the same network**.</br>
 Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
+
+</details>
 
 # Reverse proxy
 
