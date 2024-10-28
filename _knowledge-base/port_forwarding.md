@@ -93,10 +93,10 @@ and that WAN side of your router is not really "the internet", but ISPs LAN side
 
 A way to try and check, is looking up your [public IP online](http://icanhazip.com/)
 then log in to your router and finding somewhere the IP address of your WAN interface.
-If they are the same then your are not behind double NAT and port forwarding 
+If they are the same then your are 100% not behind double NAT and port forwarding 
 will work straight away.<br>
-If they differ and some local IP is there, then there is still a chance it will work,
-but you wont know till you try.
+If they differ it does not automaticly mean that it wont work,
+just that you will not know till you try.
 
 But if you are failing to make port forwarding work, it's time to call your ISP
 and ask about public IP, how much would it cost.
