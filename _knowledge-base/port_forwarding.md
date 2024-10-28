@@ -162,6 +162,7 @@ For testing we can use websites that will test if a port is open at specified pu
 * Run Port Listener, set port `666`, press Start.
   * If a windows firewall notification pops up with a question, answer yes.
 * Go to [portchecker.co](https://portchecker.co/), set the port to 666 and press Check.
+* You get the answer if the internet sees your port as open or closed.
 
 ![port_listener](https://i.imgur.com/A9fxIbi.png)
 
