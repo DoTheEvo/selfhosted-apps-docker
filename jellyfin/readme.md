@@ -76,9 +76,8 @@ services:
     volumes:
       - ./jellyfin_config:/config
       - ./jellyfin_cache:/cache
-      - /mnt/bigdisk/tv:/media/tv:ro
-      - /mnt/bigdisk/movies:/media/movies:ro
-      - /mnt/bigdisk/music:/media/music:ro
+      - /mnt/bigdisk/serialy:/media/tv:ro
+      - /mnt/bigdisk/filmy_2:/media/movies:ro
     ports:
       - "8096:8096"       # webGUI
       - "1900:1900/udp"   # autodiscovery on local networks
@@ -175,11 +174,13 @@ heavily desaturated - washed out.
 * If video is in H.265 but firefox on linux cant decode it,
   jellyfin detects this and transcodes it to something that can be played.
 
+### intel igpu
 
+to get "Enable Intel Low-Power H.264 hardware encoder" working
 
-
-
-
+* `echo "options i915 enable_guc=2" > /etc/modprobe.d/i915.conf`
+* `mkinitcpio -P`
+* reboot
 
 The above compose basic setup worked for me
 
