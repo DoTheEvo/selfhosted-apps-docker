@@ -149,6 +149,72 @@ So I guess its living with this.
 </details>
 
 ---
+pkg install xe-guest-utilities
+echo 'xenguest_enable="YES"' >> /etc/rc.conf.local
+ln -s /usr/local/etc/rc.d/xenguest /usr/local/etc/rc.d/xenguest.sh
+service xenguest start
+
+
+---
+
+<details>
+<summary><h1>XCP-ng</h1></summary>
+
+[Official xcp instructions.](https://docs.xcp-ng.org/guides/pfsense/)<br>
+Read the link above, dont skip it, might be newer info there!
+
+#### Network setup
+
+default xcp network will be used as WAN.
+
+Will create new virtual network not connected to any real physical interface
+and will try to spin some VM on that network to see if opnsense manages it.
+
+* New > Network > your-xcp-host
+* Type - leave both settings off - bonded and private
+* Interface - leave empty
+* Name it - LAN-SIDE-OPNSENSE
+* rest leave default
+* Create network
+
+#### Virtual machine creation
+
+[Download](https://opnsense.org/download/) the latest opnsense - amd64, **dvd**,
+extract iso.
+
+* New > VM > your-xcp-host
+* Template - Other install media
+* name; description; vcpu; ram; topology; iso
+* Interfaces - leave the first one default<br>
+  add new - LAN-SIDE-OPNSENSE that we created
+* add virtual disk
+* button - Show advanced settings
+  * Boot firmware - **uefi**
+* Create
+
+#### Disable TX Checksum Offload
+
+Head to the "Network" tab of your VM<br>
+advanced settings (click the blue gear icon) for each adapter<br>
+disable TX checksumming.<br>
+Restart the VM.
+
+
+#### xen guest additions
+
+installing `os-xen` didnt work for me,
+so steps from the official instructions
+
+* enable ssh on the opnsense<br>
+  `System: Settings: Administration` > Secure Shell
+* ssh in 
+* `pkg install xe-guest-utilities`
+* `echo 'xenguest_enable="YES"' >> /etc/rc.conf.local`
+* `ln -s /usr/local/etc/rc.d/xenguest /usr/local/etc/rc.d/xenguest.sh`
+* `service xenguest start`
+</details>
+
+---
 ---
 
 <details>
@@ -169,6 +235,7 @@ So I guess its living with this.
  
 
 </details>
+
 
 ---
 ---
