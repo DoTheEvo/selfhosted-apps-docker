@@ -347,7 +347,7 @@ My go-to for windows use because it offers gui for easier managment and
 the reliability of always running in the background as a service.
 
 This deployment does not make use of the main Kopia Server feature,
-to be a repository for other machines running Kopiam, just local deployment.
+to be a repository for other machines running Kopia, just local deployment.
 Few edits of `kopia_server_start.cmd` can make it happen though.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
