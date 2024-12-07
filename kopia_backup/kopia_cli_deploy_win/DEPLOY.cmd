@@ -26,8 +26,6 @@ if exist "C:\Kopia\kopia_backup_scipt.ps1" (
 echo - copying files to C:\Kopia
 robocopy "%~dp0\" "C:\Kopia" "kopia.exe" /NDL /NJH /NJS
 robocopy "%~dp0\" "C:\Kopia" "kopia_backup_scipt.ps1" /NDL /NJH /NJS
-robocopy "%~dp0\" "C:\Kopia" "win_vss_before.ps1" /NDL /NJH /NJS
-robocopy "%~dp0\" "C:\Kopia" "win_vss_after.ps1" /NDL /NJH /NJS
 echo.
 
 echo - adding C:\Kopia to PATH
