@@ -64,7 +64,7 @@ Embedded webGUI for server mode is done in React. KopiaUI comes packaged with el
 The above linked documentation is well written and worth a look
 if planning serious use.
 
-* Kopia is a single ~35MB binary file.
+* Kopia is a single ~50MB binary file.
 * Backups are stored in a **repository** that needs to be created first,
   and is always encrypted.
 * Before any action, Kopia needs to be **connected to a repo** as repos store most of 
@@ -79,11 +79,15 @@ if planning serious use.
     can be edited like any other.
   - Per user@machine policy
   - Snapshot level policy, only applying for that one path.
-* **Maintenance** is automatic.
+* Kopia is **user aware**. You are logged in as Jack and execute, it will be
+  in the repo at jack@machine. You schedule it as a SYSTEM user,
+  to avoid a window popping up, it will be under SYSTEM@machine.
+  Always use `kopia snap list -all` to see snapshots of all users.
 * **Retention** of backups - [here's](https://kopia.discourse.group/t/trying-to-understand-retention-policies/164/4)
   how it works under the hood.<br>
   [Here](https://kopia.discourse.group/t/kopia-snapshot-retention-policies-demystified/2941)
   is more in-depth, it is quite important to read and understand.
+* **Maintenance** is automatic.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
 * **Tasks** section in gui gets wiped when Kopia closes, info on snapshots run
@@ -467,7 +471,8 @@ windows thing. Or you need to enable/install `WebClient` service.
 * run scheduled task manually
 * check if it worked
   * `kopia repo status`
-  * `kopia snap list --all`
+  * `kopia snap list --all` - **--ALL IS NEEDED**, or you will spend time debuging
+     where are the snapshots, but they are there, just under SYSTEM user
 
 The script is set to save logs in to `C:\Kopia\Kopia_Logs\`.
 

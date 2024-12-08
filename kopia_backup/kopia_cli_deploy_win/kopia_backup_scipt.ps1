@@ -35,7 +35,7 @@ $USE_SHADOW_COPY = $false
 $Env:KOPIA_LOG_DIR = $LOG_PATH
 
 kopia repository connect filesystem --path $REPOSITORY_PATH --password $KOPIA_PASSWORD
-# kopia repository connect b2 --bucket=kopia-repo-rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
+# kopia repository connect b2 --bucket=kopia-repo-rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0 --password $KOPIA_PASSWORD
 
 kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
