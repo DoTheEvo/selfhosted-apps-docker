@@ -12,9 +12,9 @@ WORK IN PROGRESS<br>
 
 Torrents downloader.
 
-* [Official site](https://jellyfin.org/)
-* [Github](https://github.com/jellyfin/jellyfin)
-* [DockerHub](https://hub.docker.com/r/jellyfin/jellyfin/)
+* [Official site](https://www.qbittorrent.org/)
+* [Github](https://github.com/linuxserver/docker-qbittorrent)
+* [DockerHub](https://hub.docker.com/r/linuxserver/qbittorrent/)
 
 qBittorrent is a cross-platform free and open-source BitTorrent client.<br>
 The interface is clone of the popular uTorrent.<br>
@@ -26,7 +26,7 @@ Written mostly in C++, using libtorrent under the hood.
 
 ```
 /mnt/
-└── smalldisk/
+└── bigdisk/
     └── torrents/
 /home/
 └── ~/
@@ -38,7 +38,7 @@ Written mostly in C++, using libtorrent under the hood.
 ```
 
 * `/mnt/bigdisk/...` - a mounted storage share
-* `jellyfin-config/` - configuration 
+* `qbittorrent-config/` - configuration 
 * `.env` - a file containing environment variables for docker compose
 * `docker-compose.yml` - a docker compose file, telling docker how to run the containers
 
@@ -106,7 +106,7 @@ q.{$MY_DOMAIN} {
 
 # First run
 
-Default login: `admin@admin.com` // `password`
+The administrator username and a temporary password can be found by running `docker logs qbittorrent`
 
 ---
 
