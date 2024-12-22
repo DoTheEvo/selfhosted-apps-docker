@@ -29,7 +29,7 @@ various languages and frameworks.
 ![encoding-pic](https://i.imgur.com/s2vQxG1.png)
 
 * a **video file** is a bunch of pictures - **frames**,
-  packed in to a one file.
+  packed in to one file.
 * To save disk space and bandwidth its **compressed** using a video standard/codec.
   * **H.262** - also called MPEG-2 - stuff of the past.
   * **H.264** - the most common now, also called **AVC** or MPEG-4.
