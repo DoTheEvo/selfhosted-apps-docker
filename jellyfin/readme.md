@@ -29,12 +29,13 @@ various languages and frameworks.
 ![encoding-pic](https://i.imgur.com/s2vQxG1.png)
 
 * a **video file** is a bunch of pictures - **frames**,
-  packed in to one file.
+  packed in to a one file.
 * To save disk space and bandwidth its **compressed** using a video standard/codec.
-  * **H.262** - also called MPEG-2 - stuff of the past
-  * **H.264** - the most common now, also called **AVC** or MPEG-4
+  * **H.262** - also called MPEG-2 - stuff of the past.
+  * **H.264** - the most common now, also called **AVC** or MPEG-4.
   * **H.265** - also called **HEVC**, fast spreading, 50% improved over H.264,<br>
-    but fees for it got more expensive with convoluted patent pools 
+    but it also greatly increased fees for developers and manufacturers and and came 
+    with a convoluted patent pools.
   * **AV1** - the future, no royalty fees, more improvements.
     The successor to VP9, which was developed by google.
 * Ways to transcode
@@ -84,16 +85,16 @@ can do dozens of **concurent streams** in direct play.
 But there are cases **when a client does not support codec** of the video file.<br>
 Example is Firefox playing a movie encoded in HEVC(x265).<br>
 Jellyfin knows which codecs client supports and if needed
-it **transcodes video on the fly**, as it's being streamed.
-
-Another reason can be if you set hard limit on upstream bandwith use.<br>
+it **transcodes video on the fly**, as it's being streamed.<br>
+Another reason to transcode can be if you set a hard limit on bandwidth
+use per stream.<br>
 In `Dashboard` > `Playback` > `Streaming` setting lets say
 [2Mbps.](https://i.imgur.com/7hSf4e1.png)
 
-Out of the box, jellyfin is set to **use cpu for software-cpu transcoding**.
+Out of the box, jellyfin is set to **use cpu for software transcoding**.
 It will work fine for one or two simple 1080p concurent streams,
-unless the cpu is really underpowered/old.
-In any case it can put [a heavy load](https://i.imgur.com/rjNFN1J.png)
+unless the cpu is really underpowered/old,
+but it will put [a heavy load](https://i.imgur.com/rjNFN1J.png)
 on the CPU.
 
 ### Hardware acceleration
@@ -105,7 +106,7 @@ transcoding, using iGPU which greatly improves performance and power consumption
 
 * **Intel** - QSV - intel quicksync. Go-To recommendation and ideal for most users,
   high quality, fast, reliable drivers, cheap and low power consumption as an igpu.
-  Most used so huge userbase.
+  Huge userbase.
 * **AMD**  - VAAPI when in docker - kinda shunned as historicly it had the worst
   encode quality. [AMD improved some](https://youtu.be/H0pCpNT4b-Q),
   but so did the competition so it's still not as good. But in real use
@@ -184,21 +185,20 @@ Software used for monitoring the cpu and gpu usage
 
 # Clients 
 
-Jellyfin's open source nature allows developers to create unofficial client apps
-for various platforms.
+Jellyfin's open source nature allows developers to create unofficial client apps.
 
 * [Awesome Jellyfin Clients List](https://github.com/awesome-jellyfin/awesome-jellyfin/blob/main/CLIENTS.md)
 
-The ones I tried and find good to know about.
+The ones I tried and find interesting.
 
 ### [Findroid](https://github.com/jarnedemeulemeester/findroid)
 
 Feels bit better in user interface and control.<br>
-Does not jump subtitles like the official client, also seems its always directplay
-even 4k+HDR, have to investigate how the fuck does it do.
-Uses mpv, but does it mean theres some big load on a phone when compared
-to the official app?<br>
-It ignores max streaming bandwith limit when server streams over the internet.
+Does not jump subtitles like the official client,
+also seems it's always directplay even 4k+HDR, have to investigate
+how the fuck does it do. Uses mpv, but does it mean theres some big load
+on a phone when compared to the official app?<br>
+It ignores max streaming bandwidth limit when server streams over the internet.
 
 ### [Finamp](https://github.com/jmshrv/finamp)
 
@@ -437,7 +437,7 @@ to automount on boot - `sudo systemctl enable mnt-bigdisk.automount`
 
 * docker host - go to `jellyfin/jellyfin_config/log/`
 * the last file in the folder is the last playback attempt
-* paste that output in to chatgpt
+* paste that in to chatgpt
 
 #### Autodiscovery not working
 
