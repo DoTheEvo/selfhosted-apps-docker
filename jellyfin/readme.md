@@ -376,11 +376,15 @@ The `compose.yml` + `.env` should just work.
 * `Throttle Transcodes` - check
 * `Delete segments` - check
 
-Tone mapping
+**Tone-mapping**
 
 * for my arch host installing these packages<br>
   `sudo pacman -S xf86-video-amdgpu libva-mesa-driver mesa-vdpau vulkan-radeon vulkan-tools`
 * reboot
+
+**Screenshots**
+
+[default](https://i.imgur.com/4EIv4mo.png) | [after](https://i.imgur.com/rbvsJQ9.png)
 
 </details>
 
