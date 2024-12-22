@@ -169,7 +169,7 @@ Results
   * 4K+HDR+tonemapping - [4 streams](https://i.imgur.com/yvP72UU.jpeg)
 * ryzen **4350GE**
   * 10x streams FHD - 6 max, otherwise stutter
-  * 4K+HDR+tonemapping - 1x stream [barely](https://i.imgur.com/8iairvO.png)
+  * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/8iairvO.png)
 
 
 Software used for monitoring the cpu and gpu usage
