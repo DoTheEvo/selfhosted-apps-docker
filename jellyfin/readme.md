@@ -147,7 +147,7 @@ Archlinux straight on metal, docker Jellyfin.<br>
 Testing [10x FHD streams](https://i.imgur.com/nP71y0E.png),
 and 4K+HDR+tonemapping till see stutter <br>
 Testing by running movies, x265 encoded, in edge under linux.<br>
-`Throttle Transcodes` is turned off so that the movie is transcoded in full,
+`Throttle Transcodes` is turned off so that the movies are transcoded in full,
 not just 3min segments. 
 
 Results
@@ -166,7 +166,7 @@ Results
   * AV1 encoding - [worked](https://i.imgur.com/ZaQRIAc.png)
 * intel **i5-12600k**
   * 10x streams FHD - [pass](https://i.imgur.com/BGXOeGS.png)
-  * 4K+HDR+tonemapping - 4 streams
+  * 4K+HDR+tonemapping - [4 streams](https://i.imgur.com/yvP72UU.jpeg)
 * ryzen **4350GE**
   * 10x streams FHD - 6 max, otherwise stutter
   * 4K+HDR+tonemapping - 1x stream [barely](https://i.imgur.com/8iairvO.png)
@@ -378,8 +378,8 @@ The `compose.yml` + `.env` should just work.
 
 Tone mapping
 
-* for my arch host installing these packages
-* `sudo pacman -S xf86-video-amdgpu libva-mesa-driver mesa-vdpau vulkan-radeon vulkan-tools`
+* for my arch host installing these packages<br>
+  `sudo pacman -S xf86-video-amdgpu libva-mesa-driver mesa-vdpau vulkan-radeon vulkan-tools`
 * reboot
 
 </details>
