@@ -183,7 +183,7 @@ Software used for monitoring the cpu and gpu usage
 ---
 ---
 
-# Clients 
+# Clients and Plugins
 
 Jellyfin's open source nature allows developers to create unofficial client apps.
 
@@ -191,7 +191,7 @@ Jellyfin's open source nature allows developers to create unofficial client apps
 
 The ones I tried and find interesting.
 
-### [Findroid](https://github.com/jarnedemeulemeester/findroid)
+#### [Findroid](https://github.com/jarnedemeulemeester/findroid)
 
 Feels bit better in user interface and control.<br>
 Does not jump subtitles like the official client,
@@ -200,9 +200,14 @@ how the fuck does it do. Uses mpv, but does it mean theres some big load
 on a phone when compared to the official app?<br>
 It ignores max streaming bandwidth limit when server streams over the internet.
 
-### [Finamp](https://github.com/jmshrv/finamp)
+#### [Finamp](https://github.com/jmshrv/finamp)
 
 Aimed for music. Did not tested much yet.
+
+### Plugins
+
+* [intro-skipper](https://github.com/intro-skipper/intro-skipper?tab=readme-ov-file)
+  \- skips intros for shows
 
 # Files and directory structure
 
@@ -474,4 +479,5 @@ Manual image update:
 
 # Useful
 
+* [Jellyfin on ARM - orange pi 5](https://akashrajpurohit.com/blog/setup-jellyfin-with-hardware-acceleration-on-orange-pi-5-rockchip-rk3558/)
 * https://www.reddit.com/r/selfhosted/comments/1bit5xr/livetv_on_jellyfin_2024/
