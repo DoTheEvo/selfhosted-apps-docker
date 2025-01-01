@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-*Last update december 2024 kopia v0.18.2*
+*Last update january 2025 kopia v0.18.2*
 
 ![logo](https://i.imgur.com/A2mosM6.png)
 
@@ -87,11 +87,11 @@ if planning serious use.
   how it works under the hood.<br>
   [Here](https://kopia.discourse.group/t/kopia-snapshot-retention-policies-demystified/2941)
   is more in-depth, it is quite important to read and understand.
-* **Ignore** - simplest way is creating a file `.kopiaignore` in the root
+* **Ignore** some paths by creating a file `.kopiaignore` in the root
   of the backup target and in it list paths to ignore, one path per line,
   relative to the root. An example: if you backup `/home/user`,
   you create the ignore file at `/home/user/.kopiaignore`
-  and in it have `temp/` to ignore the directory temp in that users home.
+  and in it have `.cache/` and the next line `.local/share/Trash`.
 * **Maintenance** is automatic.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
