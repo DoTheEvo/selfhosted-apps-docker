@@ -357,7 +357,7 @@ the reliability of always running in the background as a service.
 
 This deployment does not make use of the main Kopia Server feature,
 to be a repository for other machines running Kopia, just local deployment.
-Steps to get that working outlined in the `kopia_server_start.cmd`.
+The steps to get that working are outlined in the `kopia_server_start.cmd`.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
   delete everything except `kopia_backup/kopia_server_deploy_service_win` folder.
