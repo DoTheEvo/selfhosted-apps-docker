@@ -87,6 +87,11 @@ if planning serious use.
   how it works under the hood.<br>
   [Here](https://kopia.discourse.group/t/kopia-snapshot-retention-policies-demystified/2941)
   is more in-depth, it is quite important to read and understand.
+* **Ignore** - simplest way is creating a file `.kopiaignore` in the root
+  of the backup target and in it list paths to ignore, one path per line,
+  relative to the root. An example: if you backup `/home/user`,
+  you create the ignore file at `/home/user/.kopiaignore`
+  and in it have `temp/` to ignore the directory temp in that users home.
 * **Maintenance** is automatic.
 * **Restore** from backups is most easily done by mounting a snapshot.<br>
   Web GUI versions have button for it, cli version can do `sudo kopia mount all /mnt/temp &`
@@ -352,7 +357,7 @@ the reliability of always running in the background as a service.
 
 This deployment does not make use of the main Kopia Server feature,
 to be a repository for other machines running Kopia, just local deployment.
-Few edits of `kopia_server_start.cmd` can make it happen though.
+Steps to get that working outlined in the `kopia_server_start.cmd`.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
   delete everything except `kopia_backup/kopia_server_deploy_service_win` folder.
