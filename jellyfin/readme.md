@@ -6,6 +6,14 @@
 
 ![interfacepic](https://i.imgur.com/KKmcc7g.jpeg)
 
+1. [Purpose & Overview](#Purpose--Overview)
+2. [Video - core concepts](#Video---core-concepts)
+3. [Jellyfin transcoding](#Jellyfin-transcoding)
+4. [Clients and Plugins](#Clients-and-Plugins)
+5. [Docker deploy](#Docker-deploy)
+6. [Specific setups](#Speciifc-setups)
+7. [Troubleshooting](#Troubleshooting)
+
 # Purpose & Overview
 
 Stream movies, shows, music to a phone, a TV, a browser, ...<br>
@@ -34,7 +42,7 @@ various languages and frameworks.
   * **H.262** - also called MPEG-2 - stuff of the past.
   * **H.264** - the most common now, also called **AVC** or MPEG-4.
   * **H.265** - also called **HEVC**, fast spreading, 50% improved over H.264,<br>
-    but it also greatly increased fees for developers and manufacturers and and came 
+    but it also greatly increased fees for developers and manufacturers and came 
     with a convoluted patent pools.
   * **AV1** - the future, no royalty fees, more improvements.
     The successor to VP9, which was developed by google.
@@ -68,12 +76,12 @@ various languages and frameworks.
     contains codec libraries to be a single tool for all video manipulation.
     Is often the one under the hood of any media related software, doing the work.
 
+---
+---
+
 </details>
 
----
----
-
-<details>
+<details open>
 <summary><h1>Jellyfin transcoding</h1></summary>
 
 ![jelly-transcoding-pic](https://i.imgur.com/9U1A02j.png)
@@ -170,7 +178,10 @@ Results
 * ryzen **4350GE**
   * 10x streams FHD - 6 max, otherwise stutter
   * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/8iairvO.png)
-
+* ryzen **5500GT**
+  * 10x streams FHD - 6 max, otherwise stutter,
+    [1 stream 185 fps](https://i.imgur.com/O5BfVZB.png)
+  * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/wsrUoPe.png)
 
 Software used for monitoring the cpu and gpu usage
 
@@ -209,7 +220,9 @@ Aimed for music. Did not tested much yet.
 * [intro-skipper](https://github.com/intro-skipper/intro-skipper?tab=readme-ov-file)
   \- skips intros for shows
 
-# Files and directory structure
+# Docker deploy
+
+### Files and directory structure
 
 ```
 /mnt/
@@ -236,7 +249,7 @@ Aimed for music. Did not tested much yet.
 You only need to provide the two files.</br>
 The directories are created by docker compose on the first run.
 
-# Compose
+### Compose
 
 * [the official documentation](https://jellyfin.org/docs/general/installation/container)
 
@@ -299,7 +312,7 @@ If one does not exist yet: `docker network create caddy_net`
 
 </details>
 
-# Reverse proxy
+### Reverse proxy
 
 Caddy is used, details
 [here](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/caddy_v2).</br>
@@ -311,6 +324,49 @@ tv.{$MY_DOMAIN} {
 }
 ```
 
+<details>
+<summary><h3>Mounting network shares</h3></summary>
+
+If the media files are stored on an SMB share and should be mounted directly
+on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
+instead of fstab or autofs.
+
+`/etc/systemd/system/mnt-bigdisk.mount`
+```ini
+[Unit]
+Description=12TB truenas mount
+
+[Mount]
+What=//10.0.19.11/Dataset-01
+Where=/mnt/bigdisk
+Type=cifs
+Options=ro,username=ja,password=qq,vers=3.0,soft,file_mode=0644,dir_mode=0755,uid=1000,gid=1000
+DirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`/etc/systemd/system/mnt-bigdisk.automount`
+```ini
+[Unit]
+Description=12TB truenas mount
+
+[Automount]
+Where=/mnt/bigdisk
+
+[Install]
+WantedBy=multi-user.target
+```
+
+to automount on boot - `sudo systemctl enable mnt-bigdisk.automount`
+
+---
+---
+
+</details>
+
+
 # The first run
 
 
@@ -321,8 +377,10 @@ Click through the basic setup.
 * 
 
 
+# Specific setups
+
 <details>
-<summary><h1>Intel specific setup</h1></summary>
+<summary><h3>Intel specific setup</h3></summary>
 
 * [the official documentation](https://jellyfin.org/docs/general/administration/hardware-acceleration/intel/#configure-with-linux-virtualization)
 
@@ -352,16 +410,16 @@ To be able to use `Enable Intel Low-Power H.264 hardware encoder`
 * `mkinitcpio -P`
 * reboot
 
+---
+---
+
 </details>
 
----
----
-
 <details>
-<summary><h1>AMD specific setup</h1></summary>
+<summary><h3>AMD specific setup</h3></summary>
 
 * [the official documentation](https://jellyfin.org/docs/general/administration/hardware-acceleration/amd#configure-with-linux-virtualization)
-* [some videos](https://youtu.be/H0pCpNT4b-Q) with [some takes](https://youtu.be/UNJLDS5gC7o)
+* [some videos](https://youtu.be/H0pCpNT4b-Q) and [some takes](https://youtu.be/UNJLDS5gC7o)
   on [AMD transcoding](https://youtu.be/pnvp9DtqVjo)
 
 Assuming an amd cpu with vega or RDNA.<br>
@@ -391,62 +449,23 @@ The `compose.yml` + `.env` should just work.
 
 [default](https://i.imgur.com/4EIv4mo.png) | [after](https://i.imgur.com/rbvsJQ9.png)
 
-</details>
-
 ---
 ---
-
-<details>
-<summary><h1>Mounting network shares</h1></summary>
-
-If the media files are stored and an smb share and should be mounted directly
-on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
-instead of fstab or autofs.
-
-`/etc/systemd/system/mnt-bigdisk.mount`
-```ini
-[Unit]
-Description=12TB truenas mount
-
-[Mount]
-What=//10.0.19.11/Dataset-01
-Where=/mnt/bigdisk
-Type=cifs
-Options=ro,username=ja,password=qq,file_mode=0700,dir_mode=0700,uid=1000
-DirectoryMode=0700
-
-[Install]
-WantedBy=multi-user.target
-```
-
-`/etc/systemd/system/mnt-bigdisk.automount`
-```ini
-[Unit]
-Description=12TB truenas mount
-
-[Automount]
-Where=/mnt/bigdisk
-
-[Install]
-WantedBy=multi-user.target
-```
-
-to automount on boot - `sudo systemctl enable mnt-bigdisk.automount`
 
 </details>
-
----
----
 
 # Troubleshooting
 
-#### Playback failed due to a fatal player error
-
 ![playback_error](https://i.imgur.com/aEjFvra.png)
+
+#### Playback failed due to a fatal player error
 
 * docker host - go to `jellyfin/jellyfin_config/log/`
 * the last file in the folder is the last playback attempt
 * paste that in to chatgpt
+
+But generally, if it's after you made some transcoding options changes,
+go back to default, see if that works and then only enable stuff one by one.
 
 #### Autodiscovery not working
 
@@ -455,7 +474,7 @@ to check if autodiscovery port is open and server is responding:
 * `echo -n 'Who is JellyfinServer?' | nc -u -b 10.0.19.4 7359`
 
 
-![error-pic](https://i.imgur.com/KQhmZTQ.png)
+<!-- ![error-pic](https://i.imgur.com/KQhmZTQ.png) -->
 
 #### Unable to connect to the selected server right now
 
