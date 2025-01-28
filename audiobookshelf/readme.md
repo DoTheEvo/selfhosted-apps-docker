@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-![logo](https://i.imgur.com/gSyMEvD.png)
+![logo](https://i.imgur.com/vviMB5v.png)
 
 # Purpose & Overview
 
@@ -15,66 +15,62 @@ Selfhosted audiobook library.
 * [Official site](https://www.audiobookshelf.org/)
 * [Github](https://github.com/advplyr/audiobookshelf)
 
-Jellyfin if a free media system, an alternative to proprietary Plex.<br>
-The core server side is written in C#, web client in Javascript,
-and a number of other clients written in various languages and frameworks.
+Opensource. Able to download the books localy. Written in javascript.
 
-Starting point for me was [this viggy96 repo](https://github.com/viggy96/container_config)
+# Client apps 
+
+* android - [audiobookshelf-app](https://github.com/advplyr/audiobookshelf-app)
+* ios - [plappa](https://apps.apple.com/us/app/plappa/id6475201956),
+  unless [the official one](https://github.com/advplyr/audiobookshelf-app) is out of beta
 
 # Files and directory structure
 
 ```
 /mnt/
 └── bigdisk/
-    ├── tv/
-    ├── movies/
-    └── music/
+    └── audiobooks/
 /home/
 └── ~/
     └── docker/
-        └── jellyfin/
-            ├── jellyfin-cache/
-            ├── jellyfin-config/
-            ├── transcodes/
+        └── audiobookshelf/
+            ├── config/
+            ├── metadata/
             ├── .env
-            └── docker-compose.yml
+            └── compose.yml
 ```
 
 * `/mnt/bigdisk/...` - a mounted media storage share
-* `jellyfin-cache/` - cache 
-* `jellyfin-config/` - configuration 
-* `transcodes/` - transcoded video storage
+* `config/` - persistent configuration
+* `metadata/` - metadata 
 * `.env` - a file containing environment variables for docker compose
-* `docker-compose.yml` - a docker compose file, telling docker how to run the containers
+* `compose.yml` - a docker compose file, telling docker how to run the containers
 
 You only need to provide the two files.</br>
 The directories are created by docker compose on the first run.
 
-# docker-compose
+# compose
 
-The media are mounted in read only mode.
+Port is only exposed, meaning it's just documentation to know that
+it's running on port 80. Reverse proxy is expected so thats why not
+really needed opening ports.
 
-`docker-compose.yml`
+
+`compose.yml`
 ```yml
 services:
 
-  jellyfin:
-    image: jellyfin/jellyfin:latest
-    container_name: jellyfin
-    hostname: jellyfin
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf
+    container_name: audiobookshelf
+    hostname: audiobookshelf
     restart: unless-stopped
     env_file: .env
-    devices:
-      - /dev/dri
     volumes:
-      - ./transcodes/:/transcodes
-      - ./jellyfin-config:/config
-      - ./jellyfin-cache:/cache
-      - /mnt/bigdisk/serialy:/media/video:ro
-      - /mnt/bigdisk/mp3/moje:/media/music:ro
-    ports:
-      - "8096:8096"
-      - "1900:1900/udp"
+      - ./config:/config
+      - ./metadata:/metadata
+      - /mnt/bigdisk/audiobooks:/mnt/audiobooks
+    expose:
+      - "80"
 
 networks:
   default:
@@ -87,6 +83,8 @@ networks:
 # GENERAL
 DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
+PUID=1000
+PGID=1000
 ```
 
 **All containers must be on the same network**.</br>
@@ -100,64 +98,22 @@ Caddy is used, details
 
 `Caddyfile`
 ```
-jellyfin.{$MY_DOMAIN} {
-    reverse_proxy jellyfin:8096
+books.{$MY_DOMAIN} {
+    reverse_proxy audiobookshelf:80
 }
 ```
 
 # First run
 
 
-![interface-pic](https://i.imgur.com/pZMi6bb.png)
+...
+
+# Library organization
 
 
-# Specifics of my setup
-
-* no long term use yet
-* amd cpu and no gpu, so no experience with hw transcoding
-* media files are stored and shared on trunas scale VM
- and mounted directly on the docker host using [systemd mounts](https://forum.manjaro.org/t/root-tip-systemd-mount-unit-samples/1191),
- instead of fstab or autofs.
-
-  `/etc/systemd/system/mnt-bigdisk.mount`
-  ```ini
-  [Unit]
-  Description=12TB truenas mount
-
-  [Mount]
-  What=//10.0.19.19/Dataset-01
-  Where=/mnt/bigdisk
-  Type=cifs
-  Options=ro,username=ja,password=qq,file_mode=0700,dir_mode=0700,uid=1000
-  DirectoryMode=0700
-
-  [Install]
-  WantedBy=multi-user.target
-  ```
-
-  `/etc/systemd/system/mnt-bigdisk.automount`
-  ```ini
-  [Unit]
-  Description=12TB truenas mount
-
-  [Automount]
-  Where=/mnt/bigdisk
-
-  [Install]
-  WantedBy=multi-user.target
-  ```
-
-  to automount on boot - `sudo systemctl enable mnt-bigdisk.automount`
 
 # Troubleshooting
 
-
-![error-pic](https://i.imgur.com/KQhmZTQ.png)
-
-*We're unable to connect to the selected server right now. Please ensure it is running and try again.*
-
-If you encounter this, try opening the url in browsers private window.<br>
-If it works then clear the cookies in your browser.
 
 
 # Update
