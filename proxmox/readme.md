@@ -15,7 +15,7 @@ I decided to go for **xcpng** over proxmox.
 - Work in progress 
 
 This proxmox guide is a rewrite of esxi guide,
-not finished so it will at some point talk about esxi,
+not finished, barely started so it will soon talk about esxi,
 likely will stay unfinished
 
 # Purpose
@@ -50,6 +50,16 @@ Download iso, ventoy usb, boot it, click through.
 * [qemu-guest-agent](https://pve.proxmox.com/wiki/Qemu-guest-agent)
   - install, on archlinux its a static service, so no enabling<br>
   to test if it works, ssh into hypervisor and `qm anget 100 ping`
+
+
+
+---
+
+----
+
+----
+
+---
 
 
 
