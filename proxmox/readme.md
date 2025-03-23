@@ -3,6 +3,15 @@
 
 ![logo](https://i.imgur.com/vFZQ8og.png)
 
+I decided to go for xcpng for now.
+[Here's the guide.](https://github.com/DoTheEvo/XCPng-basics)
+
+- Work in progress 
+- Work in progress 
+- Work in progress 
+
+its rewrite of esxi guide not finished likely staying unfinished
+
 # Purpose
 
 Type 1 hypervisor hosting virtual machines, running straight on metal,
