@@ -3,14 +3,20 @@
 
 ![logo](https://i.imgur.com/vFZQ8og.png)
 
-I decided to go for xcpng for now.
+---
+
+I decided to go for **xcpng** over proxmox.
 [Here's the guide.](https://github.com/DoTheEvo/XCPng-basics)
 
+---
+
 - Work in progress 
 - Work in progress 
 - Work in progress 
 
-its rewrite of esxi guide not finished likely staying unfinished
+This proxmox guide is a rewrite of esxi guide,
+not finished so it will at some point talk about esxi,
+likely will stay unfinished
 
 # Purpose
 
