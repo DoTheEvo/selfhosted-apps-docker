@@ -263,15 +263,15 @@ imagine a situation where one would want different number between these two.
   This setup is simple layer 2, no routing, not doing anything with interfaces.
 * Have a **bridge**, create a new one if you have clean config<br>
   Assign all the physical ports to this bridge in **Bridge > Ports**
-* Create **VLANs** in **Bridge > VLANs** that you want the switch be aware of.<br>
+* Define **VLANs** in **Bridge > VLANs** that it should handle.<br>
   Set which ports are tagged and which untagged for that vlan
-  * untagged - frames leaving the port are normal - PCs, Printers, TVs,..
-  * tagged - frames leaving the port are tagged - servers, gateways, wifi APs,...
+  * untagged - **outgoing** frames are normal - access port - PCs, Printers, TVs,..
+  * tagged - **outgoing** frames are tagged - trunks - servers, gateways, wifi APs,...
 * Set **PVIDs** for the ports in **Bridge > Ports**<br>
-  PVIDs is about **untagged frames** going in to the switch,
-  if they should be assigned VLAN tag as they move through switch.
+  PVID is about **incoming untagged** frames entering the switch,
+  what VLAN tag should they get as they move through switch.
   By default mikrotik switches give tag 1 to all ports.
-* Enable VLAN Filtering on the bridge itself<br>
+* After everything is configured **enable VLAN Filtering** on the bridge itself<br>
   **Bridge > Bridge > bridge** > VLAN section
 
 </details>
