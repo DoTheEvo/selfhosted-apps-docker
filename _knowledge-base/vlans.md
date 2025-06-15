@@ -251,9 +251,29 @@ imagine a situation where one would want different number between these two.
 
 </details>
 
-## MikroTik - Switch
+<details>
+<summary><h2>MikroTik - Switch</h2></summary>
 
-* [a vlan guide](https://forum.mikrotik.com/viewtopic.php?t=143620)
+![mikrotik_switch](https://i.imgur.com/FMpl9TA.gif)
+
+
+[a vlan guide](https://forum.mikrotik.com/viewtopic.php?t=143620)
+
+* **Bridge** section is where all the settings are happening.<br>
+  This setup is simple layer 2, no routing, not doing anything with interfaces.
+* Have a **bridge**, create a new one if you have clean config<br>
+  Assign all the physical ports to this bridge in **Bridge > Ports**
+* Create **VLANs** in **Bridge > VLANs** that you want the switch be aware of.<br>
+  Set which ports are tagged and which untagged for that vlan
+  * untagged - frames leaving the port are normal - PCs, Printers, TVs,..
+  * tagged - frames leaving the port are tagged - servers, gateways, wifi APs,...
+* Set **PVIDs** for the ports in **Bridge > Ports**<br>
+  PVIDs is about **untagged frames** going in to the switch,
+  if they should be assigned VLAN tag as they move through switch.
+  By default mikrotik switches give tag 1 to all ports.
+
+</details>
+
 
 <details>
 <summary><h2>Ubiquiti Unifi - Switch</h2></summary>
