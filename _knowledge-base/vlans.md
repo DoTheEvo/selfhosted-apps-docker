@@ -271,6 +271,8 @@ imagine a situation where one would want different number between these two.
   PVIDs is about **untagged frames** going in to the switch,
   if they should be assigned VLAN tag as they move through switch.
   By default mikrotik switches give tag 1 to all ports.
+* Enable VLAN Filtering on the bridge itself<br>
+  **Bridge > Bridge > bridge** > VLAN section
 
 </details>
 
