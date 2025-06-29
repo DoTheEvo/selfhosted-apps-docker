@@ -41,7 +41,7 @@ allow webgui access from the wan side.
 Theres chapter on that later... it can help a lot in the initial setups.
 
 <details>
-<summary><h3>Install in various hypervisors</h3></summary>
+<summary><h2>Install in various hypervisors</h2></summary>
 
 
 <details>
@@ -342,7 +342,7 @@ The simple dnsmasq setup.
   * Lease time, I like 10 days - `864000` for small number of devices networks
 
 
-With dnsmasq theres also an option pass leaseas to unbound DNS,
+With dnsmasq theres also an option to pass leaseas to unbound DNS,
 [here's the setup](https://docs.opnsense.org/manual/dnsmasq.html#configuration-examples)
 
 <details>
