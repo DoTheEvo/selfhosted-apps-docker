@@ -629,7 +629,7 @@ Following [the official documentation](https://docs.opnsense.org/manual/how-tos/
 
 Observe it in action in Firewall: Log Files: Live View   
 
-If you host anything with a website you can test if its working by using
+If you host anything with a website **you can test** if its working by using
 opera build in vpn, or by using some
 [online web site testers](https://www.webpagetest.org/) or 
 [port open checker](https://portchecker.co).
