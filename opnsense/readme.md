@@ -384,6 +384,10 @@ vlan tag will be `30`, the subnest will be `10.30.30.0/24`
 If running opnsense as a VM under xcpng then vlans are presented as regular
 interfaces. Xcpng is doing tagging and untagging, for opnsense they are just NICs.
 
+* Assing them
+* Assign them static IPv4 address
+
+
 ### ESXI
 
 ![esxi](https://i.imgur.com/uvpF8KC.png)
@@ -606,20 +610,22 @@ Following [the official documentation](https://docs.opnsense.org/manual/how-tos/
 
 * register account on [maxmind.com](https://www.maxmind.com/en/geolite2/signup),
   this will give access to info which IP ranges belong to which country
-* in the freshly created maxmind account generate new license
-* in this url replace `My_License_key` with your actual license key<br>
-  `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=My_License_key&suffix=zip`
+* in the freshly created maxmind account generate new license and note accountID
+* in this url replace `AccountID` and `LicenseKey` with your info<br>
+  `https://AccountID:LicenseKey@download.maxmind.com/geoip/databases/GeoLite2-Country-CSV/download?suffix=zip`
 * paste it in browser, if its working it should download zip file with the IP info 
 
 ### in opnsense
 
-* Firewall: Aliases: GeoIP tab - paste the url, click apply
+* Firewall: Aliases: GeoIP tab - paste the url, click apply<br>
+  should see last update and range change to some values
 * switch to Aliases tab, create new geoip alias and select your own country<br>
   [something like this](https://i.imgur.com/vu2slRd.png)
 * Firewall: Rules: WAN - create new rule<br>
   block; source invert; source geoip alias we created;
   enable log packets that are handled by this rule; add description<br>
   [something like this](https://i.imgur.com/qi7sL9J.png)
+* move the new rule at the top of your rules, before any port opens
 
 Observe it in action in Firewall: Log Files: Live View   
 
