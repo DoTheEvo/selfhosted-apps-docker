@@ -631,7 +631,8 @@ Observe it in action in Firewall: Log Files: Live View
 
 If you host anything with a website you can test if its working by using
 opera build in vpn, or by using some
-[online web site testers](https://www.webpagetest.org/).
+[online web site testers](https://www.webpagetest.org/) or 
+[port open checker](https://portchecker.co).
 Assuming you are not in the country from which these run their test.
  
 </details>
