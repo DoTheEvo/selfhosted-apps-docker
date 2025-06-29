@@ -21,6 +21,10 @@ and custom services built in Python.
 Can be installed on a physical server or in a virtual machine.
 
 <details>
+<summary><h1>Install in various hypervisors</h1></summary>
+
+
+<details>
 <summary><h1>VMware ESXi</h1></summary>
 
 This setup is running on the free version of ESXi 7.0 U3<br>
@@ -163,30 +167,43 @@ service xenguest start
 [Official xcp instructions.](https://docs.xcp-ng.org/guides/pfsense/)<br>
 Read the link above, dont skip it, might be newer info there!
 
+
 #### Network setup
 
-default xcp network will be used as WAN.
+There are two ways to do the trunk port, **the easier one** will be used here,
+the one where opnsense is not doing anything with vlans as xcpng deals 
+with them and each vlan is a separate network in xcpng and a separate
+interface in opnsense. Limitation is that you should **not go above 7**.<br>
+So again, **no touching vlans in opnsense**.
 
-Will create new virtual network not connected to any real physical interface
-and will try to spin some VM on that network to see if opnsense manages it.
+* PIF - physical NIC
+* VIF - virtual NIC
+* Network in XO - basicly a virtual switch to which stuff connects
 
-* New > Network > your-xcp-host
+The network setup is done under **the pool** section, not host or a VM.<br>
+Decide on WAN and LAN interfaces for opnsense,
+any additional vlan you want, create a new networks with that VLAN tag.
+
+* New > Network > your-pool
 * Type - leave both settings off - bonded and private
-* Interface - leave empty
-* Name it - LAN-SIDE-OPNSENSE
-* rest leave default
+* Interface - pick physical interface if using it or if doing VLANs.
+  Leave empty if creating a new virtual one to which only VMs will connect
+* Name it
+* MTU leave default 1500
+* VLAN tag if desired
 * Create network
+
+You are done when you have your LAN, WAN and VLANs ready.
 
 #### Virtual machine creation
 
 [Download](https://opnsense.org/download/) the latest opnsense - amd64, **dvd**,
 extract iso.
 
-* New > VM > your-xcp-host
+* New > VM > your-pool
 * Template - Other install media
 * name; description; vcpu; ram; topology; iso
-* Interfaces - leave the first one default<br>
-  add new - LAN-SIDE-OPNSENSE that we created
+* Interfaces - create new interafaces for LAN, WAN, and VLANs<br>
 * add virtual disk
 * button - Show advanced settings
   * Boot firmware - **uefi**
@@ -194,16 +211,29 @@ extract iso.
 
 #### Disable TX Checksum Offload
 
-Head to the "Network" tab of your VM<br>
+Head to the "Network" tab of your opnsense VM now<br>
 advanced settings (click the blue gear icon) for each adapter<br>
 disable TX checksumming.<br>
 Restart the VM.
 
+Note the warning in the official docs, no need to do this in opnsense
+or anywhere else, just on the xcpng virtual interfaces of that VM and only TX.
 
-#### xen guest additions
+#### Updates
 
-installing `os-xen` didnt work for me,
-so steps from the official instructions
+After the fresh install run the updates.
+
+#### Xen guest additions
+
+`System: Firmware : Plugins`<br>
+Install `os-xen` plugin. Restart the opnsense VM.
+
+If all goes well in xcpng you see that the agent is detected for the VM.
+
+<details>
+<summary><h5>Manual installation</h5></summary>
+
+In a case the plugin would not work.
 
 * enable ssh on the opnsense<br>
   `System: Settings: Administration` > Secure Shell
@@ -212,13 +242,26 @@ so steps from the official instructions
 * `echo 'xenguest_enable="YES"' >> /etc/rc.conf.local`
 * `ln -s /usr/local/etc/rc.d/xenguest /usr/local/etc/rc.d/xenguest.sh`
 * `service xenguest start`
+
+The package will have some notice in the webGUI,
+but that is because it was installed manually using pkg.
+
+---
+---
+
 </details>
 
 ---
 ---
 
-<details>
-<summary><h1>First login and basics</h1></summary>
+</details>
+
+---
+---
+
+</details>
+
+# First login and basics
 
 * click through wizzard, keep mostly defaults
   * hostname, DNS use 8.8.8.8 and/or 1.1.1.1
@@ -226,16 +269,143 @@ so steps from the official instructions
   * WAN - DHCP , defaults
   * LAN - set network and mask, I prefer 10.0.X.1
   * root password
-* Update
+* Update; Restart
+
+Afterwards you have a working router/firewall with WAN side and LAN side,
+Unbound for DNS and ISC or KEA for DHCP.<br>
+The default NAT and firewall enforces basic stuff.
+
+# Users
+
+Good practice is to create a new administrator user and disable the root account.
+
+* Add a new user - `System: Access: Users`
+* username ideally named sometething not common; password
+* Login shell - `/bin/sh`
+* Group membership - `admins`
+* Privileges - `All pages`
+
+If the user should also be able to SSH in and sudo
+
+* `System: Settings: Administration`
+* Secure Shell Server - Enable
+* Authentication Method -  Permit password login
+* Sudo - `Ask password`; `wheel, admins`
+
+Now disable the login for the root.
+Be aware it will also disable console login not just webGUI.
+
+* `System: Access: Users`
+* root; edit; disable; save
+
+# DHCP
+
+[Official docs](https://docs.opnsense.org/manual/dnsmasq.html)
+
+2022 Internet Systems Consortium stopped development of ISC DHCPD that was
+widely used in favor of working on Kea DHCP.<br>
+Opnsense needed to make a decision what to use next as the default,
+Kea or dnsmasq and decided to use dnsmasq.<br>
+But since it's not yet the default, here are the steps.
+
+The simple dnsmasq setup.
 
 
-* `System: Settings: Miscellaneous` - `Periodic NetFlow Backup` - `Disabled`<br>
-  avoids long wait time on restart / shutdown
+* Make sure other DHCP services are disabled<br>
+  `Lobby: Dashboard` section Services should not list any dhcp
+* configure dnsmasq<br>
+  `Services: Dnsmasq DNS & DHCP`
+* General tab
+    * Enable - check
+    * Interfaces - select your LAN and VLANs interfaces on which dhcp should run
+    * DNS Listening Port - `0` this disables the DNS functionality.
+    * DHCP authoritative - check
+    * DHCP register firewall rules - check
+* DHCP ranges tab
+  * add a new range<br>
+  * select the interface
+  * set the `Start address` and the `End address`
+  * Lease time, I like 10 days - `864000` for small number of devices networks
 
- 
+
+With dnsmasq theres also an option pass leaseas to unbound DNS,
+[here's the setup](https://docs.opnsense.org/manual/dnsmasq.html#configuration-examples)
+
+<details>
+<summary><h1>VLANs</h1></summary>
+
+* [general info on vlans](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/_knowledge-base/vlans.md)
+* [opnsense video](https://youtu.be/LMJeIUDlrHo)
+* [pfsense video but applicable](https://youtu.be/SsaGeXx2qh0)
+
+The basics
+
+Will be creating vlan for security cameras on the network.<br>
+vlan tag will be `30`, the subnest will be `10.30.30.0/24`
+
+* Create a VLAN - `Interfaces: Devices: VLAN`
+  * Device - leave empty, it will be generated, custom names require to follow a scheme
+  * Parent - physical interface it is associated with
+  * VLAN tag - the vlan tag, usually 20, 30, 40,...
+  * VLAN priority - default
+  * Description - purpose, for example cameras, or guest wifi
+  * apply
+* Assign the VLAN to a new interafece - `Interfaces: Assignments`<br>
+  It should be listed where you just put in description and add it
+* Enable and configure the new interface - `Interfaces: [vlan30cameras]`
+  * enable it
+  * IPv4 Configuration Type - Static IPv4
+  * IPv4 address, let's say `10.30.30.1/24`
+  * apply
+* Enable DHCP for this new VLAN - `Services: ISC DHCPv4: [vlan30cameras]`
+  * Enable it
+  * Range - `10.30.30.50` to `10.30.30.200`
+  * Save
+* in lobby dashboard Services - `KEA DHCPv4 server` should be running
+
+<summary><h5>If running opnsense as a virtual machine.</h5></summary>
+
+### xcpng
+
+If running opnsense as a VM under xcpng then vlans are presented as regular
+interfaces. Xcpng is doing tagging and untagging, for opnsense they are just NICs.
+
+### ESXI
+
+![esxi](https://i.imgur.com/uvpF8KC.png)
+
+For VLAN aware devices on the network to get through
+
+* Edit the port group with the opnsense VM LAN interface
+  and add VLAN ID = `4095`<br>
+  This will allow all VLANs to get through
+
+For a virtual machine on that ESXI host should be on that VLAN
+
+* Add new port group, to the virtual switch that opnsense uses for LAN<br>
+  Name = `vlan20`; VLAN ID = `20`
+
+Now you can edit a VM or create new one, set its Network Adapter to `vlan20`
+and it should get ip address from the vlan 20 dhcp pool. 
+
+This is a good test if stuff works as it should before diving in to configuration
+of VLANs on switches.
+
 
 </details>
 
+---
+---
+
+
+<details>
+<summary><h1>DNS - Unbound</h1></summary>
+
+Build in DNS server, enabled by default, listening at port 53
+
+Services: Unbound DNS: General
+
+</details>
 
 ---
 ---
@@ -446,27 +616,6 @@ Assuming you are not in the country from which these run their test.
 ---
 ---
 
-<details>
-<summary><h1>DNS - Unbound</h1></summary>
-
-Build in DNS server, enabled by default, listening at port 53
-
-Services: Unbound DNS: General
-
-</details>
-
----
----
-
-<details>
-<summary><h1>VLANs</h1></summary>
-
-[written on it here](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/_knowledge-base/vlans.md)
-
-</details>
-
----
----
 
 <details>
 <summary><h1>Monitoring</h1></summary>
@@ -660,3 +809,5 @@ links
 
 * [12 Ways to Secure Access to OPNsense and Your Home Network](https://homenetworkguy.com/how-to/ways-to-secure-access-to-opnsense-and-your-home-network/)
 * [Beginner's Guide to Set Up a Home Network Using OPNsense](https://homenetworkguy.com/how-to/beginners-guide-to-set-up-home-network-using-opnsense/)
+* [M920q Router](https://github.com/ianhaddock/m920q-router)
+* [redirect-all-dns-requests-to-local-dns-resolver](https://homenetworkguy.com/how-to/redirect-all-dns-requests-to-local-dns-resolver/)
