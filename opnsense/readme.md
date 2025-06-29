@@ -20,12 +20,32 @@ and custom services built in Python.
 
 Can be installed on a physical server or in a virtual machine.
 
+# Installation and Hardware choice
+
+If you can, avoid machines with broadcom network cards
+as their driver in FreeBSD is bad and you can have lots of problems.<br>
+If you have broadcom based machine then the best way is to install hypervisor
+on the metal and install opnsense as a virtual machine.
+But it can turn in to a lot of work and learning.
+
+General install:
+
+* [Download](https://opnsense.org/download/) the latest opnsense - amd64, dvd.
+* Extract it and make a bootable usb, I use ventoy.
+* Boot from it and go through the install.
+* Recommended way is to go with uefi and zfs for the snapshot feature.<br>
+  In virtual machines you want to go uefi too but with ufs.
+
+Depending on the deployment, during the setup and testing you might want to
+allow webgui access from the wan side.
+Theres chapter on that later... it can help a lot in the initial setups.
+
 <details>
-<summary><h1>Install in various hypervisors</h1></summary>
+<summary><h3>Install in various hypervisors</h3></summary>
 
 
 <details>
-<summary><h1>VMware ESXi</h1></summary>
+<summary><h3>VMware ESXi</h3></summary>
 
 This setup is running on the free version of ESXi 7.0 U3<br>
 
@@ -80,7 +100,7 @@ System > Firmware > Plugins
 ---
 
 <details>
-<summary><h1>Hyper-V</h1></summary>
+<summary><h3>Hyper-V</h3></summary>
 
 Tested in windows 11 pro, v10.0.22621<br>
 
@@ -156,7 +176,7 @@ So I guess its living with this.
 ---
 
 <details>
-<summary><h1>XCP-ng</h1></summary>
+<summary><h3>XCP-ng</h3></summary>
 
 [Official xcp instructions.](https://docs.xcp-ng.org/guides/pfsense/)<br>
 Read the link above, dont skip it, might be newer info there!
@@ -414,6 +434,9 @@ and maybe some IP restrictios will be enough.
 
 - `pfctl -d` disables firewall and allows immediate web gui access on the WAN IP.<br>
   A restart of opnsense will always re-enable packet filtering
+  - **be aware** it also disables NAT, so the machines on the LAN side wont
+    be getting out, just so that you dont spend time troubleshooting that
+    while pf is disabled.
 - Disable `Block private networks` in `Interfaces: [WAN]`.
 - Set up a firewall rule that allows WAN traffic in `Firewall: Rules: WAN`<br>
   Add new rule; everything is left default except the `Destination`
