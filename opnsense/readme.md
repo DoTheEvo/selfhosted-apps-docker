@@ -153,12 +153,6 @@ So I guess its living with this.
 </details>
 
 ---
-pkg install xe-guest-utilities
-echo 'xenguest_enable="YES"' >> /etc/rc.conf.local
-ln -s /usr/local/etc/rc.d/xenguest /usr/local/etc/rc.d/xenguest.sh
-service xenguest start
-
-
 ---
 
 <details>
