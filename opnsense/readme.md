@@ -22,11 +22,11 @@ Can be installed on a physical server or in a virtual machine.
 
 # Installation and Hardware choice
 
-If you can, avoid machines with broadcom network cards
+If you can, **avoid** machines with realtek/broadcom network cards
 as their driver in FreeBSD is bad and you can have lots of problems.<br>
-If you have broadcom based machine then the best way is to install hypervisor
+If you have such a machine then the best way is to install hypervisor
 on the metal and install opnsense as a virtual machine.
-But it can turn in to a lot of work and learning.
+But it can turn in to a lot of work and learning and worse NICs performance.
 
 General install:
 
@@ -270,6 +270,92 @@ but that is because it was installed manually using pkg.
 
 </details>
 
+<details>
+<summary><h3>Proxmox</h3></summary>
+
+# Networking
+
+* Datacenter > Your host (node) > Network
+* See physical interfaces, label them LAN and WAN
+* Crete a new `Linux Bridge` for interfaces planed to be used<br>
+  fill the `Bridge ports` with the name of physical nic you see
+  in the main interface like `enp2s0` and also give description LAN and WAN
+* click apply at the top
+
+Now theres a complication. You create a new VM for opnsense and connect both
+linux bridges to it and you start making changes in opnsense with the IP
+addresses.. you are risking losing the ability to connect to proxmox webgui.
+
+So now the plan is to assign secondary static IP to the LAN bridge.<br>
+Can't be done through gui, need to ssh on to proxmox and edit a file,
+adding the post-up line to your LAN side linux bridge as shown below,
+where 10.200.200.10/24 is added.
+
+`/etc/network/interfaces`
+```
+auto vmbr0
+iface vmbr0 inet static
+        address 10.0.19.75/24
+        gateway 10.0.19.2
+        bridge-ports enp2s0
+        bridge-stp off
+        bridge-fd 0
+        dns-nameservers 1.1.1.1 8.8.8.8
+        post-up ip addr add 10.200.200.10/24 dev vmbr0
+```
+
+# opnsense create VM
+
+[Youtube](https://youtu.be/VcTGKBHcqmk)
+
+* Create VM
+* General
+  * check advanced checkbox
+  * Name; Start at boot; Start-shutdown order - 1; Delay - 5
+* OS
+  * Iso image - opnsense
+  * Type - Linux
+  * Version - 6x
+* System
+  * Machine - q35
+  * Bios - UEFI
+  * EFI Storage - the default local-lvm
+  * Qemu Agent - check
+* Disks
+  * Disk size set
+  * SSD emulation check
+  * the rest is default
+* CPU
+  * set number of cores
+  * Type - Host
+  * AES - enable
+* Memory
+  * set desired size
+* Networks
+  * can only pick one interface so whatever LAN or WAN
+  * Model - VirtIO paravirtualized
+  * firewall - uncheck
+  * Multiqueue - same as the number of cpu vCores
+* Confirm
+  * do not start boot yet, just confirm
+* VM - opnsense
+  * hardware - add network device
+  * Breidge - the other ones created before
+  * firewall - disable
+  * Multiqueue - 4
+* Start - Console - Esc key
+  * Device Manager - Secure Boot - Attempt secure boot - disable - F10 - reset 
+
+
+After the initial setup and updates,
+install qemu agent plugin `os-qemu-guest-agent`<br>
+System > Firmware > Plugins
+
+---
+---
+
+</details>
+
 ---
 ---
 
@@ -288,6 +374,15 @@ but that is because it was installed manually using pkg.
 Afterwards you have a working router/firewall with WAN side and LAN side,
 Unbound for DNS and ISC or KEA for DHCP.<br>
 The default NAT and firewall enforces basic stuff.
+
+### Some extra settings
+
+* I like to go and disable IPv6
+  on all interfaces - `IPv6 Configuration Type` - none.<br>
+  It hides noise in options and if running as a VM it also does not bother
+  showing ipv6 ip in hypervisor info.
+* If runnig in a hypervisor dont forget guest agent.
+* 
 
 # Users
 
@@ -312,6 +407,9 @@ Be aware it will also disable console login not just webGUI.
 * `System: Access: Users`
 * root; edit; disable; save
 
+tip - when ssh or console in, `sudo su` will switch you to the root user
+that shows that custom menu
+
 # DHCP
 
 [Official docs](https://docs.opnsense.org/manual/dnsmasq.html)
@@ -325,6 +423,8 @@ But since it's not yet the default, here are the steps.
 The simple dnsmasq setup.
 
 
+* Disable the default ISC DHCPv4<br>
+  `Services: ISC DHCPv4: [interface name]` - uncheck enabled; save
 * Make sure other DHCP services are disabled<br>
   `Lobby: Dashboard` section Services should not list any dhcp
 * configure dnsmasq<br>
@@ -336,8 +436,7 @@ The simple dnsmasq setup.
     * DHCP authoritative - check
     * DHCP register firewall rules - check
 * DHCP ranges tab
-  * add a new range<br>
-  * select the interface
+  * set the interface
   * set the `Start address` and the `End address`
   * Lease time, I like 10 days - `864000` for small number of devices networks
 
@@ -369,13 +468,14 @@ vlan tag will be `30`, the subnest will be `10.30.30.0/24`
 * Enable and configure the new interface - `Interfaces: [vlan30cameras]`
   * enable it
   * IPv4 Configuration Type - Static IPv4
-  * IPv4 address, let's say `10.30.30.1/24`
+  * IPv4 address, let's say `10.30.30.1/24`<br>
+    really dont forget to change that 32 to 24
   * apply
-* Enable DHCP for this new VLAN - `Services: ISC DHCPv4: [vlan30cameras]`
-  * Enable it
+* Enable DHCP for this new VLAN - `Services: Dnsmasq DNS & DHCP : DHCP ranges`
+  * add new and set the interface
   * Range - `10.30.30.50` to `10.30.30.200`
   * Save
-* in lobby dashboard Services - `KEA DHCPv4 server` should be running
+* in lobby dashboard Services - `Dnsmasq DNS/DHCP` should be running
 
 <summary><h5>If running opnsense as a virtual machine.</h5></summary>
 
@@ -386,6 +486,13 @@ interfaces. Xcpng is doing tagging and untagging, for opnsense they are just NIC
 
 * Assing them
 * Assign them static IPv4 address
+
+### proxmox
+
+If nothing else runs on the proxmox just opnsense VM and proxmox itself
+does not need to be vlan aware - to have some other vm on specific vlan...
+then nothing really needs changing - lan wan interface, default vlan aware off,
+opnsense will be in charge.
 
 
 ### ESXI
@@ -640,6 +747,55 @@ Assuming you are not in the country from which these run their test.
 ---
 ---
 
+<details>
+<summary><h1>Wireguard</h1></summary>
+
+[The official docs](https://docs.opnsense.org/manual/how-tos/wireguard-client.html)
+
+Tested this once, following [random](https://www.youtube.com/watch?v=fuXvSkGy_as)
+video from 2025 and it just worked.<br>
+I am usually on wg-easy deployment in docker, but might start using this soon...
+
+* **new wireguard instance**<br>
+  `VPN: WireGuard: Instances`<br>
+  * Name - Wireguard1
+  * Generate new keys - gear icon
+  * Listen port - 51820
+  * Tunnel address - 10.51.51.0/24
+  * save
+* **add peers** that will be connecting<br>
+  `VPN: WireGuard: Peer generator`<br>
+  * Name - roadwarrior1
+  * Allowed IPs - 10.0.0.0/24<br>
+    this setting tells road warrior OS which IPs/subnet route through
+    the tunnel.
+  * DNS Servers - if want to use DNS at the other side of the tunnel
+  * copy config, as it will be lost once saved
+* **Assign wireguard interface**<br>
+  `Interfaces: Assignments`
+  * should be at the bottom of the page, just add description
+  * open it and enable it, no other changes
+* **Firewall rules**
+  * `Firewall: Rules: WAN`<br>
+    New rule - Pass | WAN | In | IPv4 | UDP | Destination - WAN address | 
+    Destination Port range - Other - 51820 to 51820 | Log | Description
+  * `Firewall: Rules: wireguard1`<br>
+    New rule - basicly all default and all pass<br>
+    Pass | wireguard1 | In | IPv4 | Any | Destination - any | 
+    Port range - any | Description
+* **Normalization** - MSS clamping to prevent large frames<br>
+  `Firewall: Settings: Normalization`
+  * Add new rule
+  * Interface - WireGuard (group)
+  * direction - Any
+  * Protocol - Any
+  * Description
+  * Max mss - 1360
+
+</details>
+
+---
+---
 
 <details>
 <summary><h1>Monitoring</h1></summary>
