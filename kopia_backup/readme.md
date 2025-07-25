@@ -172,14 +172,14 @@ So both `/home` and `/etc` are set to be backed up.
 ```bash
 #!/bin/bash
 
-# v0.2
+# v0.3
 # initialize repository
-#   sudo kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia
+#   kopia repo create filesystem --path /mnt/mirror/KOPIA/docker_host_kopia
 # for cloud like backblaze
-#   sudo kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
-#   sudo kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
+#   kopia repository create b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
+#   kopia repository connect b2 --bucket=rakanishu --key-id=001496285081a7e0000000003 --key=K0016L8FAMRp/F+6ckbXIYpP0UgTky0
 # adjust global policy
-#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
+#   kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
 
 REPOSITORY_PATH='/mnt/mirror/KOPIA/docker_host_kopia'
 BACKUP_THIS='/home /etc'
@@ -191,11 +191,11 @@ kopia repository disconnect
 
 # --------------  ERROR EXIT CODES  --------------
 # Kopia does not interrupts its run with an error exit code if a target or a repository are missing.
-# This hides errors and  makes systemd OnFailure event ineffective.
+# This hides errors and makes systemd OnFailure event ineffective.
 # Below are the checks for the paths existence,
-# resulting in an immediate error exit code any of them do not exist.
+# resulting in an immediate error exit code if any of them does not exist.
 # They are at the end because some backup might still get done even if something is missing
-# We just want exit code 1 to let systemd know there was a failure.
+# We just want exit code 1 to let systemd know that there was a failure.
 
 IFS=' ' read -ra paths <<< "$BACKUP_THIS"
 for path in "${paths[@]}"; do
@@ -205,8 +205,12 @@ for path in "${paths[@]}"; do
   fi
 done
 
+# DELETE THE $REPOSITORY_PATH CHECK IF YOU BACKUP TO CLOUD, OR KOPIA SERVER,...
+# OTHERWISE YOU GONNA GET ERRORS AFTER EACH BACKUP EXECUTION,
+# EVEN WHEN EVERYTHING IS OK.
+
 if [ ! -d "$REPOSITORY_PATH" ]; then
-  echo "ERROR: Directory '$REPOSITORY_PATH' does not exist."
+  echo "ERROR: Repository path '$REPOSITORY_PATH' does not exist."
   exit 1
 fi
 ```
