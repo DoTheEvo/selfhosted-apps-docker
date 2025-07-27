@@ -265,10 +265,10 @@ but that is because it was installed manually using pkg.
 
 </details>
 
----
----
-
 </details>
+
+---
+---
 
 <details>
 <summary><h3>Proxmox</h3></summary>
