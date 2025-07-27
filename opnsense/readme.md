@@ -461,25 +461,22 @@ it is recommended to go with dnsmasq. For larger deployments its Kea.
 
 A simple **dnsmasq setup**.
 
-* Disable the default ISC DHCPv4 if it's running<br>
-  `Services: ISC DHCPv4: [interface name]` - uncheck enabled; save
-* Make sure other DHCP services are disabled<br>
-  `Lobby: Dashboard` section Services should not list any dhcp
-* configure dnsmasq<br>
-  `Services: Dnsmasq DNS & DHCP`
-* General tab
+* Disable all other DHCP, check the dashboard for listed services.<br>
+* `Services: Dnsmasq DNS & DHCP`<br>
+  General tab
     * Enable - check
     * Interfaces - select your LAN and VLANs interfaces on which dhcp should run
     * DNS Listening Port - `0` this disables the DNS functionality.
     * DHCP authoritative - check
     * DHCP register firewall rules - check
 * DHCP ranges tab
+  * Add
   * set the interface
   * set the `Start address` and the `End address`
   * Lease time, I like 10 days - `864000` for small number of devices networks
 
 
-With dnsmasq theres also an option to pass leaseas to unbound DNS,
+With dnsmasq theres also an option to pass leases to unbound DNS,
 [here's the setup](https://docs.opnsense.org/manual/dnsmasq.html#configuration-examples)
 
 <details>
@@ -491,28 +488,32 @@ With dnsmasq theres also an option to pass leaseas to unbound DNS,
 
 The basics
 
-Will be creating vlan for security cameras on the network.<br>
-vlan tag will be `30`, the subnest will be `10.30.30.0/24`
+Will be creating vlan for security cameras.<br>
+vlan tag will be `30`, the subnet will be `10.30.30.0/24`
 
-* Create a VLAN - `Interfaces: Devices: VLAN`
+* `Interfaces: Devices: VLAN`<br>
+  Create a VLAN
   * Device - leave empty, it will be generated, custom names require to follow a scheme
   * Parent - physical interface it is associated with
   * VLAN tag - the vlan tag, usually 20, 30, 40,...
   * VLAN priority - default
   * Description - purpose, for example cameras, or guest wifi
   * apply
-* Assign the VLAN to a new interafece - `Interfaces: Assignments`<br>
-  It should be listed where you just put in description and add it
+* Assign the new VLAN interfaces - `Interfaces: Assignments`<br>
+  It should be listed at the bottom, you just put in description and add it
 * Enable and configure the new interface - `Interfaces: [vlan30cameras]`
   * enable it
   * IPv4 Configuration Type - Static IPv4
   * IPv4 address, let's say `10.30.30.1/24`<br>
-    really dont forget to change that 32 to 24
+    really don't forget to change that 32 to 24
   * apply
-* Enable DHCP for this new VLAN - `Services: Dnsmasq DNS & DHCP : DHCP ranges`
-  * add new and set the interface
-  * Range - `10.30.30.50` to `10.30.30.200`
-  * Save
+* `Services: Dnsmasq DNS & DHCP : DHCP ranges`<br>
+  Enable DHCP for the new VLANs
+  * General > Interfaces - add vlans
+  * DHCP ranges > Add
+    * select the interface
+    * Range - `10.30.30.50` to `10.30.30.200`
+    * Save
 * in lobby dashboard Services - `Dnsmasq DNS/DHCP` should be running
 
 <summary><h5>If running opnsense as a virtual machine.</h5></summary>
