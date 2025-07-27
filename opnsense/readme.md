@@ -367,7 +367,8 @@ System > Firmware > Plugins
   * hostname, DNS use 8.8.8.8 and/or 1.1.1.1
   * timezone and ntp server
   * WAN - DHCP , defaults
-  * LAN - set network and mask, I prefer 10.0.X.1
+  * LAN - set network and mask, I prefer 10.0.X.1<br>
+    maybe uncheck DHCP setup if you know you want to set dnsmasq later
   * root password
 * Update; Restart
 
@@ -377,12 +378,48 @@ The default NAT and firewall enforces basic stuff.
 
 ### Some extra settings
 
-* I like to go and disable IPv6
-  on all interfaces - `IPv6 Configuration Type` - none.<br>
-  It hides noise in options and if running as a VM it also does not bother
-  showing ipv6 ip in hypervisor info.
 * If runnig in a hypervisor dont forget guest agent.
-* 
+
+### Disable ipv6
+
+To not see unnecessary options and info.<br>
+But at the time of writing there seems to be a bug that requires
+extra work.
+
+* `Interfaces: Settings`<br>
+  Allow IPv6 - uncheck
+* `Interfaces: [WAN]`<br>
+  IPv6 Configuration Type - None
+* `Interfaces: [LAN]`<br>
+  IPv6 Configuration Type - None
+* Possibly in `Services` disable IPv6 in any and all DHCP services
+
+#### The bug
+
+When trying to disable IPv6 on LAN side you get 
+
+- *"The DHCPv6 Server is active on this interface and it can be used only
+  with a static IPv6 configuration. Please disable the DHCPv6 Server
+  service on this interface first, then change the interface configuration"*
+
+Some bug prevents GUI from actually properly showing the real state
+or registering changes of unchecking... 
+what's needed is deletion of ipv6 addresses on the loopback interface
+and then setting a static address on LAN interface.
+
+* `System: Settings: Administration`<br>
+  enable SSH, enable root login, enable password login
+* SSH in and get to shell
+  * `ifconfig | grep ::1` - check if the address is assigned
+  * `ifconfig lo0 inet6 ::1 delete` - delete 
+  * `ifconfig lo0 inet6 fe80::1 delete`
+* `Interfaces: [LAN]`<br>
+  IPv6 Configuration Type - Static IPv6
+  IPv6 address - `::1` / `128`
+  * `Services: ISC DHCPv6: [LAN]`<br>
+    Enable DHCPv6 server on LAN interface - uncheck
+
+Now we are able to set IPv6 to none on LAN.    
 
 # Users
 
@@ -417,13 +454,14 @@ that shows that custom menu
 2022 Internet Systems Consortium stopped development of ISC DHCPD that was
 widely used in favor of working on Kea DHCP.<br>
 Opnsense needed to make a decision what to use next as the default,
-Kea or dnsmasq and decided to use dnsmasq.<br>
-But since it's not yet the default, here are the steps.
+Kea or dnsmasq.
+As of mid 2025, the default is still ISC and recommendatin from opnsense
+is for small and medium networks under 1000 devices,
+it is recommended to go with dnsmasq. For larger deployments its Kea.
 
-The simple dnsmasq setup.
+A simple **dnsmasq setup**.
 
-
-* Disable the default ISC DHCPv4<br>
+* Disable the default ISC DHCPv4 if it's running<br>
   `Services: ISC DHCPv4: [interface name]` - uncheck enabled; save
 * Make sure other DHCP services are disabled<br>
   `Lobby: Dashboard` section Services should not list any dhcp
@@ -791,6 +829,18 @@ I am usually on wg-easy deployment in docker, but might start using this soon...
   * Protocol - Any
   * Description
   * Max mss - 1360
+
+</details>
+
+---
+---
+
+<details>
+<summary><h1>Snaposhots on ZFS</h1></summary>
+
+[The official docs](https://docs.opnsense.org/manual/snapshots.html) are great.
+
+Boot process interupt key is space.
 
 </details>
 
