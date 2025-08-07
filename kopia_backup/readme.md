@@ -331,12 +331,12 @@ WantedBy=multi-user.target
 
 ![windows_snapshot_history_gui](https://i.imgur.com/MI16Zp1.png)
 
-## KopiaUI in Windows
+## KopiaUI - Windows
 
 KopiaUI does not really need a guide. It's simple and just works for normal use.<br>
 But since we are here...
 
-* [Download latest release](https://github.com/kopia/kopia/releases)
+* [Download the latest release](https://github.com/kopia/kopia/releases)
 * Extract it somewhere, lets say `C:\Kopia`
 * Run it, click through repo creation
 * set global policy
@@ -352,15 +352,15 @@ It will now start on users login, and executes at set schedule.
 While KopiaUI seems like the way to go because of the simple deployment and
 use, it has a drawback. The scheduled backups works only when user is logged in.
 Which for many deployments feel like it introduces unnecessary uncertainty,
-or is not even viable when servers often run with no user logged in. 
+or is not even viable when machines often run with no user logged in. 
 
-## Kopia Server in Windows
+## Kopia Server - Windows
 
 My go-to for windows use because it offers gui for easier managment and 
 the reliability of always running in the background as a service.
 
-This deployment does not make use of the main Kopia Server feature,
-to be a repository for other machines running Kopia, just local deployment.
+This deployment does not make use of the main Kopia Server feature - to be
+a repository for other machines running Kopia, just local deployment.
 The steps to get that working are outlined in the `kopia_server_start.cmd`.
 
 * [Download this repo](https://github.com/DoTheEvo/selfhosted-apps-docker/archive/refs/heads/master.zip), 
@@ -728,3 +728,14 @@ The backup script contains example commands, just commented out.
 
 ---
 ---
+
+# Useful
+
+* `kopia content stats`
+* `kopia repo status`
+* `kopia cache info`
+* `kopia snap list --all`
+* `kopia mount all /mnt/temp &`
+* `kopia mount all K:`
+* `sudo kopia snapshot list --all --json | yq -P`<br>
+  yq - being `go-yq` package, that makes nice pretty yaml instead of messy json
