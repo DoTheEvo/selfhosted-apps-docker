@@ -746,12 +746,12 @@ photo.{$MY_DOMAIN} {
 <details>
 <summary><h3>Manual DNS challange</h3></summary>
 
-If it's problematic to switch nameservers to cloudflare...<br>
-Manually ever 80 days adding TXT record and deleting it,
-according to caddy log instructions.
+If it's problematic to switch nameservers to cloudflare,
+one can do the updates manually every \~80 days,
+adding TXT record and deleting it, as caddy will instruct you in the logs.
 
-Still needs to build image ourselves, using some github project.. 
-since of caddy comes only as packages.
+We still need to build the image ourselves, using some github project.. 
+since all of caddy DNS stuff comes only as packages.
 
 `Dockerfile`
 ```php
