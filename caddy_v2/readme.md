@@ -710,8 +710,9 @@ b.{$MY_DOMAIN} {
 ### - Wildcard certificate
 
 One certificate to rule all subdomains.<br>
-Well, not really, the apex/naked domain would use separate one.
-But it is nice to have just a single cert for all the subdomains.
+Well, not really, the apex/naked domain would use a separate one.
+But it's nice to have just a single cert for all the subdomains,
+and not doing 30 renewals...<br>
 Plus you are not [announcing to the world](https://dnsdumpster.com/)
 each and every subdomain you have in use.
 
