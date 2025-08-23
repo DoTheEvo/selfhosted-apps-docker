@@ -748,9 +748,10 @@ photo.{$MY_DOMAIN} {
 
 If it's problematic to switch nameservers to cloudflare...<br>
 Manually ever 80 days adding TXT record and deleting it,
-according to docker log instructions.
+according to caddy log instructions.
 
-Still need to build ourselves as all DNS stuff is packages.
+Still needs to build image ourselves, using some github project.. 
+since of caddy comes only as packages.
 
 `Dockerfile`
 ```php
@@ -762,25 +763,6 @@ RUN xcaddy build \
 FROM caddy:2.10.0
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-```
-
-`Caddyfile`
-```php
-{
-  acme_dns manual_dns
-  auto_https prefer_wildcard
-}
-
-*.{$MY_DOMAIN} {
-}
-
-cook.{$MY_DOMAIN} {
-  reverse_proxy mealie:80
-}
-
-pic.{$MY_DOMAIN} {
-  reverse_proxy immich:2283
-}
 ```
 
 ---
