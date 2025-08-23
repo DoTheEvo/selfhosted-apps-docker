@@ -61,8 +61,7 @@ and will route traffic to other containers, or machines on the network.
 
 `docker network create caddy_net`
 
-All the future containers and Caddy must be on this new network.
-  
+All the future containers and Caddy must be on this new network.<br>
 Can be named whatever you want, but it must be a new custom named network.
 Otherwise [dns resolution would not work](https://docs.docker.com/network/drivers/bridge/)
 and containers would not be able to target each other just by the hostname.
@@ -590,15 +589,13 @@ In the monitoring section theres more use of logging and visualizing it in grafa
 
 # Caddy DNS challenge
 
-This setup only works for Cloudflare.
-
 DNS challenge authenticates ownership of the domain by requesting that the owner
 puts a specific TXT record in to the domains DNS zone.<br>
 Benefit of using DNS challenge is that there is no need for your server
-to be reachable by the letsencrypt servers. Cant open ports or want to exclude
-entire world except your own country from being able to reach your server?
-DNS challange is what you want to use for https then.<br>
-It also allows for issuance of wildcard certificates.<br>
+to be reachable by the letsencrypt. Cant open ports or want to **geoblock**
+the entire world except your own country from being able to reach your server?
+DNS challange is what you need to use for https then.<br>
+It also allows for issuance of **wildcard certificates**.<br>
 The drawback is a potential security issue, since you are creating a token
 that allows full control over your domain's DNS. You store this token somewhere,
 you are giving it to some application from dockerhub...
@@ -640,19 +637,20 @@ Inside create a file named `Dockerfile`.
 
 `Dockerfile`
 ```Dockerfile
-FROM caddy:2.8.4-builder AS builder
+FROM caddy:2.10.0-builder AS builder
 
 RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare
 
-FROM caddy:2.8.4
+FROM caddy:2.10.0
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ```
 
-of note - if making changes in the Dockerfile after running, 
+*of note* - if making changes in the Dockerfile after running, 
 use command `docker compose down --rmi local`
-to remove localy built containers and force rebuild on the next compose up.
+to remove localy built containers and force rebuild on the next compose up.<br>
+That's how you update.
 
 ### - Edit docker-compose.yml
 
@@ -711,45 +709,91 @@ b.{$MY_DOMAIN} {
 
 ### - Wildcard certificate
 
-A one certificate to rule all subdomains. But not apex/naked domain, thats separate.<br>
-As shown in [the documentation](https://caddyserver.com/docs/caddyfile/patterns#wildcard-certificates),
-the subdomains must be moved under the wildcard site block and make use
-of host matching and handles.
+One certificate to rule all subdomains.<br>
+Well, not really, the apex/naked domain would use separate one.
+But it is nice to have just a single cert for all the subdomains.
+Plus you are not [announcing to the world](https://dnsdumpster.com/)
+each and every subdomain you have in use.
 
+`auto_https prefer_wildcard` - is the global directive that makes it happen,
+it will make caddy ignore automation policies for non-wildcard domains when
+theres already a wild card certificate that applies to them.
+
+This prefer_wildcard is [releatively new](https://github.com/caddyserver/caddy/pull/6146),
+previously the config was bit [messier](https://caddyserver.com/docs/caddyfile/patterns#wildcard-certificates),
+more nested.
 
 `Caddyfile`
-```
+```php
 {
   acme_dns cloudflare {$CLOUDFLARE_API_TOKEN}
-}
-
-{$MY_DOMAIN} {
-    reverse_proxy homer:8080
+  auto_https prefer_wildcard
 }
 
 *.{$MY_DOMAIN} {
-    @a host a.{$MY_DOMAIN}
-    handle @a {
-        reverse_proxy whoami:80
-    }
+}
 
-    @b host b.{$MY_DOMAIN}
-    handle @b {
-        reverse_proxy nginx:80
-    }
+cook.{$MY_DOMAIN} {
+  reverse_proxy mealie:80
+}
 
-    handle {
-        abort
-    }
+photo.{$MY_DOMAIN} {
+  reverse_proxy immich:2283
 }
 ```
 
-[Here's](https://github.com/caddyserver/caddy/issues/3200) some discussion
-on this and a simple, elegant way we could have had, without the need to
-dick with the Caddyfile this much. Just one global line declaration.
-But the effort went sideways.<br>
-So I myself do not even bother with wildcard when the config ends up looking
-complex and ugly.
+
+<details>
+<summary><h3>Manual DNS challange</h3></summary>
+
+If it's problematic to switch nameservers to cloudflare...<br>
+Manually ever 80 days adding TXT record and deleting it,
+according to docker log instructions.
+
+Still need to build ourselves as all DNS stuff is packages.
+
+`Dockerfile`
+```php
+FROM caddy:2.10.0-builder AS builder
+
+RUN xcaddy build \
+    --with github.com/nakamorg/caddy-dns-manual
+
+FROM caddy:2.10.0
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+```
+
+`Caddyfile`
+```php
+{
+  acme_dns manual_dns
+  auto_https prefer_wildcard
+}
+
+*.{$MY_DOMAIN} {
+}
+
+cook.{$MY_DOMAIN} {
+  reverse_proxy mealie:80
+}
+
+pic.{$MY_DOMAIN} {
+  reverse_proxy immich:2283
+}
+```
+
+---
+---
+
+</details>
+
+
+# mTLS
+
+Maybe one day I will bother to test?
+
+[Meanwhile](https://www.reddit.com/r/selfhosted/comments/1foxrlb/guide_setting_up_mtls_with_caddy_for_multiple/)
 
 # Monitoring
 
@@ -764,7 +808,9 @@ Complete guide how to get it up for Caddie is part of of:
 * [Prometheus + Grafana + Loki guide-by-example](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/prometheus_grafana_loki#caddy-reverse-proxy-monitoring)
 
 
-# Other guides
+# Other guides and useful stuff
 
 * [gurucomputing caddy guide](https://blog.gurucomputing.com.au/reverse-proxies-with-caddy/)
-* 
+* [Caddy WAF](https://github.com/fabriziosalmi/caddy-waf)
+* [caddy generator](https://www.reddit.com/r/selfhosted/comments/1hvtst0/i_made_a_caddyfile_generator/)
+* [caddy defender](https://www.reddit.com/r/selfhosted/comments/1i8f9a2/introducing_caddydefender_a_redditinspired_caddy/)
