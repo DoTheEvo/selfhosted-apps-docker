@@ -18,7 +18,8 @@ What makes Gatus different, from the popular Uptime Kuma, is the way one
 declares what to monitor. Instead of clicking through a web site,
 filling text inputs, checking checkboxes, marking radio buttons,...  
 **gatus uses a single config file** which makes it easy to backup,
-or fast deploy somewhere, or even automate.<br>
+or fast deploy somewhere, or even automate.
+
 Written in golang, this deployment uses sqlite for database,
 but can work with postgress or just live in memory.
  
@@ -94,14 +95,18 @@ gatus.{$MY_DOMAIN} {
 
 # Configuration
 
-Here only single config file is used, but one can use several.<br>
+More complex setups can use several config files,
+here is just an exaple how to monitor few web servers and use 
+[ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
+for alerts.
+
 Theres an extenstive [documentation](https://gatus.io/docs)
-and [github readmes](https://github.com/TwiN/gatus).<br>
+and [github readmes](https://github.com/TwiN/gatus) for more detailed info,
+plus gatus got pretty popular so there are
+[youtube videos.](https://www.youtube.com/results?search_query=gatus+monitoring)
 
-Example `config.yaml` where [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-is used for push notifications.
-
-* *note* - changes to the config do not require container up/down
+* *extra info:*<br>
+  Changes to the config are applied on save, no container up/down is required.
 
 ```yml
 ui:
@@ -142,7 +147,6 @@ endpoints:
        - type: ntfy
 ```
 
-
 # Manual image update:
 
 - `docker-compose pull`</br>
@@ -152,9 +156,5 @@ endpoints:
 # Backup and restore
 
 #### Backup
-
-should be just backup of `uptimekuma_data` directory
-
-not tested yet
   
 #### Restore
