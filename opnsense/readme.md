@@ -22,8 +22,8 @@ Can be installed on a physical server or in a virtual machine.
 
 # Installation and Hardware choice
 
-If you can, **avoid** machines with realtek/broadcom network cards
-as their driver in FreeBSD is bad and you can have lots of problems.<br>
+If you can, **avoid** machines with realtek network cards
+as their driver in FreeBSD is not that great and you can have problems.<br>
 If you have such a machine then the best way is to install hypervisor
 on the metal and install opnsense as a virtual machine.
 But it can turn in to a lot of work and learning and worse NICs performance.
@@ -278,31 +278,12 @@ but that is because it was installed manually using pkg.
 * Datacenter > Your host (node) > Network
 * See physical interfaces, label them LAN and WAN
 * Crete a new `Linux Bridge` for interfaces planed to be used<br>
-  fill the `Bridge ports` with the name of physical nic you see
-  in the main interface like `enp2s0` and also give description LAN and WAN
+  * fill the `Bridge ports` with the name of physical nic you see
+  in the main interface like `enp2s0`
+  * set the IPv4 for it, something that will be on opnsense LAN side,
+  lets say `10.0.0.200/24`
+  * give description LAN and WAN
 * click apply at the top
-
-Now theres a complication. You create a new VM for opnsense and connect both
-linux bridges to it and you start making changes in opnsense with the IP
-addresses.. you are risking losing the ability to connect to proxmox webgui.
-
-So now the plan is to assign secondary static IP to the LAN bridge.<br>
-Can't be done through gui, need to ssh on to proxmox and edit a file,
-adding the post-up line to your LAN side linux bridge as shown below,
-where 10.200.200.10/24 is added.
-
-`/etc/network/interfaces`
-```
-auto vmbr0
-iface vmbr0 inet static
-        address 10.0.19.75/24
-        gateway 10.0.19.2
-        bridge-ports enp2s0
-        bridge-stp off
-        bridge-fd 0
-        dns-nameservers 1.1.1.1 8.8.8.8
-        post-up ip addr add 10.200.200.10/24 dev vmbr0
-```
 
 # opnsense create VM
 
@@ -373,7 +354,7 @@ System > Firmware > Plugins
 * Update; Restart
 
 Afterwards you have a working router/firewall with WAN side and LAN side,
-Unbound for DNS and ISC or KEA for DHCP.<br>
+dnsmasq for DHCO and Unbound for DNS.<br>
 The default NAT and firewall enforces basic stuff.
 
 ### Some extra settings
@@ -382,21 +363,19 @@ The default NAT and firewall enforces basic stuff.
 
 ### Disable ipv6
 
-To not see unnecessary options and info.<br>
-But at the time of writing there seems to be a bug that requires
-extra work.
+If not using it then disabling it hides some unnecessary options and info.<br>
 
 * `Interfaces: Settings`<br>
   Allow IPv6 - uncheck
+* `System: Settings: General`<br>
+  Prefer IPv4 over IPv6 - check
 * `Interfaces: [WAN]`<br>
   IPv6 Configuration Type - None
 * `Interfaces: [LAN]`<br>
-  IPv6 Configuration Type - None
-* Possibly in `Services` disable IPv6 in any and all DHCP services
+  IPv6 Configuration Type - None (possible bug if you get an error, read below)
 
-#### The bug
-
-When trying to disable IPv6 on LAN side you get 
+<details>
+<summary><h5>The bug when trying to disable IPv6 on LAN side</h5></summary>
 
 - *"The DHCPv6 Server is active on this interface and it can be used only
   with a static IPv6 configuration. Please disable the DHCPv6 Server
@@ -404,11 +383,13 @@ When trying to disable IPv6 on LAN side you get
 
 Some bug prevents GUI from actually properly showing the real state
 or registering changes of unchecking... 
-what's needed is deletion of ipv6 addresses on the loopback interface
+
+**Option #1** - SSH or console in. Select option "1" Assing Interfaces.
+During that it asks about ipv6 and you just disable it, select none.
+
+**Option #2** - what's needed is deletion of ipv6 addresses on the loopback interface
 and then setting a static address on LAN interface.
 
-* `System: Settings: Administration`<br>
-  enable SSH, enable root login, enable password login
 * SSH in and get to shell
   * `ifconfig | grep ::1` - check if the address is assigned
   * `ifconfig lo0 inet6 ::1 delete` - delete 
@@ -420,6 +401,13 @@ and then setting a static address on LAN interface.
     Enable DHCPv6 server on LAN interface - uncheck
 
 Now we are able to set IPv6 to none on LAN.    
+
+
+---
+---
+
+</details>
+
 
 # Users
 
@@ -444,20 +432,18 @@ Be aware it will also disable console login not just webGUI.
 * `System: Access: Users`
 * root; edit; disable; save
 
-tip - when ssh or console in, `sudo su` will switch you to the root user
-that shows that custom menu
+tip - when ssh or console in, `sudo /usr/local/sbin/opnsense-shell`
+will open the opnsense menu under non-root user.
 
-# DHCP
+<details>
+<summary><h1>DHCP - dnsmasq</h1></summary>
 
 [Official docs](https://docs.opnsense.org/manual/dnsmasq.html)
 
 2022 Internet Systems Consortium stopped development of ISC DHCPD that was
 widely used in favor of working on Kea DHCP.<br>
 Opnsense needed to make a decision what to use next as the default,
-Kea or dnsmasq.
-As of mid 2025, the default is still ISC and recommendatin from opnsense
-is for small and medium networks under 1000 devices,
-it is recommended to go with dnsmasq. For larger deployments its Kea.
+Kea or dnsmasq. As of mid 2025, the default just became dnsmasq.
 
 A simple **dnsmasq setup**.
 
@@ -478,6 +464,67 @@ A simple **dnsmasq setup**.
 
 With dnsmasq theres also an option to pass leases to unbound DNS,
 [here's the setup](https://docs.opnsense.org/manual/dnsmasq.html#configuration-examples)
+
+---
+---
+
+</details>
+
+<details>
+<summary><h1>DNS - Unbound</h1></summary>
+
+`Services: Unbound DNS: General`
+
+Unbound is a build in DNS server, enabled by default, listening on port 53
+
+### DNS over TLS
+
+[Official docs.](https://docs.opnsense.org/manual/unbound.html#dns-over-tls)
+
+To improve privacy and safety.
+
+* `Services: Unbound DNS: DNS over TLS`
+* add new
+  * Server IP - `1.1.1.1`
+  * Server Port - `853`
+  * Verify CN - `cloudflare-dns.com`
+* add new
+  * Server IP - `9.9.9.9`
+  * Server Port - `853`
+  * Verify CN - `dns.quad9.net`
+* `System: Settings: General`<br>
+  * DNS servers list should be empty
+  * `uncheck` - DNS server options -  Allow DNS server list to be overridden by DHCP/PPP on WAN 
+
+### Overrides - Split DNS
+
+If selfhosting and need split DNS to point to some local IP,
+instead of the public IP.
+
+* `Services: Unbound DNS: Overrides`
+* add new
+  * Host - subdomain - like bookstack
+  * Domain - the actual domain, like example.com
+  * IP addres - local IP address, usually where reverse proxy lives
+  * Description
+
+### DNS interception - hijacking 
+
+If one would want to prevent machines on the network from being able to
+bypass local DNS server by manually setting their DNS to something like 8.8.8.8
+
+The idea is simple, DNS queries have destination port 53, and they
+have to go thorugh firewall.. so rules can be made that traffic with dst port
+53 gets redirected to actually go to unbound.
+
+* `Firewall: NAT: Port Forward`
+*
+
+
+</details>
+
+---
+---
 
 <details>
 <summary><h1>VLANs</h1></summary>
@@ -561,40 +608,35 @@ of VLANs on switches.
 ---
 ---
 
-
-<details>
-<summary><h1>DNS - Unbound</h1></summary>
-
-Build in DNS server, enabled by default, listening at port 53
-
-Services: Unbound DNS: General
-
-</details>
-
----
----
-
 <details>
 <summary><h1>Web GUI access from WAN side</h1></summary>
 
-For example in cases where the only thing under protection of opnsense
-are some VMs on a hypervisor, but managment is easier done from the host.<br>
-Or if the risk is acceptabale,hoping random port, long password for a non-root user,
-and maybe some IP restrictios will be enough.
+Sometimes useful.<br>
+For example during some initial setup if connected just to WAN.
+Or in a a case where only some VMs are under the protection of opnsense,
+but managment is easier done from the host.<br>
+Or if the risk is acceptabale actually opening opnsense for managment from the
+wan side, to have control even when not present and vpn is down.
+Hoping a random port, a long password for a non-root user,
+and maybe even some IP restrictions are enough.
 
 - `pfctl -d` disables firewall and allows immediate web gui access on the WAN IP.<br>
-  A restart of opnsense will always re-enable packet filtering
+  A restart of opnsense will always re-enable packet filtering, or even just
+  some changes in settings.
   - **be aware** it also disables NAT, so the machines on the LAN side wont
     be getting out, just so that you dont spend time troubleshooting that
     while pf is disabled.
-- Disable `Block private networks` in `Interfaces: [WAN]`.
-- Set up a firewall rule that allows WAN traffic in `Firewall: Rules: WAN`<br>
+- `Interfaces: [WAN]`<br>
+  Disable `Block private networks`
+- `Firewall: Rules: WAN`<br>
+  Set up a firewall rule that allows WAN traffic on to the firewall managment port<br>
   Add new rule; everything is left default except the `Destination`
   is set to `This Firewall`.<br>
   Can also enable `Log packets that are handled by this rule` if use of this rule
   should be visible in `Firewall: Log Files: Live View`.
-- Turn on `Disable reply-to` in `Firewall: Settings: Advanced`,<br>
-  otherwise connections made from the same network will not get through.<br>
+- `Firewall: Settings: Advanced`<br>
+  Turn on `Disable reply-to`<br>
+  Otherwise connections made from the same network will not get through.<br>
   Some [read on this.](https://forum.opnsense.org/index.php?topic=15900.0)
 - Reboot.<br>
   Afterwards opnsense should be accessible on WAN IP, without the need for `pfctl -d`.
@@ -735,6 +777,58 @@ who is already on the LAN side I guess.
 
 now from local LAN side one can access web gui with https://fw.example.com
 and its an encrypted communication between the browser and the firewall
+
+</details>
+
+---
+---
+
+<details>
+<summary><h1>Config automatic remote backups</h1></summary>
+
+I run nextcloud, so using its webDAV storage
+
+* Nextcloud
+  * Create a new user
+  * Log in, left bottom corner - `Settings` - in it there's `WebDAV` path, copy it
+* OPNsense
+  * ssh in, I am using a non-root user, lets say named `bastard`
+  * create a folder `bin`, in it create a file `opnsense-backup.sh`
+    heres a backup script, change the WEBDAV_URL, WEBDAV_USER, WEBDAV_PASS
+    <details>
+    <summary><h5>opnsense-backup.sh</h5></summary>
+    ```
+    #!/bin/sh
+    # backup to nextcloud WebDAV
+
+    # Config file
+    CONFIG="/conf/config.xml"
+
+    # Timestamped temporary copy
+    BACKUP="/tmp/opnsense-$(date +%F_%H-%M-%S).xml"
+    cp "$CONFIG" "$BACKUP"
+
+    # WebDAV destination
+    WEBDAV_URL="https://next.example.com/remote.php/dav/files/opnsense/"
+    WEBDAV_USER="opnsense"
+    WEBDAV_PASS="t5gfz1bdnFC232qJjhM8UB"
+
+    # Upload using curl
+    curl -u "$WEBDAV_USER:$WEBDAV_PASS" -T "$BACKUP" "$WEBDAV_URL$(basename $BACKUP)"
+
+    # Remove temp file
+    rm "$BACKUP"
+    ```
+  * make the file executable - `chmod +x opnsense-backup.sh`<br>
+    run it to test if it's working
+  * schedule automatic execution - `crontab -e`<br>
+    `0 1 * * * /home/bastard/bin/opnsense-backup.sh`
+
+
+* *extra info* - **vi text editor** in opnsense,
+`dd` deletes line, shift+insert should paste, sometimes cutting top, but second
+paste behind already pasted stuff should be full and then `dd` the previous lines.
+To quit its `:q!` without save, or `:qw` with save.
 
 </details>
 
