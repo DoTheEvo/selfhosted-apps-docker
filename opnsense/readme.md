@@ -465,10 +465,10 @@ A simple **dnsmasq setup**.
 With dnsmasq theres also an option to pass leases to unbound DNS,
 [here's the setup](https://docs.opnsense.org/manual/dnsmasq.html#configuration-examples)
 
----
----
-
 </details>
+
+---
+---
 
 <details>
 <summary><h1>DNS - Unbound</h1></summary>
