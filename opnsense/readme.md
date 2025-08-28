@@ -784,7 +784,7 @@ and its an encrypted communication between the browser and the firewall
 ---
 
 <details>
-<summary><h1>Config automatic remote backups</h1></summary>
+<summary><h1>Automatic remote backups</h1></summary>
 
 I run nextcloud, so using its webDAV storage
 
