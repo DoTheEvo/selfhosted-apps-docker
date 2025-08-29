@@ -784,22 +784,49 @@ and its an encrypted communication between the browser and the firewall
 ---
 
 <details>
-<summary><h1>Automatic remote backups</h1></summary>
+<summary><h1>Configuration backups</h1></summary>
 
-I run nextcloud, so using its webDAV storage
+### config.xml
+
+`/conf/config.xml` - the entire configuration of opnsense.<br>
+It **contains everything**, including plugins config,
+though you need to install plugins manually.
+
+
+`System: Configuration: History`<br>
+OPNsense keeps **history** of config.xml and its easy to revert to a version before
+some recent changes.  
+
+`System: Configuration: Backups`<br>
+Can **download** the config here.<br>
+*Backup Count* - Number of historical versions to keep, at least 30.
+
+
+### Automatic cloud config backups
+
+It's really nice to have that peace of mind to have regular automatic CLOUD backups
+of the `config.xml`. Then even if the machine/disk dies you just have it.
+You can tell yourself that you will just download it and keep it when all the stuff
+is set how you like it... but when the event happens you will be looking at that 3 months
+or 19 months old file and wonder what changes you made since that last backup...
+
+For CE edition one needs to do some scripting.<br>
+I have a nextcloud running
+and that means I can make use of `curl` being able to push files to a webDAV share.
+
 
 * Nextcloud
   * Create a new user
   * Log in, left bottom corner - `Settings` - in it there's `WebDAV` path, copy it
 * OPNsense
   * ssh in, I am using a non-root user, lets say named `bastard`
-  * create a folder `bin`, in it create a file `opnsense-backup.sh`
-    heres a backup script, change the WEBDAV_URL, WEBDAV_USER, WEBDAV_PASS
-    <details>
-    <summary><h5>opnsense-backup.sh</h5></summary>
+  * create a folder `bin` in bastards home,
+    in it create a file `opnsense-backup.sh`
+    change the WEBDAV_URL, WEBDAV_USER, WEBDAV_PASS<br>
+    `opnsense-backup.sh`
     ```
     #!/bin/sh
-    # backup to nextcloud WebDAV
+    # backup config.xml to nextcloud WebDAV
 
     # Config file
     CONFIG="/conf/config.xml"
