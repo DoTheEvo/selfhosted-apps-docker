@@ -663,9 +663,44 @@ For some harderining of security.
 ---
 
 <details>
-<summary><h1>Port fowarding and NAT reflection(hairpin/loopback)</h1></summary>
+<summary><h1>Port fowarding</h1></summary>
 
-[source](https://forum.opnsense.org/index.php?topic=8783.0)
+[The source.](https://forum.opnsense.org/index.php?topic=8783.0)
+
+A host with IP 192.168.1.200, has a service answering on port 8096.<br>
+Want to create a port forwarding rule,
+to make it accessible from the outside.
+
+- `Firewall: Aliases`<br>
+   Create a new alias for the host.
+  - *Name*: Jellyfin
+  - *Type*: Host(s)
+  - *Content*: 192.168.1.200
+  - *Description*: Media Server
+
+- `Firewall: NAT: Port Forward`<br>
+  Create a new port forwarding rule, leaving default stuff not explicitly named.
+  - *Interface*: `WAN`
+  - *TCP/IP Version*: `IPv4`
+  - *Protocol*: `TCP`
+  - *Destination*: `WAN address`
+  - *Destination Port range*: `(other) 8096 to (other) 8096`
+  - *Redirect target IP*: Alias `Jellyfin`
+  - *Redirect target Port*: `(other) 8096`
+  - *Filter rule association*: Add associated filter rule<br>
+    This setting makes sure that also WAN firewall rule is created
+    that allows in the traffic.
+
+
+
+
+</details>
+
+---
+---
+
+<details>
+<summary><h1>NAT reflection - hairpin/loopback</h1></summary>
 
 ### NAT reflection
 
@@ -674,53 +709,30 @@ you are asking a DNS server for an IP address.
 When selfhosting that `a.example.com` it will give you your own public IP,
 and most consumer routers don't allow this loopback, where your requests
 should go out and then right back.<br>
-So a solution for above-consumer-level routers/firewalls is to just have 
-checkboxes about NAT reflection, also called hairpin NAT or a NAT loopback.
+Better tier firewalls have a simple solution,
+a checkbox somewhere about NAT reflection, also called hairpin NAT
+or a NAT loopback.
+
+For opnsense it's:
 
 `Firewall: Settings: Advanced`
 - Reflection for port forwards: `Enabled`
 - Reflection for 1:1: `Disabled`
 - Automatic outbound NAT for Reflection: `Enabled`
 
-*extra info:*<br>
-Many consider NAT reflection to be a hack that should not be used.<br>
-That the correct way is split DNS, where you maintain separate DNS records for
-LAN side so that `a.example.com` points directly to some local ip.
+But many consider NAT reflection to be a hack that should not be used.<br>
+That the correct way is to split DNS, where you maintain separate DNS records
+for LAN side so that `a.example.com` points directly to some local ip.
 Reason being that this way machines on LAN side that use FQDN(a.example.com)
 to access other machine on LAN are not hitting the firewall with traffic
-that goes between them.
-But IMO in small scale selfhosted setup its perfectly fine
-and it requires far less management.
-
-### Port Forwarding:
-
-a host with IP 192.168.1.200, with port 3100 open TCP<br>
-want to port forward from the outside 3200 to 3100
-
-- set up Aliases in `Firewall: Aliases`<br>
-  - name: A short friendly name for the IP address you're aliasing. I'll call it "media-server"
-  - type: Host(s)
-  - Aliases: Input 192.168.1.200
-
-- register the portforwarding in `Firewall: NAT: Port Forward`<br>
-  - Interface: `WAN`
-  - TCP/IP Version: `IPv4`
-  - Protocol: `TCP`
-  - Under `Source > Advanced`:<br>
-    - Source / Invert: `Unchecked`
-    - Source: `Any`
-    - Source Port Range: `any to any`
-  - Destination / Invert: `Unchecked`
-  - Destination: `WAN address`
-  - Destination Port range: `(other) 3200 to (other) 3200`
-  - Redirect target IP: `Alias "media-server"`
-  - Redirect target Port: `(other) 3100`
+that goes between them, it just goes straight through switches.<br>
+In a small scale selfhosted setup its perfectly fine and it requires
+less management.
 
 </details>
 
 ---
 ---
-
 
 <details>
 <summary><h1>Switch to https</h1></summary>
@@ -863,6 +875,18 @@ To quit its `:q!` without save, or `:qw` with save.
 ---
 
 <details>
+<summary><h1>Snaposhots on ZFS</h1></summary>
+
+[The official docs](https://docs.opnsense.org/manual/snapshots.html) are great.
+
+Boot process interupt key is space.
+
+</details>
+
+---
+---
+
+<details>
 <summary><h1>Geoblock</h1></summary>
 
 Lock out the entire world from your network, except for your own country.
@@ -951,18 +975,6 @@ I am usually on wg-easy deployment in docker, but might start using this soon...
   * Protocol - Any
   * Description
   * Max mss - 1360
-
-</details>
-
----
----
-
-<details>
-<summary><h1>Snaposhots on ZFS</h1></summary>
-
-[The official docs](https://docs.opnsense.org/manual/snapshots.html) are great.
-
-Boot process interupt key is space.
 
 </details>
 
