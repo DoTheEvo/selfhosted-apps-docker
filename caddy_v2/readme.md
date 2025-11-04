@@ -585,7 +585,21 @@ map.{$MY_DOMAIN} {
 }
 ```
 
-In the monitoring section theres more use of logging and visualizing it in grafana.
+In the later monitoring section theres visualiziation of logs in grafana.
+
+For just **quick troubleshooting**.<br>
+If need to check requests reaching caddy, check if there is an issue
+if they are coming from local ip or wan side ip in case of dns problems... 
+
+```php
+test.{$MY_DOMAIN} {
+  log {
+      output file /data/logs/test-access.log
+      format console
+  }
+  reverse_proxy test:80
+}
+```
 
 # Caddy DNS challenge
 
