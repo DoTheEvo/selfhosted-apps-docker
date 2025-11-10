@@ -11,7 +11,7 @@
 3. [Jellyfin transcoding](#Jellyfin-transcoding)
 4. [Clients and Plugins](#Clients-and-Plugins)
 5. [Docker deploy](#Docker-deploy)
-6. [Specific setups](#Speciifc-setups)
+6. [Specific setups](#Specific-setups)
 7. [Troubleshooting](#Troubleshooting)
 
 # Purpose & Overview
@@ -38,7 +38,7 @@ various languages and frameworks.
 
 * a **video file** is a bunch of pictures - **frames**,
   packed in to one file.
-* To save disk space and bandwidth its **compressed** using a video standard/codec.
+* To save disk space and bandwidth it's **compressed** using a video standard/codec.
   * **H.262** - also called MPEG-2 - stuff of the past.
   * **H.264** - the most common now, also called **AVC** or MPEG-4.
   * **H.265** - also called **HEVC**, fast spreading, 50% improved over H.264,<br>
@@ -47,12 +47,12 @@ various languages and frameworks.
   * **AV1** - the future, no royalty fees, more improvements.
     The successor to VP9, which was developed by google.
 * Ways to transcode
-  * **Software** - cpu does the job, uses some library, it is **very cpu heavy**<br>
+  * **Software** - cpu does the job, uses some library, it's **very cpu heavy**<br>
     a phone doing a software playback would either stutter, or be through
     the entire battery in 30 minutes.
   * **Hardware** - there is a dedicated hardware - `ASIC` - a tiny part
     of a cpu/gpu/soc that is designed for just one thing -
-    to transcode a specific video standard. It is extremely efficient at it.
+    to transcode a specific video standard. It's extremely efficient at it.
 * `standard` vs `codec`
   * **Video Compression Standard** - set of specifications to follow, like a recipe,
     examples are H.264, H.265, AV1,..
@@ -139,14 +139,14 @@ That is unless you want to go 4K + HDR.
 ![tonemapping](https://i.imgur.com/kAz2HkY.gif)
 
 With 4K resolution often comes **HDR** - High Dynamic Range.<br>
-If its played on HDR device all is fine and theres better contrast and details.
+If it's played on HDR device all is fine and theres better contrast and details.
 But non-HDR devices need transcoding with tonemapping.<br>
 **Tonemapping** is what converts HDR content to **SDR** - Standard Dynamic Range.
 Without tonemapping the colors would be heavily desaturated - washed out.
 
 Some **clients**, like Findroid on android use mpv for playback, which somehow
 deals with the HDR to SDR conversion on its own.
-Might be better since its direct play, but might be worse because of putting load
+Might be better since it's direct play, but might be worse because of putting load
 on the device.
 
 ### Testing various hardware
@@ -168,9 +168,7 @@ Results
   * 4K+HDR+tonemapping - not tested
 * ryzen **8600G**
   * 10x streams FHD - [pass](https://i.imgur.com/9R60Spw.png)<br>
-    except [weird green artifacts](https://i.imgur.com/s4lSJRI.png)
-    for ~30sec when starting all 10 streams at once
-  * 4K+HDR+tonemapping - not tested
+  * 4K+HDR+tonemapping - [3 streams](https://i.imgur.com/CkT7Df6.jpeg)
   * AV1 encoding - [worked](https://i.imgur.com/ZaQRIAc.png)
 * intel **i5-12600k**
   * 10x streams FHD - [pass](https://i.imgur.com/BGXOeGS.png)
@@ -182,12 +180,16 @@ Results
   * 10x streams FHD - 6 max, otherwise stutter,
     [1 stream 185 fps](https://i.imgur.com/O5BfVZB.png)
   * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/wsrUoPe.png)
+* ryzen **7600X**
+  * 10x streams FHD - [pass](https://i.imgur.com/NAyfXmG.png)
+  * 4K+HDR+tonemapping - not tested
 
 Software used for monitoring the cpu and gpu usage
 
 * [btop](https://github.com/aristocratos/btop) 
 * `intel_gpu_top` from [intel-gpu-tools](https://archlinux.org/packages/extra/x86_64/intel-gpu-tools/) package
 * `radeontop` from [radeontop](https://archlinux.org/packages/extra/x86_64/radeontop/) package
+  and `rocm-smi-lib` to show in btop gpu load
 
 </details>
 
@@ -478,7 +480,7 @@ to check if autodiscovery port is open and server is responding:
 
 #### Unable to connect to the selected server right now
 
-*We're unable to connect to the selected server right now. Please ensure it is running and try again.*
+*We're unable to connect to the selected server right now. Please ensure it's running and try again.*
 
 * try opening the url in browsers private window
 * if that works then clear the cookies in your browser
