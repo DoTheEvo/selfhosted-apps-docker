@@ -792,6 +792,20 @@ Maybe one day I will bother to test?
 
 [Meanwhile](https://www.reddit.com/r/selfhosted/comments/1foxrlb/guide_setting_up_mtls_with_caddy_for_multiple/)
 
+# Update
+
+Manual image update:
+
+- edit the compose with the new version tag
+- `docker compose pull`
+- `docker compose up -d`
+- `docker image prune`
+
+If using `Dockerfile` then 
+
+- edit the Dockerfile with the new version tag
+- `docker compose up -d --build`
+
 # Monitoring
 
 ![dashboards](https://i.imgur.com/dMfxVQy.png)
