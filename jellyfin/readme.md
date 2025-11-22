@@ -167,19 +167,21 @@ Results
   * 10x streams FHD - [pass](https://i.imgur.com/nP71y0E.png)
   * 4K+HDR+tonemapping - not tested
 * ryzen **8600G**
-  * 10x streams FHD - [pass](https://i.imgur.com/9R60Spw.png)<br>
-  * 4K+HDR+tonemapping - [3 streams](https://i.imgur.com/CkT7Df6.jpeg)
+  * 10x streams FHD - [pass](https://i.imgur.com/9R60Spw.png),
+    [1 stream 288 fps](https://i.imgur.com/27sSJXV.png)
+  * 4K+HDR+tonemapping - [3 streams](https://i.imgur.com/CkT7Df6.jpeg),
+    [1 stream 86 fps](https://i.imgur.com/9AP80MO.png)
   * AV1 encoding - [worked](https://i.imgur.com/ZaQRIAc.png)
 * intel **i5-12600k**
   * 10x streams FHD - [pass](https://i.imgur.com/BGXOeGS.png)
   * 4K+HDR+tonemapping - [4 streams](https://i.imgur.com/yvP72UU.jpeg)
 * ryzen **4350GE**
   * 10x streams FHD - 6 max, otherwise stutter
-  * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/8iairvO.png)
+  * 4K+HDR+tonemapping - [1x stream 33 fps](https://i.imgur.com/8iairvO.png)
 * ryzen **5500GT**
   * 10x streams FHD - 6 max, otherwise stutter,
     [1 stream 185 fps](https://i.imgur.com/O5BfVZB.png)
-  * 4K+HDR+tonemapping - [1x stream](https://i.imgur.com/wsrUoPe.png)
+  * 4K+HDR+tonemapping - [1x stream 46 fps](https://i.imgur.com/wsrUoPe.png)
 * ryzen **7600X**
   * 10x streams FHD - [pass](https://i.imgur.com/NAyfXmG.png)
   * 4K+HDR+tonemapping - not tested
