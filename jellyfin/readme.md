@@ -144,47 +144,52 @@ But non-HDR devices need transcoding with tonemapping.<br>
 **Tonemapping** is what converts HDR content to **SDR** - Standard Dynamic Range.
 Without tonemapping the colors would be heavily desaturated - washed out.
 
-Some **clients**, like Findroid on android use mpv for playback, which somehow
-deals with the HDR to SDR conversion on its own.
-Might be better since it's direct play, but might be worse because of putting load
-on the device.
+Some **clients**, like Findroid on android use mpv for playback, which
+is able to do just tonemapping without the whole transcoding so it is almost
+as direct play in terms of load. 
 
 ### Testing various hardware
 
 Archlinux straight on metal, docker Jellyfin.<br>
 Testing [10x FHD streams](https://i.imgur.com/nP71y0E.png),
-and 4K+HDR+tonemapping till see stutter <br>
-Testing by running movies, x265 encoded, in edge under linux.<br>
-`Throttle Transcodes` is turned off so that the movies are transcoded in full,
-not just 3min segments. 
+and 4K HDR + tonemapping till see stutter <br>
+Testing by running movies, x265 encoded, in Edge under linux.<br>
+`Throttle Transcodes` is not enabled, so that the movies are transcoded in full,
+not just 3min segments.
 
-Results
+The testing changed over time, in the early testing I did not do 4K and focused
+more on power consumption. BTW power consumption can warry a lot depending 
+on the motherboard, network cards, C-states,.. numbers are just to give
+rough idea.
 
-* ryzen **7700X**
-  * 10x streams FHD - [pass](https://i.imgur.com/NAyfXmG.png)
-  * 4K+HDR+tonemapping - not tested
-* intel **n200**
-  * 10x streams FHD - [pass](https://i.imgur.com/nP71y0E.png)
-  * 4K+HDR+tonemapping - not tested
-* ryzen **8600G**
-  * 10x streams FHD - [pass](https://i.imgur.com/9R60Spw.png),
+* ryzen **7700X** - [22.4W](https://i.imgur.com/uxqzf6Q.png) idle
+  * [10x](https://i.imgur.com/NAyfXmG.png) FHD streams
+* intel **n200** miniPC MSI Cubi - [5W](https://i.imgur.com/DBIGtIG.png) idle
+  * [10x](https://i.imgur.com/nP71y0E.png) FHD streams
+* ryzen **8600G** - [14W](https://i.imgur.com/xtVm6nA.png) idle
+  * [10x](https://i.imgur.com/9R60Spw.png) FHD streams,
     [1 stream 288 fps](https://i.imgur.com/27sSJXV.png)
-  * 4K+HDR+tonemapping - [3 streams](https://i.imgur.com/CkT7Df6.jpeg),
+  * [3x](https://i.imgur.com/CkT7Df6.jpeg) 4K HDR + tonemapping,
     [1 stream 86 fps](https://i.imgur.com/9AP80MO.png)
   * AV1 encoding - [worked](https://i.imgur.com/ZaQRIAc.png)
-* intel **i5-12600k**
-  * 10x streams FHD - [pass](https://i.imgur.com/BGXOeGS.png)
-  * 4K+HDR+tonemapping - [4 streams](https://i.imgur.com/yvP72UU.jpeg)
-* ryzen **4350GE**
-  * 10x streams FHD - 6 max, otherwise stutter
-  * 4K+HDR+tonemapping - [1x stream 33 fps](https://i.imgur.com/8iairvO.png)
-* ryzen **5500GT**
-  * 10x streams FHD - 6 max, otherwise stutter,
+* intel **i5-12600k** - [14W](https://i.imgur.com/TIvozb9.png) idle
+  * [10x](https://i.imgur.com/BGXOeGS.png) FHD streams 
+  * [4x](https://i.imgur.com/yvP72UU.jpeg) 4K HDR + tonemapping
+* ryzen **4350GE** miniPC ThinkCentre M75q Gen2 - [4W](https://i.imgur.com/8js7ESW.png) idle
+  * 6x FHD streams
+  * 1x 4K HDR + tonemapping - [1x stream 33 fps](https://i.imgur.com/8iairvO.png)
+* ryzen **5500GT** - [16W](https://i.imgur.com/UANzgLd.png) idle
+  * 6x FHD streams,
     [1 stream 185 fps](https://i.imgur.com/O5BfVZB.png)
-  * 4K+HDR+tonemapping - [1x stream 46 fps](https://i.imgur.com/wsrUoPe.png)
-* ryzen **7600X**
-  * 10x streams FHD - [pass](https://i.imgur.com/NAyfXmG.png)
-  * 4K+HDR+tonemapping - not tested
+  * 1x 4K HDR + tonemapping - [1x stream 46 fps](https://i.imgur.com/wsrUoPe.png)
+* ryzen **7600X** - [23W](https://i.imgur.com/uCFJz4S.jpeg) idle
+  * 10x FHD streams 
+* ryzen **9600X** - [18W](https://i.imgur.com/OQoAOwr.jpeg) idle
+  * 5x FHD streams, 
+    [1 stream 148 fps](https://i.imgur.com/O3P66zX.png)
+  * 1x 4K HDR + tonemapping,
+    [1 stream 32 fps](https://i.imgur.com/347N12D.png)
+
 
 Software used for monitoring the cpu and gpu usage
 
