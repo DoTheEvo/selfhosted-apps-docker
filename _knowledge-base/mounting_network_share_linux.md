@@ -1,12 +1,12 @@
 # Mounting at Boot Network Shares
 
 Many ways to mount - fstab, autofs, systemd, fuse, gvfs,...<br>
-but the current go-to is **systemd mount**.
+**systemd mount** is the current go-to
 
 There are two distinct ways to mount with systemd
 
 * **mount** unit is enabled<br>
-  straight up simple mounting at boot, high expectation that the network share
+  straight up simple mounting at boot, expectation that the network share
   is always available during the boot, it's simple and easy to control
   order of execution, time outs, easy to debug,
   best for servers, docker hosts,...
@@ -51,9 +51,9 @@ on samba systemd mount
 
 ### Automount version
 
-If the machine is just an end user PC or a notebook that moves between networks
-and share is not always there...  we can use automount that mounts the share
-only when something tries to access the path.
+If the machine is just an end user PC, notebook that moves between networks
+...  we can use automount that mounts the share only when something tries
+to access the path.
 
 * **disable the mount unit** if already enabled:
   `sudo systemctl disable mnt-pool.mount`
@@ -151,7 +151,7 @@ detailed instructions.
     the block device we want to work with
   * format the sdx directly, no need for sdx1 partitioning
     if all the space is used.
-    It makes lsblk output cleaner, where iscsi devices easily recognizable.
+    It makes lsblk output cleaner, when iscsi devices are easily recognizable.
   * `sudo mkfs.ext4 /dev/sdx -L test_2`
 * **mount** the share somewhere and **take ownership**
   * `sudo mkdir /mnt/test_2`
@@ -218,4 +218,8 @@ information. Something like this:<br>
 
 ### iSCSI - windows
 
-...
+* run `iscsicpl.exe` - iSCSI Initiator
+* Set trueNAS ip as `Target`; Quick connect
+
+This connects the share as a block device and ads it to Favorite Targets,
+meaning the share is remounted on boot.
