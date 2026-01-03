@@ -41,8 +41,8 @@ Whats required before thinking about vlans.
 <details>
 <summary><h3>Some basic networking knowledge is required.</h3></summary>
 
-You should know about IP addresses, Mac addresses, packets, **frames**,
-swiches, routers, about existance of the first 4 OSI layers,..
+You should know about IP addresses, Mac addresses, packets, frames,
+swiches, routers, about existance of first 4 OSI layers,..
 
 * [What is OSI Model | Real World Examples](https://youtu.be/0y6FtKsg6J4)
 * [OSI Model Deep Dive](https://youtu.be/oVVlMqsLdro)
@@ -97,7 +97,7 @@ Some aspects:
 ### The Core concept
 
 The **absofucking essence** of VLANs is a clear understanding of two types
-of traffic - untagged and tagged.
+of ports - untagged and tagged.
 
 ![tagged_untagged_traffic](https://i.imgur.com/snTxTyf.gif)
 
