@@ -98,8 +98,7 @@ gatus.{$MY_DOMAIN} {
 More complex setups can use several config files,
 here is just an exaple how to monitor few web servers and use 
 [ntfy](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal)
-for alerts.
-
+for alerts.<br>
 Theres an extenstive [documentation](https://gatus.io/docs)
 and [github readmes](https://github.com/TwiN/gatus) for more detailed info,
 plus gatus got pretty popular so there are
@@ -132,7 +131,7 @@ endpoints:
     interval: 5m
     conditions:
       - "[STATUS] == 200"
-      - "[RESPONSE_TIME] < 500"
+      - "[RESPONSE_TIME] < 2000"
     alerts:
        - type: ntfy
 
@@ -142,9 +141,30 @@ endpoints:
     interval: 5m
     conditions:
       - "[STATUS] == 200"
-      - "[RESPONSE_TIME] < 500"
+      - "[RESPONSE_TIME] < 2000"
     alerts:
        - type: ntfy
+```
+
+### Certificate check
+
+You should have automatic cert renewal, I love caddy for that,
+but sometimes for geoblocking and dns reasons, you gotta do it manually.<br>
+Gatus checks cert automatically without you defining anything,
+but only once the certificate expire it would send an alert.
+
+To define it few days in advance...
+
+```
+- name: test1
+  url: "https://test1.lalala/"
+  interval: 5m
+  conditions:
+    - "[STATUS] == 200"
+    - "[RESPONSE_TIME] < 2000"
+    - "[CERTIFICATE_EXPIRATION] > 5d"
+  alerts:
+     - type: ntfy
 ```
 
 # Manual image update:
