@@ -34,12 +34,12 @@ Caddy with its build-in automatic https allows configs to be clean and simple
 and to just work.
 
 ```
-nextcloud.example.com {
-  reverse_proxy nextcloud-web:80
+photo.example.com {
+  reverse_proxy immich_server:2283
 }
 
-jellyfin.example.com {
-  reverse_proxy 192.168.1.20:80
+tv.example.com {
+  reverse_proxy jellyfin:8096
 }
 ```
 
@@ -234,7 +234,7 @@ If it is just quick testing one can use Opera browser
 and enable its build in VPN.<br>
 
 This edit of a host file works only on that one machine.
-To solve it for all devices theres need to to run dns server on the network,
+To solve it for all devices theres need to to run a dns server on the network,
 or running a higher tier firewall/router.  
 * [Here's](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/dnsmasq)
   a guide-by-example for dnsmasq.
