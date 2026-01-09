@@ -256,14 +256,16 @@ Run all the containers.
 Give Caddy time to get certificates, checking `docker logs caddy` as it goes,
 then visit the urls. It should lead to the services with https working.
 
-If something is fucky use `docker logs caddy` to see what is happening.<br>
+If something is fucky use `docker logs caddy` to see what is happening.
 Restarting the container `docker container restart caddy` can help.
 Or investigate inside `docker exec -it caddy /bin/sh`.
 For example trying to ping hosts that are suppose to be reachable,
-`ping nginx` should work.
+`ping nginx` should work.<br>
+I use [ctop](https://github.com/bcicen/ctop) for checking logs or execing in.
 
 There's also other possible issues, like bad port forwarding towards docker host,
 or ISP not providing you with publicly reachable IP.
+Check [this](https://github.com/DoTheEvo/selfhosted-apps-docker/blob/master/_knowledge-base/port_forwarding.md) port forwarding guide.
 
 *extra info:*<br>
 `docker exec -w /etc/caddy caddy caddy reload` reloads config
@@ -810,7 +812,7 @@ If using `Dockerfile` then
 
 ![dashboards](https://i.imgur.com/dMfxVQy.png)
 
-Prometheus, Grafana, Loki, Promtail are one way ot to get some sort of monitoring
+Prometheus, Grafana, Loki, Promtail are one way to get some sort of monitoring
 of Caddie's performance and logs, create dashboards from these data,
 like a geomap of IPs tha access caddy, and set up allerts for some events,...
 
