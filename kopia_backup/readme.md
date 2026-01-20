@@ -2,7 +2,7 @@
 
 ###### guide-by-example
 
-*Last update July 2025 kopia v0.21.1*
+*Last update January 2026 kopia v0.22.3*
 
 ![logo](https://i.imgur.com/A2mosM6.png)
 
@@ -733,6 +733,7 @@ The backup script contains example commands, just commented out.
 
 * `kopia content stats`
 * `kopia repo status`
+* `kopia maintenance info`
 * `kopia cache info`
 * `kopia snap list --all`
 * `kopia mount all /mnt/temp &`
