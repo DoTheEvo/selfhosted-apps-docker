@@ -175,7 +175,7 @@ rough idea.
 * intel **i5-12600k** - [14W](https://i.imgur.com/TIvozb9.png) idle
   * [10x](https://i.imgur.com/BGXOeGS.png) FHD streams 
   * [4x](https://i.imgur.com/yvP72UU.jpeg) 4K HDR + tonemapping
-* ryzen **4350GE** miniPC ThinkCentre M75q Gen2 - [4W](https://i.imgur.com/8js7ESW.png) idle
+* ryzen **4350GE** miniPC ThinkCentre M75q Gen2 - [4W](https://i.imgur.com/S7NL4GD.png) idle
   * 6x FHD streams
   * 1x 4K HDR + tonemapping - [1x stream 33 fps](https://i.imgur.com/8iairvO.png)
 * ryzen **5500GT** - [16W](https://i.imgur.com/UANzgLd.png) idle
@@ -189,6 +189,9 @@ rough idea.
     [1 stream 148 fps](https://i.imgur.com/O3P66zX.png)
   * 1x 4K HDR + tonemapping,
     [1 stream 32 fps](https://i.imgur.com/347N12D.png)
+* ultra7 **265k** - [19W](https://i.imgur.com/DnIRBO1.jpeg) idle
+  * 1 stream [633 fps](https://i.imgur.com/eXUldZm.png)
+  * 1 stream 4K HDR + tonemapping [200fps](https://i.imgur.com/ktr6erU.png)
 
 
 Software used for monitoring the cpu and gpu usage
