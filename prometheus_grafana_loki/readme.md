@@ -91,15 +91,22 @@ Prometheus is relatively young project, it is a **pull type** monitoring.
 * `prometheus.yml` - a configuration file for prometheus
 
 The three files must be provided.</br>
-The directories are created by docker compose on the first run.
+Usually the directories are created by docker compose on the first run,
+but now we want to create them manualy because of ownership issues.
+Previously we just run the containers as root to avoid dealing with it,
+but since thats not recommended...
+
+be in terminal, in your directory containing the composes file.
+
+* `mkdir -p prometheus_data grafana_data` - create the direcotries
+* `sudo chown 65534:65534 prometheus_data && sudo chown 472:472 grafana_data` - change the ownership
 
 # docker-compose
 
 * **Prometheus** - The official image used. Few extra commands passing configuration.
-  Of note is 240 hours(10days) **retention** policy.
+  Of note is 240 hours(10days) or 10GB max **retention** policy.
 * **Grafana** - The official image used. Bind mounted directory
-  for persistent data storage. User sets **as root**, as it solves issues I am
-  lazy to investigate, likely me editing some files as root.
+  for persistent data storage. 
 * **NodeExporter** - An exporter for linux machines,
   in this case gathering the **metrics** of the docker host,
   like uptime, cpu load, memory use, network bandwidth use, disk space,...<br>
@@ -107,7 +114,9 @@ The directories are created by docker compose on the first run.
 * **cAdvisor** - An exporter for gathering docker **containers** metrics,
   showing cpu, memory, network use of **each container**<br>
   Runs in `privileged` mode and has some bind mounts of system directories
-  to have access to required info.
+  to have access to required info.<br>
+  The three commands - housekeeping, docker only, disable metrics are there
+  to lesser the cpu load of this container.
 
 *Note* - ports are only `expose`, since expectation of use of a reverse proxy
 and accessing the services by hostname, not ip and port.
@@ -118,49 +127,50 @@ services:
 
   # MONITORING SYSTEM AND THE METRICS DATABASE
   prometheus:
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:v3.13.2
     container_name: prometheus
     hostname: prometheus
-    user: root
     restart: unless-stopped
-    depends_on:
-      - cadvisor
+    init: true
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=240h'
+      - '--storage.tsdb.retention.size=10GB'
       - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
     volumes:
       - ./prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
     expose:
       - "9090"
-    labels:
-      org.label-schema.group: "monitoring"
 
   # WEB BASED UI VISUALISATION OF METRICS
   grafana:
-    image: grafana/grafana:9.4.3
+    image: grafana/grafana:13.1.3
     container_name: grafana
     hostname: grafana
-    user: root
     restart: unless-stopped
+    init: true
     env_file: .env
     volumes:
       - ./grafana_data:/var/lib/grafana
     expose:
       - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
 
   # HOST LINUX MACHINE METRICS EXPORTER
   nodeexporter:
-    image: prom/node-exporter:v1.5.0
+    image: prom/node-exporter:v1.12.1
     container_name: nodeexporter
     hostname: nodeexporter
     restart: unless-stopped
+    init: true
+    network_mode: host
+    pid: host
     command:
       - '--path.procfs=/host/proc'
       - '--path.rootfs=/rootfs'
@@ -172,15 +182,14 @@ services:
       - /:/rootfs:ro
     expose:
       - "9100"
-    labels:
-      org.label-schema.group: "monitoring"
 
   # DOCKER CONTAINERS METRICS EXPORTER
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.1
+    image: ghcr.io/google/cadvisor:v0.60.5
     container_name: cadvisor
     hostname: cadvisor
     restart: unless-stopped
+    init: true
     privileged: true
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -189,15 +198,16 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
     expose:
-      - "3000"
-    labels:
-      org.label-schema.group: "monitoring"
+      - "8080"
+    command:
+      - --housekeeping_interval=30s
+      - --docker_only=true
+      - --disable_metrics=tcp,udp,percpu,sched,process,hugetlb,referenced_memory,cpu_topology,resctrl
 
 networks:
   default:
-    name: $DOCKER_MY_NETWORK
+    name: caddy_net
     external: true
 ```
 
@@ -205,7 +215,6 @@ networks:
 
 ```bash
 # GENERAL
-DOCKER_MY_NETWORK=caddy_net
 TZ=Europe/Bratislava
 
 # GRAFANA
@@ -214,13 +223,12 @@ GF_SECURITY_ADMIN_PASSWORD=admin
 GF_USERS_ALLOW_SIGN_UP=false
 # GRAFANA EMAIL
 GF_SMTP_ENABLED=true
-GF_SMTP_HOST=smtp-relay.sendinblue.com:587
+GF_SMTP_HOST=smtp-relay.brevo.com:587
 GF_SMTP_USER=example@gmail.com
 GF_SMTP_PASSWORD=xzu0dfFhn3eqa
 ```
 
 **All containers must be on the same network**.</br>
-Which is named in the `.env` file.</br>
 If one does not exist yet: `docker network create caddy_net`
 
 ## prometheus.yml
@@ -232,13 +240,13 @@ Contains the bare minimum settings of targets from where metrics are to be pulle
 `prometheus.yml`
 ```yml
 global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
+  scrape_interval:     30s
+  evaluation_interval: 30s
 
 scrape_configs:
   - job_name: 'nodeexporter'
     static_configs:
-      - targets: ['nodeexporter:9100']
+      - targets: ['host.docker.internal:9100']
 
   - job_name: 'cadvisor'
     static_configs:
@@ -268,26 +276,18 @@ prom.{$MY_DOMAIN} {
 ## First run and Grafana configuration
 
 * Login **admin/admin** to `graf.example.com`, change the password.
-* **Add** Prometheus as a **Data source** in Configuration<br>
+* **Add** Prometheus as a **Data source** in Connections<br>
   Set **URL** to `http://prometheus:9090`<br>
+  Set **Scrape interval** to `30s`
 * **Import** dashboards from [json files in this repo](dashboards/)<br>
 
-These **dashboards** are the preconfigured ones from
-[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom)
-with **few changes**.<br>
-**Docker host** dashboard did not show free disk space for me, **had to change fstype**
-from `aufs` to `ext4`.
-Also included is [a fix](https://github.com/stefanprodan/dockprom/issues/18#issuecomment-487023049)
-for **host network monitoring** not showing traffick. In all of them
-the default time interval is set to 1h instead of 15m
+**Dashboards** used in the past were the preconfigured ones from
+[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom),
+but with grafana v12 a new dashboard schema and so the old dashboard dont work anymore.
 
-* **docker_host.json** - dashboard showing linux docker host metrics
-* **docker_containers.json** - dashboard showing docker containers metrics,
-  except the ones labeled as `monitoring` in the compose file
-* **monitoring_services.json** - dashboar showing docker containers metrics
-  of containers that are labeled `monitoring`
+So I had Claude make some basic dashboard to monitor a docker hosts and the containers.
 
-![interface-pic](https://i.imgur.com/wzwgBkp.png)
+![dash-pic](https://i.imgur.com/6Rx6Aau.png)
 
 ---
 ---
@@ -350,7 +350,6 @@ Links
 # Pushgateway
 
 Gives freedom to **push** information in to prometheus from **anywhere**.<br>
-
 Be aware that it should **not be abused** to turn prometheus in to push type
 monitoring. It is only intented for
 [specific situations.](https://github.com/prometheus/pushgateway/blob/master/README.md)
@@ -369,7 +368,7 @@ To **add** pushgateway functionality to the current stack:
 
   # PUSHGATEWAY FOR PROMETHEUS
   pushgateway:
-    image: prom/pushgateway:v1.5.1
+    image: prom/pushgateway:v1.11.3
     container_name: pushgateway
     hostname: pushgateway
     restart: unless-stopped
@@ -380,7 +379,7 @@ To **add** pushgateway functionality to the current stack:
 
   networks:
   default:
-    name: $DOCKER_MY_NETWORK
+    name: caddy_net
     external: true
   ```
   </details>
@@ -409,8 +408,8 @@ To **add** pushgateway functionality to the current stack:
 
   ```yml
   global:
-    scrape_interval:     15s
-    evaluation_interval: 15s
+    scrape_interval:     30s
+    evaluation_interval: 30s
 
   scrape_configs:
     - job_name: 'pushgateway-scrape'
@@ -446,10 +445,11 @@ To **wipe** the pushgateway clean<br>
 ### The real world use
 
 * [**Veeam Prometheus Grafana**](https://github.com/DoTheEvo/veeam-prometheus-grafana) 
+* [**Kopia Prometheus Grafana**](https://github.com/DoTheEvo/kopia-prometheus-grafana) 
 
-Linked above is a guide-by-example with more info on **pushgateway setup**.<br>
+Linked above are guide-by-examples with more info on **pushgateway setup**.<br>
 A real world use to **monitor backups**, along with pushing metrics
-from **windows in powershell**.<br>
+from **windows in powershell** for veeam, or with **golang** for kopia.<br>
 
 ![veeam-dash](https://i.imgur.com/dUyzuyl.png)
 
@@ -458,196 +458,8 @@ from **windows in powershell**.<br>
 
 # Alertmanager
 
-To send a **notification** about some **metric** breaching some preset **condition**.<br>
-Notifications channels used here are **email** and
-[**ntfy**](https://github.com/DoTheEvo/selfhosted-apps-docker/tree/master/gotify-ntfy-signal) 
-
-*Note*<br>
-I myself am **not** planning on using alertmanager. 
-Grafana can do alerts for both logs and metrics.
-
-![alert](https://i.imgur.com/b4hchSu.png)
-
-## The setup
-
-To **add** alertmanager to the current stack:
-
-* **New file** - `alertmanager.yml` to be **bind mounted** in alertmanager container.<br>
-  This is the **configuration** on how and where **to deliver** alerts.<br>
-  Correct smtp or ntfy info needs to be filled out.
-
-  <details>
-  <summary>alertmanager.yml</summary>
-
-  ```yml
-  route:
-    receiver: 'email'
-
-  receivers:
-    - name: 'ntfy'
-      webhook_configs:
-      - url: 'https://ntfy.example.com/alertmanager'
-        send_resolved: true
-        
-    - name: 'email'
-      email_configs:
-      - to: 'whoever@example.com'
-        from: 'alertmanager@example.com'
-        smarthost: smtp-relay.sendinblue.com:587
-        auth_username: '<registration_email@gmail.com>'
-        auth_identity: '<registration_email@gmail.com>'
-        auth_password: '<long ass generated SMTP key>'
-  ```
-  </details>
-
-* **New file** - `alert.rules` to be **bind mounted** in to prometheus container<br>
-  This file **defines** at what value a metric becomes an **alert** event.
-
-  <details>
-  <summary>alert.rules</summary>
-
-  ```yml
-  groups:
-    - name: host
-      rules:
-        - alert: DiskSpaceLow
-          expr: sum(node_filesystem_free_bytes{fstype="ext4"}) > 19
-          for: 10s
-          labels:
-            severity: critical
-          annotations:
-            description: "Diskspace is low!"
-  ```
-  </details>
-
-* **Changed** `prometheus.yml`. Added **alerting section** that points to alertmanager
-  container, and also **set path** to a `rules` file.
-
-  <details>
-  <summary>prometheus.yml</summary>
-
-  ```yml
-  global:
-    scrape_interval:     15s
-    evaluation_interval: 15s
-
-  scrape_configs:
-    - job_name: 'nodeexporter'
-      static_configs:
-        - targets: ['nodeexporter:9100']
-
-    - job_name: 'cadvisor'
-      static_configs:
-        - targets: ['cadvisor:8080']
-
-    - job_name: 'prometheus'
-      static_configs:
-        - targets: ['localhost:9090']
-
-  alerting:
-    alertmanagers:
-    - scheme: http
-      static_configs:
-      - targets: 
-        - 'alertmanager:9093'
-
-  rule_files:
-    - '/etc/prometheus/rules/alert.rules'
-  ```
-  </details>
-
-* **New container** - `alertmanager` added to the compose file and **prometheus
-  container** has bind mount **rules file** added.
-
-  <details>
-    <summary>docker-compose.yml</summary>
-
-  ```yml
-  services:
-
-    # MONITORING SYSTEM AND THE METRICS DATABASE
-    prometheus:
-      image: prom/prometheus:v2.42.0
-      container_name: prometheus
-      hostname: prometheus
-      user: root
-      restart: unless-stopped
-      depends_on:
-        - cadvisor
-      command:
-        - '--config.file=/etc/prometheus/prometheus.yml'
-        - '--storage.tsdb.path=/prometheus'
-        - '--web.console.libraries=/etc/prometheus/console_libraries'
-        - '--web.console.templates=/etc/prometheus/consoles'
-        - '--storage.tsdb.retention.time=240h'
-        - '--web.enable-lifecycle'
-      volumes:
-        - ./prometheus_data:/prometheus
-        - ./prometheus.yml:/etc/prometheus/prometheus.yml
-        - ./alert.rules:/etc/prometheus/rules/alert.rules
-      expose:
-        - "9090"
-      labels:
-        org.label-schema.group: "monitoring"
-
-    # ALERT MANAGMENT FOR PROMETHEUS
-    alertmanager:
-      image: prom/alertmanager:v0.25.0
-      container_name: alertmanager
-      hostname: alertmanager
-      user: root
-      restart: unless-stopped
-      volumes:
-        - ./alertmanager.yml:/etc/alertmanager.yml
-        - ./alertmanager_data:/alertmanager
-      command:
-        - '--config.file=/etc/alertmanager.yml'
-        - '--storage.path=/alertmanager'
-      expose:
-        - "9093"
-      labels:
-        org.label-schema.group: "monitoring"
-
-  networks:
-    default:
-      name: $DOCKER_MY_NETWORK
-      external: true
-  ```
-  </details>
-
-* **Adding** alertmanager to the **Caddyfile** of the reverse proxy so that
-  it can be reached at `https://alert.example.com`. **Not necessary**,
-  but useful as it **allows to send alerts from anywhere**,
-  not just from prometheus, or other containers on same docker network.
-
-  <details>
-  <summary>Caddyfile</summary>
-
-  ```php
-  alert.{$MY_DOMAIN} {
-      reverse_proxy alertmanager:9093
-  }
-  ```
-  </details>  
-
-## The basics
-
-![alert](https://i.imgur.com/C7g0xJt.png)
-
-
-Once above setup is done, **an alert** about low disk space **should fire**
-and a **notification** email should come.<br>
-In `alertmanager.yml` a switch from email **to ntfy** can be done.
-
-*Useful*
-
-* **alert** from anywhere using **curl**:<br>
-  `curl -H 'Content-Type: application/json' -d '[{"labels":{"alertname":"blabla"}}]' https://alert.example.com/api/v1/alerts`
-* **reload rules**:<br>
-  `curl -X POST https://prom.example.com/-/reload`
-
-[stefanprodan/dockprom](https://github.com/stefanprodan/dockprom#define-alerts)
-has more detailed section on alerting worth checking out.    
+scrapping this section, september 2026<br>
+grafana alerting will be used, probably that one should have a section
 
 ---
 ---
@@ -658,7 +470,6 @@ has more detailed section on alerting worth checking out.
 
 Loki is a log aggregation tool, made by the grafana team.
 Sometimes called a Prometheus for logs, it's a **push** type monitoring.<br>
-
 It uses [LogQL](https://promcon.io/2019-munich/slides/lt1-08_logql-in-5-minutes.pdf)
 for queries, which is similar to PromQL in its use of labels.
 
@@ -671,12 +482,13 @@ There are two ways to **push logs** to Loki from a docker container.
     `/etc/docker/daemon.json` or per container in compose files.<br>
     It's the simpler, easier way, but **lacks fine control** over the logs
     being pushed.
-  * **[Promtail](https://grafana.com/docs/loki/latest/clients/promtail/)**
-    deployed as an another **container**, with bind mount of logs it should scrape,
+  * **[Alloy](https://grafana.com/docs/loki/latest/send-data/alloy/)**
+    (successsor of promtail)deployed as an another **container**, with bind mount of logs it should scrape,
     and bind mount of its config file. This config file is very powerful,
-    giving a lot of **control** how logs are processed and pushed.
+    giving a lot of **control** how logs are processed and pushed.<br>
+    Can also just run with an open port, waiting for others to push logs to it.
 
-![loki_arch](https://i.imgur.com/aoMPrVV.png)
+![loki_arch](https://i.imgur.com/6VVMURr.png)
 
 ## Loki setup
 
@@ -692,7 +504,7 @@ There are two ways to **push logs** to Loki from a docker container.
 
     # LOG MANAGMENT WITH LOKI
     loki:
-      image: grafana/loki:main-0295fd4
+      image: grafana/loki:3.7.6
       container_name: loki
       hostname: loki
       user: root
@@ -704,12 +516,10 @@ There are two ways to **push logs** to Loki from a docker container.
         - '-config.file=/etc/loki-config.yml'
       ports:
         - "3100:3100"
-      labels:
-        org.label-schema.group: "monitoring"
 
   networks:
     default:
-      name: $DOCKER_MY_NETWORK
+      name: caddy_net
       external: true
   ```
   </details>
@@ -745,38 +555,30 @@ There are two ways to **push logs** to Loki from a docker container.
       kvstore:
         store: inmemory
 
-  # --- disable splitting to fix "too many outstanding requests"
-
   query_range:
     parallelise_shardable_queries: false
-
-  # ---  compactor to have control over length of data retention
 
   compactor:
     working_directory: /loki/compactor
     compaction_interval: 10m
     retention_enabled: true
+    delete_request_store: filesystem
     retention_delete_delay: 2h
     retention_delete_worker_count: 150
 
   limits_config:
-    retention_period: 240h
-    split_queries_by_interval: 0  # part of disable splitting fix
-
-  # -------------------------------------------------------
+    retention_period: 720h
+    split_queries_by_interval: 0
 
   schema_config:
     configs:
-      - from: 2020-10-24
-        store: boltdb-shipper
+      - from: 2026-01-01
+        store: tsdb
         object_store: filesystem
-        schema: v11
+        schema: v13
         index:
           prefix: index_
           period: 24h
-
-  ruler:
-    alertmanager_url: http://alertmanager:9093
 
   analytics:
     reporting_enabled: false
@@ -808,9 +610,9 @@ There are two ways to **push logs** to Loki from a docker container.
     ```
     </details>
 
-* #### promtail
+* #### Alloy
 
-  * Containers that should be monitored with **promtail** need it **added**
+  * Containers that should be monitored with **Alloy** need it **added**
     **to** their **compose** file, and made sure that it has access to the log files.
 
     <details>
@@ -828,21 +630,22 @@ There are two ways to **push logs** to Loki from a docker container.
         tty: true
         stdin_open: true
         ports:
-          - 25565:25565     # minecraft server players connect
+          - 25565:25565
         volumes:
           - ./minecraft_data:/data
 
       # LOG AGENT PUSHING LOGS TO LOKI
-      promtail:
-        image: grafana/promtail
-        container_name: minecraft-promtail
-        hostname: minecraft-promtail
+      alloy:
+        image: grafana/alloy:latest
+        container_name: minecraft-alloy
+        hostname: minecraft-alloy
         restart: unless-stopped
         volumes:
           - ./minecraft_data/logs:/var/log/minecraft:ro
-          - ./promtail-config.yml:/etc/promtail-config.yml
+          - ./config.alloy:/etc/alloy/config.alloy:ro
         command:
-          - '-config.file=/etc/promtail-config.yml'
+          - run
+          - /etc/alloy/config.alloy
 
     networks:
       default:
@@ -874,42 +677,51 @@ There are two ways to **push logs** to Loki from a docker container.
           - ./caddy_logs:/var/log/caddy
 
       # LOG AGENT PUSHING LOGS TO LOKI
-      promtail:
-        image: grafana/promtail
-        container_name: caddy-promtail
-        hostname: caddy-promtail
+      alloy:
+        image: grafana/alloy:latest
+        container_name: caddy-alloy
+        hostname: caddy-alloy
         restart: unless-stopped
         volumes:
           - ./caddy_logs:/var/log/caddy:ro
-          - ./promtail-config.yml:/etc/promtail-config.yml
+          - ./config.alloy:/etc/alloy/config.alloy:ro
         command:
-          - '-config.file=/etc/promtail-config.yml'
+          - run
+          - /etc/alloy/config.alloy
 
     networks:
       default:
         name: $DOCKER_MY_NETWORK
         external: true
-
     ```
     </details>
 
-  * Generic **config file for promtail**, needs to be bind mounted 
+  * Generic **config file for alloy**, needs to be bind mounted
+    in to alloy container
 
     <details>
-    <summary>promtail-config.yml</summary>
+    <summary>config.alloy</summary>
 
     ```yml
-    clients:
-      - url: http://loki:3100/loki/api/v1/push
+    local.file_match "logs" {
+      path_targets = [
+        {
+          "__path__" = "/var/log/blablabla/*.log",
+          "job"      = "blablabla_log",
+        },
+      ]
+    }
 
-    scrape_configs:
-      - job_name: blablabla
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: blablabla_log
-              __path__: /var/log/blablabla/*.log
+    loki.source.file "logs" {
+      targets    = local.file_match.logs.targets
+      forward_to = [loki.write.default.receiver]
+    }
+
+    loki.write "default" {
+      endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+      }
+    }
     ```
     </details>
 
@@ -918,12 +730,16 @@ There are two ways to **push logs** to Loki from a docker container.
 * In **grafana**, loki needs to be added as a **datasource**, `http://loki:3100`
 * In **Explore section**, switch to Loki as source
   * if loki-docker-driver then filter by `container_name` or `compose_project`
-  * if promtail then filter by job name set in promtail config
-    in the labels section
+  * if alloy then filter by job name set in `config.alloy`
 
 If all was set correctly logs should be visible in Grafana.
 
 ![query](https://i.imgur.com/XSevjIR.png)
+
+
+**work in progress switching from promtail to alloy**<br>
+**work in progress switching from promtail to alloy**<br>
+**work in progress switching from promtail to alloy**<br>
 
 # Minecraft Loki example
 
@@ -1663,3 +1479,7 @@ that makes daily snapshot of the entire directory.
 * delete the entire monitoring directory</br>
 * from the backup copy back the monitoring directory</br>
 * start the containers `docker-compose up -d`
+
+# Other resources
+
+* [Prometheus: How We Slashed Memory Usage](https://devoriales.com/post/384/prometheus-how-we-slashed-memory-usage)
