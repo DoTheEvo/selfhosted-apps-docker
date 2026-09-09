@@ -34,6 +34,7 @@
 * [wireguard](wireguard/) - the one and only VPN to ever consider
 * [wg-easy](wg-easy/) - wireguard in docker with web gui
 * [zammad](zammad/) - ticketing system
+* [reportburster](reportburster/) - BI application and an alternative to commercial software like Crystal Reports, SSRS, Tableau, or even Power BI
 * [arch_linux_host_install](arch_linux_host_install)
 
 Can also just check the directories listed at the top for work in progress
