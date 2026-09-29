@@ -385,13 +385,29 @@ Kopia should now run on boot and be easy to manage through web GUI.<br>
 Be it creating backup jobs, mounting old snapshots to restore files,
 or just looking around if all works as it should.
 
-All relevant files are in `C:\Kopia`, from binaries, `repository.config`, to logs.
+All relevant files are in `C:\Kopia`, binaries, `repository.config`, logs, cache,..
 
 Before shawl, task scheduler was used.<br>
 This [matushorvath/Kopia as Windows Service](https://gist.github.com/matushorvath/dd7148c201ceae03ddebc1b4bbef4d20)
 guide helped move beyond that. It contains more info if one would want to 
 actually run as server repository for other machines.<br>
 Also use of [nssm](https://nssm.cc/) is popular.
+
+### Some notes
+
+* You can run kopia sersvice as any user you want,
+  often one having same credentials as network share saves on some tinkering
+* Password to a repository is stored under the windows user you first run it,
+  if you change the user, kopia wont start until you delete `repository.config`.
+  Afterwards kopia starts normally under any user, you just have to mount
+  repo again.
+* If writing a sript you you should set `$env:KOPIA_CONFIG_PATH="C:\Kopia\repository.config"`<br>
+  but we cant pass password to unlock the repo, so plan to use a user
+  that has the credentials saved.
+* in the `kopia_server_deploy_service_win` folder there is a powershell script
+  that regularly checks path and any shareit finds is added as a new policy,
+  inheriting from global - `check_and_add_NAS_shares.ps1`
+
 
 ### Problem with access to password protected network shares
 

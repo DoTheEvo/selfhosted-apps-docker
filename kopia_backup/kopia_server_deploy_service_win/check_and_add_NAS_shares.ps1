@@ -5,7 +5,7 @@ $env:KOPIA_CONFIG_PATH = "C:\Kopia\repository.config"
 
 # Get list of shares from the NAS
 $Shares = net view "\\$NasName" | ForEach-Object {
-    if ($_ -match '^(\S+)\s+Disk\s*$') {
+    if ($_ -match '^(\S+)\s+Disk\s') {
         $matches[1]
     }
 } | Where-Object { $_ -notin $Excluded }
