@@ -8,8 +8,10 @@
 
 Automatic updates of docker containers.
 
-* [Github](https://github.com/containrrr/watchtower)
-* [DockerHub image used](https://hub.docker.com/r/containrrr/watchtower)
+* [Github](https://github.com/openserbia/watchtower)
+* [DockerHub image used](https://hub.docker.com/r/openserbia/watchtower)
+
+> The original [`containrrr/watchtower`](https://github.com/containrrr/watchtower) was archived (read-only) on 2025-12-17 and no longer works on current Docker Engine (28/29). This guide uses the actively maintained, drop-in fork [`openserbia/watchtower`](https://github.com/openserbia/watchtower) — same flags, labels, and behavior, just a different image name. Other maintained forks (e.g. `nicholas-fedor/watchtower`) work too.
 
 Watchtower is an application that will monitor the running Docker containers
 and watch for changes to the images that those containers
@@ -47,7 +49,7 @@ version: '3'
 services:
 
   watchtower:
-    image: containrrr/watchtower:latest
+    image: openserbia/watchtower:latest
     container_name: watchtower
     hostname: watchtower
     restart: unless-stopped
